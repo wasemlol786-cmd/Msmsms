@@ -315,6 +315,64 @@
 
 </div>
 
+    <!-- Welcome / Profile Modal -->
+<div
+    class="modal"
+    id="profileModal"
+    aria-hidden="true"
+>
+
+    <div class="modal-box profile-modal-box">
+
+        <div class="profile-welcome-icon">
+            <i class="fa-solid fa-file-lines"></i>
+        </div>
+
+        <h2>Welcome to FileForge</h2>
+
+        <p>
+            Choose a display name for your workspace.
+        </p>
+
+        <div class="modal-content">
+
+            <label for="displayNameInput">
+                Display Name
+            </label>
+
+            <input
+                type="text"
+                id="displayNameInput"
+                placeholder="Example: Mohamed"
+                maxlength="30"
+                autocomplete="off"
+            >
+
+            <small>
+                You can change your name once every 7 days.
+            </small>
+
+        </div>
+
+        <div class="modal-actions">
+
+            <button
+                class="create-btn"
+                id="saveProfileBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+                Continue
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 <!-- Main JavaScript File -->
 <script src="script.js"></script>
