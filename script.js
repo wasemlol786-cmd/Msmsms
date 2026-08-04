@@ -1,415 +1,637 @@
-/* ================================
-FileForge - Main Styles
-================================ */
+/* =================================
+FileForge - Main JavaScript
+================================= */
 
-@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,400&family=Great+Vibes&display=swap");
+/* =================================
+Elements
+================================= */
+const newFileBtn = document.getElementById("newFileBtn");
+const createFileBtn = document.getElementById("createFileBtn");
+const newFolderBtn = document.getElementById("newFolderBtn");
+const mobileFileUpload = document.getElementById("mobileFileUpload");
 
-/* Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+const newFileModal = document.getElementById("newFileModal");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const cancelFileBtn = document.getElementById("cancelFileBtn");
+const confirmCreateBtn = document.getElementById("confirmCreateBtn");
+const newFileName = document.getElementById("newFileName");
+
+const newFolderModal = document.getElementById("newFolderModal");
+const closeFolderModalBtn = document.getElementById("closeFolderModalBtn");
+const cancelFolderBtn = document.getElementById("cancelFolderBtn");
+const confirmCreateFolderBtn = document.getElementById("confirmCreateFolderBtn");
+const newFolderName = document.getElementById("newFolderName");
+
+const confirmModal = document.getElementById("confirmModal");
+const confirmTitle = document.getElementById("confirmTitle");
+const confirmMessage = document.getElementById("confirmMessage");
+const confirmCancelBtn = document.getElementById("confirmCancelBtn");
+const confirmOkBtn = document.getElementById("confirmOkBtn");
+
+const fileList = document.getElementById("fileList");
+const fileCount = document.getElementById("fileCount");
+const searchFiles = document.getElementById("searchFiles");
+const breadcrumbs = document.getElementById("breadcrumbs");
+
+const fileName = document.getElementById("fileName");
+const textEditor = document.getElementById("textEditor");
+const activeFileHeaderIcon = document.getElementById("activeFileHeaderIcon");
+const fontStyleSelect = document.getElementById("fontStyleSelect");
+
+const lineCount = document.getElementById("lineCount");
+const wordCount = document.getElementById("wordCount");
+const characterCount = document.getElementById("characterCount");
+const saveStatus = document.getElementById("saveStatus");
+
+const downloadBtn = document.getElementById("downloadBtn");
+const clearBtn = document.getElementById("clearBtn");
+const deleteBtn = document.getElementById("deleteBtn");
+
+const tabFiles = document.getElementById("tabFiles");
+const tabNotes = document.getElementById("tabNotes");
+const explorerView = document.getElementById("explorerView");
+const notesView = document.getElementById("notesView");
+const quickNotesArea = document.getElementById("quickNotesArea");
+
+/* =================================
+Profile Elements
+================================= */
+const profileModal = document.getElementById("profileModal");
+const displayNameInput = document.getElementById("displayNameInput");
+const saveProfileBtn = document.getElementById("saveProfileBtn");
+const closeProfileBtn = document.getElementById("closeProfileBtn");
+const profileChipBtn = document.getElementById("profileChipBtn");
+const topbarUserName = document.getElementById("topbarUserName");
+const profileCooldownMsg = document.getElementById("profileCooldownMsg");
+
+const PROFILE_KEY = "fileforge_profile_v2";
+const STORAGE_KEY = "fileforge_files_v2";
+const NOTES_KEY = "fileforge_quick_notes_v1";
+
+let userProfile = null;
+let items = [];
+let activeFileId = null;
+let currentFolderId = "root";
+let onConfirmCallback = null;
+
+/* =================================
+Extension & Icon Mapper
+================================= */
+function getFileIconClass(filename) {
+    if (!filename.includes(".")) return "fa-regular fa-file-code";
+    const ext = filename.split(".").pop().toLowerCase();
+
+    const iconMap = {
+        js: "fa-brands fa-js",
+        ts: "fa-solid fa-code",
+        py: "fa-brands fa-python",
+        html: "fa-brands fa-html5",
+        css: "fa-brands fa-css3-alt",
+        json: "fa-solid fa-code",
+        cpp: "fa-solid fa-c",
+        c: "fa-solid fa-c",
+        java: "fa-brands fa-java",
+        php: "fa-brands fa-php",
+        react: "fa-brands fa-react",
+        vue: "fa-brands fa-vuejs",
+        md: "fa-solid fa-file-pen",
+        txt: "fa-regular fa-file-lines"
+    };
+
+    return iconMap[ext] || "fa-regular fa-file-code";
 }
 
-html, body {
-  width: 100%;
-  height: 100%;
+/* =================================
+Load & Save Data
+================================= */
+function loadData() {
+    try {
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            const parsed = JSON.parse(savedData);
+            if (Array.isArray(parsed)) items = parsed;
+        }
+
+        const savedNotes = localStorage.getItem(NOTES_KEY);
+        if (savedNotes) quickNotesArea.value = savedNotes;
+    } catch (e) {
+        console.error("Load error:", e);
+        items = [];
+    }
 }
 
-:root {
-  --background: #090b10;
-  --background-soft: #10131a;
-  --panel: #141821;
-  --panel-light: #1a1f2a;
-  --border: #282f3d;
-  --border-light: #353e4f;
-  --text: #f3f5f8;
-  --text-soft: #9ba4b5;
-  --text-dark: #687184;
-  --primary: #6d5dfc;
-  --primary-light: #887cff;
-  --danger: #ff5268;
-  --success: #38d996;
-  --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+function saveData() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        showSavedStatus();
+    } catch (e) {
+        console.error("Save error:", e);
+        saveStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Save failed`;
+    }
 }
 
-body {
-  background: radial-gradient(circle at top right, rgba(109, 93, 252, 0.13), transparent 35%), var(--background);
-  color: var(--text);
-  font-family: "Inter", Arial, sans-serif;
-  overflow: hidden;
+let statusTimer;
+function showSavedStatus() {
+    clearTimeout(statusTimer);
+    saveStatus.innerHTML = `<i class="fa-solid fa-cloud-check"></i> Saved`;
+    statusTimer = setTimeout(() => {
+        saveStatus.innerHTML = `<i class="fa-solid fa-cloud"></i> Ready`;
+    }, 1500);
 }
 
-.app {
-  width: 100%;
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  padding: 18px;
+/* =================================
+Custom Dialog Modal
+================================= */
+function customConfirm(title, message, callback) {
+    confirmTitle.textContent = title;
+    confirmMessage.textContent = message;
+    onConfirmCallback = callback;
+    confirmModal.classList.add("show");
+    confirmModal.setAttribute("aria-hidden", "false");
 }
 
-/* Topbar */
-.topbar {
-  width: 100%;
-  min-height: 82px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 14px 18px;
-  background: rgba(20, 24, 33, 0.85);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(18px);
-  margin-bottom: 15px;
+function closeConfirmModal() {
+    confirmModal.classList.remove("show");
+    confirmModal.setAttribute("aria-hidden", "true");
+    onConfirmCallback = null;
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 13px;
+confirmCancelBtn.addEventListener("click", closeConfirmModal);
+confirmOkBtn.addEventListener("click", () => {
+    if (onConfirmCallback) onConfirmCallback();
+    closeConfirmModal();
+});
+
+/* =================================
+Create Items (File / Folder)
+================================= */
+function createFile(name, content = "") {
+    let fileNameVal = name ? name.trim() : newFileName.value.trim();
+    if (!fileNameVal) fileNameVal = "untitled.txt";
+
+    const newFile = {
+        id: Date.now().toString() + Math.random().toString(36).slice(2),
+        type: "file",
+        name: fileNameVal,
+        content: content,
+        parentId: currentFolderId,
+        fontStyle: "font-default",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+
+    items.unshift(newFile);
+    activeFileId = newFile.id;
+
+    saveData();
+    renderExplorer();
+    openActiveFile();
+    closeModal(newFileModal);
 }
 
-.logo-icon {
-  width: 48px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  color: white;
-  font-size: 20px;
-  background: linear-gradient(135deg, var(--primary-light), var(--primary));
-  border-radius: 14px;
-  box-shadow: 0 8px 25px rgba(109, 93, 252, 0.3);
+function createFolder() {
+    let folderNameVal = newFolderName.value.trim();
+    if (!folderNameVal) folderNameVal = "New Folder";
+
+    const newFolder = {
+        id: Date.now().toString() + Math.random().toString(36).slice(2),
+        type: "folder",
+        name: folderNameVal,
+        parentId: currentFolderId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+
+    items.unshift(newFolder);
+    saveData();
+    renderExplorer();
+    closeModal(newFolderModal);
 }
 
-.topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* =================================
+Mobile File Upload
+================================= */
+mobileFileUpload.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        createFile(file.name, event.target.result);
+    };
+    reader.readAsText(file);
+    mobileFileUpload.value = "";
+});
+
+/* =================================
+Explorer / Folder Logic
+================================= */
+function openFolder(folderId) {
+    currentFolderId = folderId;
+    renderExplorer();
+    renderBreadcrumbs();
 }
 
-.profile-chip-btn {
-  background: var(--panel-light);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 10px 14px;
-  border-radius: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  transition: 0.2s;
+function renderBreadcrumbs() {
+    breadcrumbs.innerHTML = "";
+    let path = [];
+    let curr = currentFolderId;
+
+    while (curr !== "root") {
+        const folderObj = items.find((i) => i.id === curr && i.type === "folder");
+        if (folderObj) {
+            path.unshift(folderObj);
+            curr = folderObj.parentId;
+        } else {
+            curr = "root";
+        }
+    }
+
+    // Root
+    const rootSpan = document.createElement("span");
+    rootSpan.className = `crumb ${currentFolderId === "root" ? "active" : ""}`;
+    rootSpan.innerHTML = `<i class="fa-solid fa-house"></i> Root`;
+    rootSpan.onclick = () => openFolder("root");
+    breadcrumbs.appendChild(rootSpan);
+
+    path.forEach((f, idx) => {
+        const sep = document.createElement("span");
+        sep.textContent = " / ";
+        breadcrumbs.appendChild(sep);
+
+        const span = document.createElement("span");
+        span.className = `crumb ${idx === path.length - 1 ? "active" : ""}`;
+        span.textContent = f.name;
+        span.onclick = () => openFolder(f.id);
+        breadcrumbs.appendChild(span);
+    });
 }
 
-.profile-chip-btn:hover {
-  border-color: var(--primary);
-  color: white;
+function renderExplorer() {
+    fileList.innerHTML = "";
+    const searchText = searchFiles.value.trim().toLowerCase();
+
+    let currentItems = items.filter((item) => {
+        if (searchText) {
+            return item.name.toLowerCase().includes(searchText);
+        }
+        return item.parentId === currentFolderId;
+    });
+
+    fileCount.textContent = `${currentItems.length} items`;
+
+    if (currentItems.length === 0) {
+        fileList.innerHTML = `
+            <div class="empty-files">
+                <i class="fa-regular fa-folder-open"></i>
+                <h3>No files or folders</h3>
+                <p>Add a file or folder to keep organized.</p>
+            </div>
+        `;
+        return;
+    }
+
+    currentItems.forEach((item) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `file-item ${item.id === activeFileId ? "active" : ""}`;
+
+        const iconDiv = document.createElement("div");
+        iconDiv.className = "file-item-icon";
+
+        if (item.type === "folder") {
+            iconDiv.innerHTML = `<i class="fa-solid fa-folder" style="color: #f7d070;"></i>`;
+        } else {
+            const iconClass = getFileIconClass(item.name);
+            iconDiv.innerHTML = `<i class="${iconClass}"></i>`;
+        }
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "file-item-info";
+
+        const titleDiv = document.createElement("div");
+        titleDiv.className = "file-item-name";
+        titleDiv.textContent = item.name;
+
+        const dateDiv = document.createElement("div");
+        dateDiv.className = "file-item-date";
+        dateDiv.textContent = formatDate(item.updatedAt);
+
+        infoDiv.append(titleDiv, dateDiv);
+        btn.append(iconDiv, infoDiv);
+
+        btn.onclick = () => {
+            if (item.type === "folder") {
+                openFolder(item.id);
+            } else {
+                enableEditor();
+                openFile(item.id);
+            }
+        };
+
+        fileList.appendChild(btn);
+    });
 }
 
-.upload-btn-label {
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
+/* =================================
+File Operations
+================================= */
+function openFile(id) {
+    const selected = items.find((i) => i.id === id && i.type === "file");
+    if (!selected) return;
+
+    activeFileId = selected.id;
+    fileName.value = selected.name;
+    textEditor.value = selected.content || "";
+
+    const iconClass = getFileIconClass(selected.name);
+    activeFileHeaderIcon.className = iconClass;
+
+    fontStyleSelect.value = selected.fontStyle || "font-default";
+    textEditor.className = selected.fontStyle || "font-default";
+
+    updateStatistics();
+    renderExplorer();
 }
 
-.new-file-btn {
-  border: none;
-  color: white;
-  background: linear-gradient(135deg, var(--primary-light), var(--primary));
-  padding: 12px 17px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  cursor: pointer;
-  transition: 0.2s;
-  box-shadow: 0 8px 24px rgba(109, 93, 252, 0.25);
+function openActiveFile() {
+    if (!activeFileId) {
+        showNoFile();
+        return;
+    }
+    openFile(activeFileId);
 }
 
-.new-file-btn:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.1);
+function showNoFile() {
+    fileName.value = "No file selected";
+    textEditor.value = "";
+    fileName.disabled = true;
+    textEditor.disabled = true;
+    activeFileHeaderIcon.className = "fa-regular fa-file-lines";
+    updateStatistics();
 }
 
-/* Workspace Layout */
-.workspace {
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: 310px minmax(0, 1fr);
-  gap: 15px;
+function enableEditor() {
+    fileName.disabled = false;
+    textEditor.disabled = false;
 }
 
-/* Sidebar */
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: rgba(20, 24, 33, 0.88);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  backdrop-filter: blur(18px);
+function updateFileContent() {
+    if (!activeFileId) return;
+    const activeFile = items.find((i) => i.id === activeFileId);
+    if (!activeFile) return;
+
+    activeFile.content = textEditor.value;
+    activeFile.updatedAt = new Date().toISOString();
+
+    saveData();
+    updateStatistics();
 }
 
-.sidebar-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--border);
+function renameFile() {
+    if (!activeFileId) return;
+    const activeFile = items.find((i) => i.id === activeFileId);
+    if (!activeFile) return;
+
+    let newName = fileName.value.trim();
+    if (!newName) {
+        newName = "untitled.txt";
+        fileName.value = newName;
+    }
+
+    activeFile.name = newName;
+    activeFile.updatedAt = new Date().toISOString();
+
+    activeFileHeaderIcon.className = getFileIconClass(newName);
+
+    saveData();
+    renderExplorer();
 }
 
-.tab-btn {
-  flex: 1;
-  padding: 12px;
-  background: transparent;
-  border: none;
-  color: var(--text-dark);
-  font-weight: 600;
-  font-size: 12px;
-  cursor: pointer;
-  transition: 0.2s;
+fontStyleSelect.addEventListener("change", (e) => {
+    const style = e.target.value;
+    textEditor.className = style;
+
+    if (activeFileId) {
+        const activeFile = items.find((i) => i.id === activeFileId);
+        if (activeFile) {
+            activeFile.fontStyle = style;
+            saveData();
+        }
+    }
+});
+
+/* =================================
+Statistics & Helper
+================================= */
+function updateStatistics() {
+    const content = textEditor.value;
+    const lines = content === "" ? 1 : content.split("\n").length;
+    const cleanText = content.trim();
+    const words = cleanText === "" ? 0 : cleanText.split(/\s+/).length;
+
+    lineCount.textContent = lines;
+    wordCount.textContent = words;
+    characterCount.textContent = content.length;
 }
 
-.tab-btn.active {
-  color: var(--primary-light);
-  border-bottom: 2px solid var(--primary);
-  background: rgba(109, 93, 252, 0.05);
+function formatDate(date) {
+    const time = new Date(date);
+    if (Number.isNaN(time.getTime())) return "Saved";
+    return time.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
-.tab-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+/* =================================
+Clear / Delete Buttons
+================================= */
+function clearContent() {
+    if (!activeFileId) return;
+    customConfirm("Clear Content", "Are you sure you want to clear all text in this file?", () => {
+        textEditor.value = "";
+        updateFileContent();
+    });
 }
 
-.tab-content.hidden {
-  display: none;
+function deleteFile() {
+    if (!activeFileId) return;
+    const activeFile = items.find((i) => i.id === activeFileId);
+    const title = activeFile ? activeFile.name : "this file";
+
+    customConfirm("Delete Item", `Are you sure you want to delete "${title}"?`, () => {
+        items = items.filter((i) => i.id !== activeFileId);
+        const remainingFiles = items.filter((i) => i.type === "file");
+        activeFileId = remainingFiles.length > 0 ? remainingFiles[0].id : null;
+
+        saveData();
+        renderExplorer();
+        openActiveFile();
+    });
 }
 
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px 18px 10px;
+function downloadFile() {
+    if (!activeFileId) return;
+    const activeFile = items.find((i) => i.id === activeFileId);
+    if (!activeFile) return;
+
+    const fileBlob = new Blob([activeFile.content], { type: "text/plain;charset=utf-8" });
+    const downloadUrl = URL.createObjectURL(fileBlob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = activeFile.name;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(downloadUrl);
 }
 
-.breadcrumbs {
-  padding: 0 18px 10px;
-  font-size: 11px;
-  color: var(--text-dark);
-  white-space: nowrap;
-  overflow-x: auto;
+/* =================================
+Sidebar Tabs (Explorer / Notes)
+================================= */
+tabFiles.addEventListener("click", () => {
+    tabFiles.classList.add("active");
+    tabNotes.classList.remove("active");
+    explorerView.classList.remove("hidden");
+    notesView.classList.add("hidden");
+});
+
+tabNotes.addEventListener("click", () => {
+    tabNotes.classList.add("active");
+    tabFiles.classList.remove("active");
+    notesView.classList.remove("hidden");
+    explorerView.classList.add("hidden");
+});
+
+quickNotesArea.addEventListener("input", () => {
+    localStorage.setItem(NOTES_KEY, quickNotesArea.value);
+});
+
+/* =================================
+Modals
+================================= */
+function openModal(modal) {
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden", "false");
 }
 
-.crumb {
-  cursor: pointer;
-  transition: 0.2s;
+function closeModal(modal) {
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden", "true");
 }
 
-.crumb:hover, .crumb.active {
-  color: var(--primary-light);
+newFileBtn.onclick = () => openModal(newFileModal);
+createFileBtn.onclick = () => openModal(newFileModal);
+closeModalBtn.onclick = () => closeModal(newFileModal);
+cancelFileBtn.onclick = () => closeModal(newFileModal);
+confirmCreateBtn.onclick = () => createFile();
+
+newFolderBtn.onclick = () => openModal(newFolderModal);
+closeFolderModalBtn.onclick = () => closeModal(newFolderModal);
+cancelFolderBtn.onclick = () => closeModal(newFolderModal);
+confirmCreateFolderBtn.onclick = () => createFolder();
+
+/* =================================
+User Profile System
+================================= */
+function loadProfile() {
+    try {
+        const saved = localStorage.getItem(PROFILE_KEY);
+        if (saved) userProfile = JSON.parse(saved);
+    } catch (e) {
+        console.error("Profile load error:", e);
+    }
 }
 
-.search-box {
-  position: relative;
-  margin: 0 15px 10px;
+function saveProfile() {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(userProfile));
+    updateProfileUI();
 }
 
-.search-box i {
-  position: absolute;
-  top: 50%;
-  left: 13px;
-  transform: translateY(-50%);
-  color: var(--text-dark);
+function canChangeName() {
+    if (!userProfile || !userProfile.nameChangedAt) return true;
+    const lastChanged = new Date(userProfile.nameChangedAt).getTime();
+    const now = Date.now();
+    const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+    return now - lastChanged >= SEVEN_DAYS;
 }
 
-.search-box input {
-  width: 100%;
-  height: 38px;
-  padding: 0 14px 0 38px;
-  color: var(--text);
-  background: var(--background-soft);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  outline: none;
+function updateProfileUI() {
+    if (userProfile && userProfile.displayName) {
+        topbarUserName.textContent = userProfile.displayName;
+    }
 }
 
-.file-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 5px 10px 15px;
+function openProfileModal() {
+    if (userProfile) {
+        displayNameInput.value = userProfile.displayName;
+        closeProfileBtn.classList.remove("hidden");
+
+        if (!canChangeName()) {
+            displayNameInput.disabled = true;
+            saveProfileBtn.disabled = true;
+            profileCooldownMsg.textContent = "You can only change your name once every 7 days.";
+            profileCooldownMsg.style.color = "#ff5268";
+        } else {
+            displayNameInput.disabled = false;
+            saveProfileBtn.disabled = false;
+            profileCooldownMsg.textContent = "You can change your display name now.";
+            profileCooldownMsg.style.color = "#38d996";
+        }
+    } else {
+        closeProfileBtn.classList.add("hidden");
+    }
+    openModal(profileModal);
 }
 
-.file-item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 10px;
-  margin-bottom: 5px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  cursor: pointer;
-  color: var(--text);
-  transition: 0.2s;
+saveProfileBtn.addEventListener("click", () => {
+    let nameVal = displayNameInput.value.trim();
+    if (!nameVal) nameVal = "Malik";
+
+    if (!userProfile) {
+        userProfile = {
+            displayName: nameVal,
+            createdAt: new Date().toISOString(),
+            nameChangedAt: new Date().toISOString()
+        };
+    } else {
+        if (!canChangeName()) return;
+        userProfile.displayName = nameVal;
+        userProfile.nameChangedAt = new Date().toISOString();
+    }
+
+    saveProfile();
+    closeModal(profileModal);
+});
+
+profileChipBtn.onclick = openProfileModal;
+closeProfileBtn.onclick = () => closeModal(profileModal);
+
+/* =================================
+Event Listeners & Init
+================================= */
+textEditor.addEventListener("input", updateFileContent);
+fileName.addEventListener("input", renameFile);
+searchFiles.addEventListener("input", renderExplorer);
+
+clearBtn.addEventListener("click", clearContent);
+deleteBtn.addEventListener("click", deleteFile);
+downloadBtn.addEventListener("click", downloadFile);
+
+loadProfile();
+loadData();
+renderBreadcrumbs();
+renderExplorer();
+
+if (userProfile) {
+    updateProfileUI();
+} else {
+    openProfileModal();
 }
 
-.file-item:hover {
-  background: rgba(255, 255, 255, 0.035);
-  border-color: var(--border);
-}
-
-.file-item.active {
-  background: rgba(109, 93, 252, 0.13);
-  border-color: rgba(109, 93, 252, 0.3);
-}
-
-.file-item-icon {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  color: var(--primary-light);
-  background: rgba(109, 93, 252, 0.1);
-  border-radius: 8px;
-  font-size: 16px;
-}
-
-.file-item-name {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.notes-container {
-  padding: 15px;
-  flex: 1;
-}
-
-#quickNotesArea {
-  width: 100%;
-  height: 100%;
-  background: var(--background-soft);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px;
-  color: var(--text);
-  resize: none;
-  outline: none;
-  font-family: inherit;
-  font-size: 13px;
-}
-
-/* Editor */
-.editor-section {
-  display: flex;
-  flex-direction: column;
-  background: rgba(20, 24, 33, 0.9);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  backdrop-filter: blur(18px);
-}
-
-.editor-header {
-  min-height: 65px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 18px;
-  border-bottom: 1px solid var(--border);
-}
-
-.font-style-picker {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--panel-light);
-  border: 1px solid var(--border);
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-}
-
-.font-style-picker select {
-  background: transparent;
-  border: none;
-  color: var(--text);
-  outline: none;
-  cursor: pointer;
-}
-
-.editor-container {
-  flex: 1;
-  padding: 15px;
-}
-
-#textEditor {
-  width: 100%;
-  height: 100%;
-  resize: none;
-  background: #0c0f15;
-  border: 1px solid var(--border);
-  border-radius: 13px;
-  padding: 18px;
-  color: #e9edf5;
-  outline: none;
-  line-height: 1.7;
-}
-
-/* Dynamic Font Classes */
-.font-default { font-family: "Fira Code", monospace; }
-.font-sans { font-family: "Inter", sans-serif; }
-.font-serif { font-family: "Playfair Display", serif; }
-.font-fancy { font-family: "Great Vibes", cursive; font-size: 20px !important; }
-.font-code { font-family: "Consolas", monospace; background: #05070a !important; color: #38d996 !important; }
-
-/* Modals */
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
-}
-
-.modal.show { display: flex; }
-
-.modal-box {
-  width: 100%;
-  max-width: 440px;
-  background: #151923;
-  border: 1px solid var(--border-light);
-  border-radius: 18px;
-}
-
-.custom-dialog-box {
-  text-align: center;
-  padding: 25px;
-}
-
-.dialog-icon {
-  font-size: 40px;
-  color: var(--danger);
-  margin-bottom: 15px;
-}
-
-.delete-confirm-btn {
-  background: var(--danger) !important;
-  border-color: var(--danger) !important;
-}
-
-.hidden { display: none !important; }
-
-/* Responsive Rules */
-@media (max-width: 850px) {
-  body { overflow: auto; }
-  .app { height: auto; min-height: 100dvh; }
-  .workspace { grid-template-columns: 1fr; }
+const initialFiles = items.filter((i) => i.type === "file");
+if (initialFiles.length > 0) {
+    activeFileId = initialFiles[0].id;
+    enableEditor();
+    openActiveFile();
+} else {
+    showNoFile();
 }
