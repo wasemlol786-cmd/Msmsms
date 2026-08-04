@@ -1,957 +1,963 @@
 /* =================================
-   FileForge - Main JavaScript
-   المرحلة الحالية:
-   ملفات + فولدرات + مذكرات + مهملات
-   رفع + تحميل + نشر + بروفايل + ID
-   ================================= */
+   FileForge — Complete Script
+================================= */
 
-const $ = (id) => document.getElementById(id);
+"use strict";
 
 /* =================================
    Elements
 ================================= */
 
-const newFileBtn = $("newFileBtn");
-const createFileBtn = $("createFileBtn");
+const $ = (id) => document.getElementById(id);
 
-const newFileModal = $("newFileModal");
-const closeModalBtn = $("closeModalBtn");
-const cancelFileBtn = $("cancelFileBtn");
-const confirmCreateBtn = $("confirmCreateBtn");
-const newFileName = $("newFileName");
+const elements = {
+    homeBtn: $("homeBtn"),
 
-const fileList = $("fileList");
-const emptyFiles = $("emptyFiles");
-const fileCount = $("fileCount");
-const searchFiles = $("searchFiles");
+    profileBtn: $("profileBtn"),
+    profileName: $("profileName"),
 
-const fileName = $("fileName");
-const textEditor = $("textEditor");
+    onlineCount: $("onlineCount"),
 
-const lineCount = $("lineCount");
-const wordCount = $("wordCount");
-const characterCount = $("characterCount");
+    newFileBtn: $("newFileBtn"),
+    createFileBtn: $("createFileBtn"),
+    createFolderBtn: $("createFolderBtn"),
+    emptyCreateBtn: $("emptyCreateBtn"),
 
-const saveStatus = $("saveStatus");
+    fileList: $("fileList"),
+    fileCount: $("fileCount"),
+    sidebarTitle: $("sidebarTitle"),
 
-const downloadBtn = $("downloadBtn");
-const clearBtn = $("clearBtn");
-const deleteBtn = $("deleteBtn");
+    searchFiles: $("searchFiles"),
 
-const profileModal = $("profileModal");
-const displayNameInput = $("displayNameInput");
-const saveProfileBtn = $("saveProfileBtn");
+    uploadBtn: $("uploadBtn"),
+    fileUploadInput: $("fileUploadInput"),
+
+    activeItemIcon: $("activeItemIcon"),
+    fileName: $("fileName"),
+
+    textEditor: $("textEditor"),
+    editorEmpty: $("editorEmpty"),
+
+    fontStyle: $("fontStyle"),
+
+    saveStatus: $("saveStatus"),
+    saveInfoText: $("saveInfoText"),
+
+    lineCount: $("lineCount"),
+    wordCount: $("wordCount"),
+    characterCount: $("characterCount"),
+
+    shareBtn: $("shareBtn"),
+    downloadBtn: $("downloadBtn"),
+    clearBtn: $("clearBtn"),
+    publishBtn: $("publishBtn"),
+    deleteBtn: $("deleteBtn"),
+
+    trashCount: $("trashCount"),
+
+    newFileModal: $("newFileModal"),
+    newFileName: $("newFileName"),
+    newFileFolder: $("newFileFolder"),
+    confirmCreateBtn: $("confirmCreateBtn"),
+
+    folderModal: $("folderModal"),
+    folderNameInput: $("folderNameInput"),
+    confirmFolderBtn: $("confirmFolderBtn"),
+
+    profileModal: $("profileModal"),
+    displayNameInput: $("displayNameInput"),
+    saveProfileBtn: $("saveProfileBtn"),
+
+    profileSettingsModal: $("profileSettingsModal"),
+    profileNameInput: $("profileNameInput"),
+    nameChangeInfo: $("nameChangeInfo"),
+    deviceIdText: $("deviceIdText"),
+    copyIdBtn: $("copyIdBtn"),
+    updateProfileBtn: $("updateProfileBtn"),
+
+    shareModal: $("shareModal"),
+    shareIdInput: $("shareIdInput"),
+    sharedUsersList: $("sharedUsersList"),
+    addSharedUserBtn: $("addSharedUserBtn"),
+
+    permissionsModal: $("permissionsModal"),
+
+    permissionView: $("permissionView"),
+    permissionEdit: $("permissionEdit"),
+    permissionAdd: $("permissionAdd"),
+    permissionDelete: $("permissionDelete"),
+    permissionDownload: $("permissionDownload"),
+    permissionAll: $("permissionAll"),
+
+    savePermissionsBtn: $("savePermissionsBtn"),
+
+    publishModal: $("publishModal"),
+    publishDescription: $("publishDescription"),
+    publishVisibility: $("publishVisibility"),
+    previewLines: $("previewLines"),
+    confirmPublishBtn: $("confirmPublishBtn"),
+
+    toast: $("toast"),
+    toastIcon: $("toastIcon"),
+    toastText: $("toastText")
+};
+
 
 /* =================================
    Storage Keys
 ================================= */
 
-const FILES_KEY = "fileforge_files_v2";
-const PROFILE_KEY = "fileforge_profile_v2";
-const NOTES_KEY = "fileforge_notes_v2";
-const FOLDERS_KEY = "fileforge_folders_v2";
-const TRASH_KEY = "fileforge_trash_v2";
-const POSTS_KEY = "fileforge_posts_v2";
+const STORAGE = {
+    items: "fileforge_items",
+    profile: "fileforge_profile",
+    deviceId: "fileforge_device_id",
+    activeId: "fileforge_active_id",
+    view: "fileforge_view"
+};
+
 
 /* =================================
-   Data
+   App Data
 ================================= */
 
-let files = [];
-let notes = [];
-let folders = [];
-let trash = [];
-let posts = [];
+let items = [];
 
-let activeFileId = null;
-
-let userProfile = null;
+let activeItemId = null;
 
 let currentView = "files";
 
-let statusTimer;
+let saveTimer = null;
+
+let currentPermissionUser = null;
+
 
 /* =================================
    Helpers
 ================================= */
 
-function createId(prefix = "FF") {
+function createId() {
 
-    const random = Math.random()
+    return (
+        Date.now()
         .toString(36)
-        .slice(2, 10)
-        .toUpperCase();
-
-    const time = Date.now()
+        +
+        Math.random()
         .toString(36)
-        .slice(-7)
-        .toUpperCase();
-
-    return `${prefix}-${random}-${time}`;
-
+        .slice(2, 9)
+    );
 }
 
-function escapeHtml(text) {
 
-    const element =
-        document.createElement("div");
+function escapeHtml(value) {
 
-    element.textContent =
-        String(text ?? "");
+    const div = document.createElement("div");
 
-    return element.innerHTML;
+    div.textContent = String(value);
 
+    return div.innerHTML;
 }
 
-function formatDate(date) {
 
-    const time =
-        new Date(date);
+function getDateText(time) {
 
-    if (
-        Number.isNaN(
-            time.getTime()
-        )
-    ) {
+    const date = new Date(time);
 
-        return "Unknown date";
-
-    }
-
-    return time.toLocaleString(
-        "en-US",
+    return date.toLocaleDateString(
+        undefined,
         {
+            day: "2-digit",
             month: "short",
-            day: "numeric",
-            year: "numeric",
-            hour: "numeric",
-            minute: "2-digit"
+            year: "numeric"
         }
     );
-
 }
 
-function showAppMessage(
+
+function getDeviceId() {
+
+    let id = localStorage.getItem(
+        STORAGE.deviceId
+    );
+
+    if (id) {
+
+        return id;
+    }
+
+    const letters =
+        "ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+    const numbers =
+        "23456789";
+
+    function randomPart(
+        characters,
+        length
+    ) {
+
+        let result = "";
+
+        for (
+            let i = 0;
+            i < length;
+            i++
+        ) {
+
+            result +=
+                characters[
+                    Math.floor(
+                        Math.random()
+                        *
+                        characters.length
+                    )
+                ];
+        }
+
+        return result;
+    }
+
+    id =
+        "FF-"
+        +
+        randomPart(
+            letters + numbers,
+            6
+        )
+        +
+        "-"
+        +
+        randomPart(
+            letters + numbers,
+            6
+        );
+
+    localStorage.setItem(
+        STORAGE.deviceId,
+        id
+    );
+
+    return id;
+}
+
+
+function getProfile() {
+
+    try {
+
+        return JSON.parse(
+            localStorage.getItem(
+                STORAGE.profile
+            )
+        );
+
+    } catch {
+
+        return null;
+    }
+}
+
+
+function saveProfile(
+    profile
+) {
+
+    localStorage.setItem(
+        STORAGE.profile,
+        JSON.stringify(profile)
+    );
+}
+
+
+function saveItems() {
+
+    localStorage.setItem(
+        STORAGE.items,
+        JSON.stringify(items)
+    );
+}
+
+
+function loadItems() {
+
+    try {
+
+        const saved =
+            JSON.parse(
+                localStorage.getItem(
+                    STORAGE.items
+                )
+            );
+
+        items =
+            Array.isArray(saved)
+            ? saved
+            : [];
+
+    } catch {
+
+        items = [];
+    }
+}
+
+
+function getActiveItem() {
+
+    return items.find(
+        item =>
+        item.id === activeItemId
+    );
+}
+
+
+function showToast(
     message,
     type = "success"
 ) {
 
-    let toast =
-        document.querySelector(
-            ".fileforge-toast"
+    const icons = {
+
+        success:
+            "fa-circle-check",
+
+        error:
+            "fa-circle-xmark",
+
+        warning:
+            "fa-triangle-exclamation",
+
+        info:
+            "fa-circle-info"
+    };
+
+    elements.toastIcon.className =
+        "fa-solid "
+        +
+        (
+            icons[type]
+            ||
+            icons.success
         );
 
-    if (!toast) {
-
-        toast =
-            document.createElement("div");
-
-        toast.className =
-            "fileforge-toast";
-
-        document.body.appendChild(
-            toast
-        );
-
-    }
-
-    toast.textContent =
+    elements.toastText.textContent =
         message;
 
-    toast.dataset.type =
-        type;
-
-    toast.classList.add(
+    elements.toast.classList.add(
         "show"
     );
 
     clearTimeout(
-        toast.timer
+        showToast.timer
     );
 
-    toast.timer =
+    showToast.timer =
         setTimeout(
             () => {
 
-                toast.classList.remove(
+                elements.toast
+                .classList
+                .remove(
                     "show"
                 );
 
             },
-            2500
+            2600
         );
-
 }
 
-/* =================================
-   Custom Confirm
-================================= */
 
-function customConfirm(
-    title,
-    message
+function openModal(
+    modal
 ) {
 
-    return new Promise(
-        resolve => {
-
-            const old =
-                document.querySelector(
-                    ".confirm-overlay"
-                );
-
-            if (old) {
-
-                old.remove();
-
-            }
-
-            const overlay =
-                document.createElement(
-                    "div"
-                );
-
-            overlay.className =
-                "confirm-overlay";
-
-            overlay.innerHTML = `
-
-                <div class="confirm-box">
-
-                    <div class="confirm-icon">
-
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-
-                    </div>
-
-                    <h2>
-                        ${escapeHtml(title)}
-                    </h2>
-
-                    <p>
-                        ${escapeHtml(message)}
-                    </p>
-
-                    <div class="confirm-actions">
-
-                        <button
-                            class="cancel-btn"
-                            type="button"
-                        >
-                            Cancel
-                        </button>
-
-                        <button
-                            class="create-btn confirm-danger"
-                            type="button"
-                        >
-                            Continue
-                        </button>
-
-                    </div>
-
-                </div>
-
-            `;
-
-            const buttons =
-                overlay.querySelectorAll(
-                    "button"
-                );
-
-            buttons[0]
-            .addEventListener(
-                "click",
-                () => {
-
-                    overlay.remove();
-
-                    resolve(false);
-
-                }
-            );
-
-            buttons[1]
-            .addEventListener(
-                "click",
-                () => {
-
-                    overlay.remove();
-
-                    resolve(true);
-
-                }
-            );
-
-            document.body.appendChild(
-                overlay
-            );
-
-        }
-    );
-
-}
-
-/* =================================
-   Local Storage
-================================= */
-
-function loadData() {
-
-    try {
-
-        files =
-            JSON.parse(
-                localStorage.getItem(
-                    FILES_KEY
-                )
-                || "[]"
-            );
-
-        notes =
-            JSON.parse(
-                localStorage.getItem(
-                    NOTES_KEY
-                )
-                || "[]"
-            );
-
-        folders =
-            JSON.parse(
-                localStorage.getItem(
-                    FOLDERS_KEY
-                )
-                || "[]"
-            );
-
-        trash =
-            JSON.parse(
-                localStorage.getItem(
-                    TRASH_KEY
-                )
-                || "[]"
-            );
-
-        posts =
-            JSON.parse(
-                localStorage.getItem(
-                    POSTS_KEY
-                )
-                || "[]"
-            );
-
-        userProfile =
-            JSON.parse(
-                localStorage.getItem(
-                    PROFILE_KEY
-                )
-                || "null"
-            );
-
-    } catch (error) {
-
-        console.error(
-            error
-        );
-
-        files = [];
-        notes = [];
-        folders = [];
-        trash = [];
-        posts = [];
-
-    }
-
-}
-
-function saveAll() {
-
-    try {
-
-        localStorage.setItem(
-            FILES_KEY,
-            JSON.stringify(files)
-        );
-
-        localStorage.setItem(
-            NOTES_KEY,
-            JSON.stringify(notes)
-        );
-
-        localStorage.setItem(
-            FOLDERS_KEY,
-            JSON.stringify(folders)
-        );
-
-        localStorage.setItem(
-            TRASH_KEY,
-            JSON.stringify(trash)
-        );
-
-        localStorage.setItem(
-            POSTS_KEY,
-            JSON.stringify(posts)
-        );
-
-        if (userProfile) {
-
-            localStorage.setItem(
-                PROFILE_KEY,
-                JSON.stringify(
-                    userProfile
-                )
-            );
-
-        }
-
-        showSavedStatus();
-
-    } catch (error) {
-
-        console.error(
-            error
-        );
-
-        showAppMessage(
-            "Could not save data",
-            "error"
-        );
-
-    }
-
-}
-
-/* =================================
-   Save Status
-================================= */
-
-function showSavedStatus() {
-
-    if (!saveStatus) {
+    if (!modal) {
 
         return;
-
     }
 
-    clearTimeout(
-        statusTimer
+    modal.classList.add(
+        "show"
     );
-
-    saveStatus.innerHTML = `
-        <i class="fa-solid fa-cloud-check"></i>
-        Saved
-    `;
-
-    statusTimer =
-        setTimeout(
-            () => {
-
-                saveStatus.innerHTML = `
-                    <i class="fa-solid fa-cloud"></i>
-                    Ready
-                `;
-
-            },
-            1500
-        );
-
 }
+
+
+function closeModal(
+    modal
+) {
+
+    if (!modal) {
+
+        return;
+    }
+
+    modal.classList.remove(
+        "show"
+    );
+}
+
+
+function closeAllModals() {
+
+    document
+    .querySelectorAll(
+        ".modal"
+    )
+    .forEach(
+        modal => {
+
+            modal.classList.remove(
+                "show"
+            );
+
+        }
+    );
+}
+
 
 /* =================================
    Profile
 ================================= */
 
-function createDeviceId() {
+function setupProfile() {
 
-    return createId(
-        "FF"
-    );
+    const profile =
+        getProfile();
 
-}
+    const deviceId =
+        getDeviceId();
 
-function createProfile() {
-
-    let name =
-        displayNameInput
-        .value
-        .trim();
-
-    if (!name) {
-
-        name =
-            "FileForge User";
-
-    }
-
-    userProfile = {
-
-        displayName:
-            name,
-
-        deviceId:
-            createDeviceId(),
-
-        createdAt:
-            new Date()
-            .toISOString(),
-
-        nameChangedAt:
-            new Date()
-            .toISOString()
-
-    };
-
-    saveAll();
-
-    closeProfileModal();
-
-    showAppMessage(
-        `Welcome, ${name}!`
-    );
-
-}
-
-function openProfileModal() {
-
-    if (!profileModal) {
-
-        return;
-
-    }
-
-    profileModal
-    .classList
-    .add("show");
-
-    profileModal
-    .setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
-    setTimeout(
-        () => {
-
-            displayNameInput
-            ?.focus();
-
-        },
-        150
-    );
-
-}
-
-function closeProfileModal() {
-
-    profileModal
-    ?.classList
-    .remove("show");
-
-    profileModal
-    ?.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
-}
-
-/* =================================
-   File Creation
-================================= */
-
-function openModal() {
-
-    newFileModal
-    ?.classList
-    .add("show");
-
-    newFileModal
-    ?.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
-    if (newFileName) {
-
-        newFileName.value =
-            "";
-
-    }
-
-    setTimeout(
-        () => {
-
-            newFileName
-            ?.focus();
-
-        },
-        100
-    );
-
-}
-
-function closeModal() {
-
-    newFileModal
-    ?.classList
-    .remove("show");
-
-    newFileModal
-    ?.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
-}
-
-function createFile() {
-
-    let name =
-        newFileName
-        .value
-        .trim();
-
-    if (!name) {
-
-        name =
-            "Untitled File";
-
-    }
-
-    const now =
-        new Date()
-        .toISOString();
-
-    const file = {
-
-        id:
-            createId("FILE"),
-
-        name,
-
-        content: "",
-
-        folderId:
-            null,
-
-        ownerId:
-            userProfile
-            ?.deviceId
-            || "LOCAL",
-
-        createdAt:
-            now,
-
-        updatedAt:
-            now
-
-    };
-
-    files.unshift(
-        file
-    );
-
-    activeFileId =
-        file.id;
-
-    currentView =
-        "files";
-
-    saveAll();
-
-    closeModal();
-
-    enableEditor();
-
-    renderCurrentView();
-
-    openFile(
-        file.id
-    );
-
-    showAppMessage(
-        "File created"
-    );
-
-}
-
-/* =================================
-   Open File
-================================= */
-
-function openFile(id) {
-
-    const file =
-        files.find(
-            item =>
-            item.id === id
-        );
-
-    if (!file) {
-
-        return;
-
-    }
-
-    activeFileId =
-        file.id;
-
-    enableEditor();
-
-    fileName.value =
-        file.name;
-
-    textEditor.value =
-        file.content;
-
-    updateStatistics();
-
-    renderCurrentView();
-
-}
-
-/* =================================
-   Editor
-================================= */
-
-function enableEditor() {
-
-    fileName.disabled =
-        false;
-
-    textEditor.disabled =
-        false;
-
-    downloadBtn.disabled =
-        false;
-
-    clearBtn.disabled =
-        false;
-
-    deleteBtn.disabled =
-        false;
-
-}
-
-function disableEditor() {
-
-    fileName.disabled =
-        true;
-
-    textEditor.disabled =
-        true;
-
-    downloadBtn.disabled =
-        true;
-
-    clearBtn.disabled =
-        true;
-
-    deleteBtn.disabled =
-        true;
-
-}
-
-function showNoFile() {
-
-    activeFileId =
-        null;
-
-    fileName.value =
-        "No file selected";
-
-    textEditor.value =
-        "";
-
-    disableEditor();
-
-    updateStatistics();
-
-}
-
-function updateFileContent() {
-
-    if (!activeFileId) {
-
-        return;
-
-    }
-
-    const file =
-        files.find(
-            item =>
-            item.id ===
-            activeFileId
-        );
-
-    if (!file) {
-
-        return;
-
-    }
-
-    file.content =
-        textEditor.value;
-
-    file.updatedAt =
-        new Date()
-        .toISOString();
-
-    saveAll();
-
-    updateStatistics();
-
-}
-
-function renameFile() {
-
-    if (!activeFileId) {
-
-        return;
-
-    }
-
-    const file =
-        files.find(
-            item =>
-            item.id ===
-            activeFileId
-        );
-
-    if (!file) {
-
-        return;
-
-    }
-
-    let name =
-        fileName
-        .value
-        .trim();
-
-    if (!name) {
-
-        name =
-            "Untitled File";
-
-        fileName.value =
-            name;
-
-    }
-
-    file.name =
-        name;
-
-    file.updatedAt =
-        new Date()
-        .toISOString();
-
-    saveAll();
-
-    renderCurrentView();
-
-}
-
-/* =================================
-   Statistics
-================================= */
-
-function updateStatistics() {
-
-    const content =
-        textEditor
-        ?.value
-        || "";
-
-    const lines =
-        content === ""
-        ? 1
-        : content
-        .split("\n")
-        .length;
-
-    const clean =
-        content.trim();
-
-    const words =
-        clean === ""
-        ? 0
-        : clean
-        .split(/\s+/)
-        .length;
-
-    lineCount.textContent =
-        lines;
-
-    wordCount.textContent =
-        words;
-
-    characterCount.textContent =
-        content.length;
-
-}
-
-/* =================================
-   Render Files
-================================= */
-
-function renderFiles() {
-
-    if (!fileList) {
-
-        return;
-
-    }
-
-    const search =
-        searchFiles
-        ?.value
-        .trim()
-        .toLowerCase()
-        || "";
-
-    const result =
-        files.filter(
-            file =>
-            file.name
-            .toLowerCase()
-            .includes(search)
-        );
-
-    fileCount.textContent =
-        `${files.length} ${
-            files.length === 1
-            ? "file"
-            : "files"
-        }`;
-
-    fileList.innerHTML =
-        "";
+    elements.deviceIdText.textContent =
+        deviceId;
 
     if (
-        result.length === 0
+        !profile
+        ||
+        !profile.name
     ) {
 
-        fileList.innerHTML = `
+        openModal(
+            elements.profileModal
+        );
+
+        setTimeout(
+            () => {
+
+                elements
+                .displayNameInput
+                .focus();
+
+            },
+            100
+        );
+
+        return;
+    }
+
+    elements.profileName.textContent =
+        profile.name;
+}
+
+
+function saveFirstProfile() {
+
+    const name =
+        elements
+        .displayNameInput
+        .value
+        .trim();
+
+    if (
+        name.length < 2
+    ) {
+
+        showToast(
+            "Enter a name with at least 2 characters.",
+            "warning"
+        );
+
+        return;
+    }
+
+    const profile = {
+
+        name:
+
+            name.slice(
+                0,
+                30
+            ),
+
+        lastNameChange:
+
+            Date.now()
+    };
+
+    saveProfile(
+        profile
+    );
+
+    elements.profileName.textContent =
+        profile.name;
+
+    closeModal(
+        elements.profileModal
+    );
+
+    showToast(
+        "Welcome to FileForge!"
+    );
+}
+
+
+function openProfileSettings() {
+
+    const profile =
+        getProfile();
+
+    if (!profile) {
+
+        openModal(
+            elements.profileModal
+        );
+
+        return;
+    }
+
+    elements.profileNameInput.value =
+        profile.name;
+
+    elements.deviceIdText.textContent =
+        getDeviceId();
+
+    const week =
+        7
+        *
+        24
+        *
+        60
+        *
+        60
+        *
+        1000;
+
+    const remaining =
+        week
+        -
+        (
+            Date.now()
+            -
+            profile.lastNameChange
+        );
+
+    if (
+        remaining > 0
+    ) {
+
+        const days =
+            Math.ceil(
+                remaining
+                /
+                (
+                    24
+                    *
+                    60
+                    *
+                    60
+                    *
+                    1000
+                )
+            );
+
+        elements
+        .nameChangeInfo
+        .textContent =
+
+            "You can change your name again in "
+            +
+            days
+            +
+            " day"
+            +
+            (
+                days === 1
+                ? ""
+                : "s"
+            )
+            +
+            ".";
+
+    } else {
+
+        elements
+        .nameChangeInfo
+        .textContent =
+
+            "You can change your display name now.";
+    }
+
+    openModal(
+        elements.profileSettingsModal
+    );
+}
+
+
+function updateProfile() {
+
+    const profile =
+        getProfile();
+
+    if (!profile) {
+
+        return;
+    }
+
+    const name =
+        elements
+        .profileNameInput
+        .value
+        .trim();
+
+    if (
+        name.length < 2
+    ) {
+
+        showToast(
+            "Enter a valid display name.",
+            "warning"
+        );
+
+        return;
+    }
+
+    if (
+        name === profile.name
+    ) {
+
+        closeModal(
+            elements
+            .profileSettingsModal
+        );
+
+        return;
+    }
+
+    const week =
+        7
+        *
+        24
+        *
+        60
+        *
+        60
+        *
+        1000;
+
+    if (
+        Date.now()
+        -
+        profile.lastNameChange
+        <
+        week
+    ) {
+
+        showToast(
+            "Your name can only be changed once every 7 days.",
+            "warning"
+        );
+
+        return;
+    }
+
+    profile.name =
+        name.slice(
+            0,
+            30
+        );
+
+    profile.lastNameChange =
+        Date.now();
+
+    saveProfile(
+        profile
+    );
+
+    elements.profileName.textContent =
+        profile.name;
+
+    closeModal(
+        elements
+        .profileSettingsModal
+    );
+
+    showToast(
+        "Profile updated."
+    );
+}
+
+
+/* =================================
+   Views
+================================= */
+
+const viewData = {
+
+    files: {
+
+        title:
+            "My Files",
+
+        icon:
+            "fa-folder"
+    },
+
+    notes: {
+
+        title:
+            "My Notes",
+
+        icon:
+            "fa-note-sticky"
+    },
+
+    shared: {
+
+        title:
+            "Shared With Me",
+
+        icon:
+            "fa-users"
+    },
+
+    explore: {
+
+        title:
+            "Explore",
+
+        icon:
+            "fa-earth-americas"
+    },
+
+    trash: {
+
+        title:
+            "Trash",
+
+        icon:
+            "fa-trash"
+    }
+};
+
+
+function setView(
+    view
+) {
+
+    currentView =
+        view;
+
+    localStorage.setItem(
+        STORAGE.view,
+        view
+    );
+
+    document
+    .querySelectorAll(
+        ".nav-item"
+    )
+    .forEach(
+        button => {
+
+            button
+            .classList
+            .toggle(
+
+                "active",
+
+                button.dataset.view
+                ===
+                view
+
+            );
+
+        }
+    );
+
+    elements.sidebarTitle.textContent =
+        viewData[view]
+        .title;
+
+    activeItemId = null;
+
+    localStorage.removeItem(
+        STORAGE.activeId
+    );
+
+    updateEditor();
+
+    renderItems();
+}
+
+
+/* =================================
+   Items
+================================= */
+
+function getVisibleItems() {
+
+    if (
+        currentView
+        ===
+        "trash"
+    ) {
+
+        return items.filter(
+            item =>
+            item.trashed
+        );
+    }
+
+    if (
+        currentView
+        ===
+        "notes"
+    ) {
+
+        return items.filter(
+            item =>
+
+                !item.trashed
+
+                &&
+
+                item.type
+                ===
+                "file"
+
+                &&
+
+                item.isNote
+        );
+    }
+
+    if (
+        currentView
+        ===
+        "shared"
+    ) {
+
+        return items.filter(
+            item =>
+
+                !item.trashed
+
+                &&
+
+                item.sharedWith
+
+                &&
+
+                item.sharedWith.length
+                >
+                0
+        );
+    }
+
+    if (
+        currentView
+        ===
+        "explore"
+    ) {
+
+        return items.filter(
+            item =>
+
+                !item.trashed
+
+                &&
+
+                item.published
+        );
+    }
+
+    return items.filter(
+        item =>
+        !item.trashed
+    );
+}
+
+
+function getSearchItems() {
+
+    const query =
+        elements
+        .searchFiles
+        .value
+        .trim()
+        .toLowerCase();
+
+    let result =
+        getVisibleItems();
+
+    if (
+        !query
+    ) {
+
+        return result;
+    }
+
+    return result.filter(
+        item =>
+
+            item.name
+            .toLowerCase()
+            .includes(
+                query
+            )
+    );
+}
+
+
+function renderItems() {
+
+    const visible =
+        getSearchItems();
+
+    elements.fileCount.textContent =
+
+        visible.length
+        +
+        (
+            visible.length
+            ===
+            1
+            ? " item"
+            : " items"
+        );
+
+    elements.trashCount.textContent =
+
+        items.filter(
+            item =>
+            item.trashed
+        ).length;
+
+    if (
+        visible.length
+        ===
+        0
+    ) {
+
+        elements.fileList.innerHTML = `
 
             <div class="empty-files">
 
                 <i class="fa-regular fa-folder-open"></i>
 
                 <h3>
-                    ${
-                        files.length
-                        ? "No files found"
-                        : "No files yet"
-                    }
+                    No items here
                 </h3>
 
                 <p>
-                    ${
-                        files.length
-                        ? "Try another search."
-                        : "Create your first file to start writing."
-                    }
+                    Create a file or folder to get started.
                 </p>
 
             </div>
@@ -959,455 +965,1027 @@ function renderFiles() {
         `;
 
         return;
-
     }
 
-    result.forEach(
-        file => {
+    const sorted =
+        [
+            ...visible
+        ]
+        .sort(
+            (
+                a,
+                b
+            ) => {
 
-            const button =
-                document.createElement(
-                    "button"
-                );
+                if (
+                    a.type
+                    !==
+                    b.type
+                ) {
 
-            button.type =
-                "button";
+                    return (
+                        a.type
+                        ===
+                        "folder"
+                    )
+                    ? -1
+                    : 1;
+                }
 
-            button.className =
-                "file-item";
-
-            if (
-                file.id ===
-                activeFileId
-            ) {
-
-                button.classList.add(
-                    "active"
+                return (
+                    b.updatedAt
+                    -
+                    a.updatedAt
                 );
 
             }
+        );
 
-            button.innerHTML = `
+    elements.fileList.innerHTML =
 
-                <div class="file-item-icon">
+        sorted
+        .map(
+            item => {
 
-                    <i class="fa-regular fa-file-lines"></i>
+                const isFolder =
 
-                </div>
+                    item.type
+                    ===
+                    "folder";
 
-                <div class="file-item-info">
+                const active =
 
-                    <div class="file-item-name">
+                    item.id
+                    ===
+                    activeItemId;
 
-                        ${escapeHtml(
-                            file.name
-                        )}
+                const icon =
 
-                    </div>
+                    isFolder
 
-                    <div class="file-item-date">
+                    ? "fa-folder"
 
-                        ${formatDate(
-                            file.updatedAt
-                        )}
+                    : (
+                        item.uploaded
 
-                    </div>
+                        ? "fa-file-arrow-up"
 
-                </div>
-
-            `;
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    openFile(
-                        file.id
+                        : "fa-file-lines"
                     );
 
-                }
-            );
+                return `
 
-            fileList.appendChild(
-                button
-            );
+                    <button
+                        class="
+                            file-item
+                            ${
+                                isFolder
+                                ?
+                                "folder-item"
+                                :
+                                ""
+                            }
+                            ${
+                                active
+                                ?
+                                "active"
+                                :
+                                ""
+                            }
+                        "
+                        data-item-id="
+                            ${item.id}
+                        "
+                        type="button"
+                    >
 
-        }
-    );
+                        <span
+                            class="
+                                file-item-icon
+                            "
+                        >
 
+                            <i
+                                class="
+                                    fa-solid
+                                    ${icon}
+                                "
+                            ></i>
+
+                        </span>
+
+                        <span
+                            class="
+                                file-item-info
+                            "
+                        >
+
+                            <span
+                                class="
+                                    file-item-name
+                                "
+                            >
+
+                                ${
+                                    escapeHtml(
+                                        item.name
+                                    )
+                                }
+
+                            </span>
+
+                            <span
+                                class="
+                                    file-item-date
+                                "
+                            >
+
+                                ${
+                                    getDateText(
+                                        item.updatedAt
+                                    )
+                                }
+
+                            </span>
+
+                        </span>
+
+                        <button
+                            class="
+                                item-menu-btn
+                            "
+                            data-menu-id="
+                                ${item.id}
+                            "
+                            type="button"
+                            title="Options"
+                        >
+
+                            <i
+                                class="
+                                    fa-solid
+                                    fa-ellipsis
+                                "
+                            ></i>
+
+                        </button>
+
+                    </button>
+
+                `;
+
+            }
+        )
+        .join("");
 }
 
-/* =================================
-   Notes
-================================= */
-
-function renderNotes() {
-
-    fileList.innerHTML =
-        "";
-
-    fileCount.textContent =
-        `${notes.length} notes`;
-
-    if (
-        notes.length === 0
-    ) {
-
-        fileList.innerHTML = `
-
-            <div class="empty-files">
-
-                <i class="fa-regular fa-note-sticky"></i>
-
-                <h3>
-                    No notes yet
-                </h3>
-
-                <p>
-                    Your private notes will appear here.
-                </p>
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-    notes.forEach(
-        note => {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.className =
-                "file-item";
-
-            button.innerHTML = `
-
-                <div class="file-item-icon">
-
-                    <i class="fa-regular fa-note-sticky"></i>
-
-                </div>
-
-                <div class="file-item-info">
-
-                    <div class="file-item-name">
-
-                        ${escapeHtml(
-                            note.name
-                        )}
-
-                    </div>
-
-                    <div class="file-item-date">
-
-                        ${formatDate(
-                            note.updatedAt
-                        )}
-
-                    </div>
-
-                </div>
-
-            `;
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    textEditor.value =
-                        note.content;
-
-                    fileName.value =
-                        note.name;
-
-                    enableEditor();
-
-                    activeFileId =
-                        null;
-
-                    showAppMessage(
-                        "Note opened"
-                    );
-
-                }
-            );
-
-            fileList.appendChild(
-                button
-            );
-
-        }
-    );
-
-}
 
 /* =================================
-   Trash
+   Create File
 ================================= */
 
-function renderTrash() {
+function updateFolderOptions() {
 
-    fileList.innerHTML =
-        "";
+    const folders =
+        items.filter(
+            item =>
 
-    fileCount.textContent =
-        `${trash.length} items`;
+                item.type
+                ===
+                "folder"
 
-    if (
-        trash.length === 0
-    ) {
+                &&
 
-        fileList.innerHTML = `
+                !item.trashed
+        );
 
-            <div class="empty-files">
+    elements.newFileFolder.innerHTML =
 
-                <i class="fa-solid fa-trash"></i>
+        `
+        <option value="root">
+            My Files
+        </option>
+        `
 
-                <h3>
-                    Trash is empty
-                </h3>
+        +
 
-                <p>
-                    Deleted files will appear here.
-                </p>
+        folders
+        .map(
+            folder => `
 
-            </div>
+                <option
+                    value="
+                        ${folder.id}
+                    "
+                >
 
-        `;
-
-        return;
-
-    }
-
-    trash.forEach(
-        item => {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.className =
-                "file-item";
-
-            button.innerHTML = `
-
-                <div class="file-item-icon">
-
-                    <i class="fa-solid fa-trash"></i>
-
-                </div>
-
-                <div class="file-item-info">
-
-                    <div class="file-item-name">
-
-                        ${escapeHtml(
-                            item.name
-                        )}
-
-                    </div>
-
-                    <div class="file-item-date">
-
-                        Deleted:
-                        ${formatDate(
-                            item.deletedAt
-                        )}
-
-                    </div>
-
-                </div>
-
-            `;
-
-            button.addEventListener(
-                "click",
-                async () => {
-
-                    const restore =
-                        await customConfirm(
-                            "Restore file?",
-                            `Restore "${item.name}"?`
-                        );
-
-                    if (!restore) {
-
-                        return;
-
+                    ${
+                        escapeHtml(
+                            folder.name
+                        )
                     }
 
-                    delete item.deletedAt;
+                </option>
 
-                    files.unshift(
-                        item
-                    );
+            `
+        )
+        .join("");
+}
 
-                    trash =
-                        trash.filter(
-                            old =>
-                            old.id !==
-                            item.id
-                        );
 
-                    saveAll();
+function openNewFileModal() {
 
-                    renderTrash();
+    updateFolderOptions();
 
-                    showAppMessage(
-                        "File restored"
-                    );
+    elements.newFileName.value =
+        "";
 
-                }
-            );
-
-            fileList.appendChild(
-                button
-            );
-
-        }
+    openModal(
+        elements.newFileModal
     );
 
+    setTimeout(
+        () => {
+
+            elements
+            .newFileName
+            .focus();
+
+        },
+        100
+    );
 }
+
+
+function createFile() {
+
+    let name =
+        elements
+        .newFileName
+        .value
+        .trim();
+
+    if (
+        !name
+    ) {
+
+        showToast(
+            "Enter a file name.",
+            "warning"
+        );
+
+        return;
+    }
+
+    if (
+        !name.includes(
+            "."
+        )
+    ) {
+
+        name +=
+            ".txt";
+    }
+
+    const now =
+        Date.now();
+
+    const item = {
+
+        id:
+            createId(),
+
+        type:
+            "file",
+
+        name:
+            name.slice(
+                0,
+                100
+            ),
+
+        content:
+            "",
+
+        folder:
+            elements
+            .newFileFolder
+            .value,
+
+        isNote:
+            currentView
+            ===
+            "notes",
+
+        uploaded:
+            false,
+
+        trashed:
+            false,
+
+        published:
+            false,
+
+        sharedWith:
+            [],
+
+        createdAt:
+            now,
+
+        updatedAt:
+            now
+    };
+
+    items.unshift(
+        item
+    );
+
+    saveItems();
+
+    closeModal(
+        elements.newFileModal
+    );
+
+    activeItemId =
+        item.id;
+
+    localStorage.setItem(
+        STORAGE.activeId,
+        item.id
+    );
+
+    renderItems();
+
+    updateEditor();
+
+    showToast(
+        "File created."
+    );
+}
+
 
 /* =================================
-   Current View
+   Create Folder
 ================================= */
 
-function renderCurrentView() {
+function openFolderModal() {
 
-    if (
-        currentView ===
-        "notes"
-    ) {
+    elements.folderNameInput.value =
+        "";
 
-        renderNotes();
+    openModal(
+        elements.folderModal
+    );
 
-        return;
+    setTimeout(
+        () => {
 
-    }
+            elements
+            .folderNameInput
+            .focus();
 
-    if (
-        currentView ===
-        "trash"
-    ) {
-
-        renderTrash();
-
-        return;
-
-    }
-
-    renderFiles();
-
+        },
+        100
+    );
 }
+
+
+function createFolder() {
+
+    const name =
+        elements
+        .folderNameInput
+        .value
+        .trim();
+
+    if (
+        !name
+    ) {
+
+        showToast(
+            "Enter a folder name.",
+            "warning"
+        );
+
+        return;
+    }
+
+    const now =
+        Date.now();
+
+    items.unshift({
+
+        id:
+            createId(),
+
+        type:
+            "folder",
+
+        name:
+            name.slice(
+                0,
+                80
+            ),
+
+        content:
+            "",
+
+        trashed:
+            false,
+
+        published:
+            false,
+
+        sharedWith:
+            [],
+
+        createdAt:
+            now,
+
+        updatedAt:
+            now
+    });
+
+    saveItems();
+
+    closeModal(
+        elements.folderModal
+    );
+
+    renderItems();
+
+    showToast(
+        "Folder created."
+    );
+}
+
+
+/* =================================
+   Select Item
+================================= */
+
+function selectItem(
+    id
+) {
+
+    const item =
+        items.find(
+            current =>
+            current.id
+            ===
+            id
+        );
+
+    if (
+        !item
+    ) {
+
+        return;
+    }
+
+    if (
+        item.type
+        ===
+        "folder"
+    ) {
+
+        showToast(
+            "Folders are ready for organization.",
+            "info"
+        );
+
+        return;
+    }
+
+    activeItemId =
+        id;
+
+    localStorage.setItem(
+        STORAGE.activeId,
+        id
+    );
+
+    updateEditor();
+
+    renderItems();
+}
+
+
+/* =================================
+   Editor
+================================= */
+
+function setEditorEnabled(
+    enabled
+) {
+
+    elements.fileName.disabled =
+        !enabled;
+
+    elements.textEditor.disabled =
+        !enabled;
+
+    elements.fontStyle.disabled =
+        !enabled;
+
+    elements.shareBtn.disabled =
+        !enabled;
+
+    elements.downloadBtn.disabled =
+        !enabled;
+
+    elements.clearBtn.disabled =
+        !enabled;
+
+    elements.publishBtn.disabled =
+        !enabled;
+
+    elements.deleteBtn.disabled =
+        !enabled;
+}
+
+
+function updateEditor() {
+
+    const item =
+        getActiveItem();
+
+    if (
+        !item
+        ||
+        item.type
+        !==
+        "file"
+        ||
+        item.trashed
+    ) {
+
+        setEditorEnabled(
+            false
+        );
+
+        elements.fileName.value =
+            "";
+
+        elements.textEditor.value =
+            "";
+
+        elements.editorEmpty
+        .classList
+        .add(
+            "show"
+        );
+
+        elements.activeItemIcon.className =
+
+            "fa-regular "
+            +
+            (
+                viewData[
+                    currentView
+                ]?.icon
+                ||
+                "fa-file-lines"
+            );
+
+        updateStats(
+            ""
+        );
+
+        return;
+    }
+
+    setEditorEnabled(
+        true
+    );
+
+    elements.editorEmpty
+    .classList
+    .remove(
+        "show"
+    );
+
+    elements.fileName.value =
+        item.name;
+
+    elements.textEditor.value =
+        item.content
+        ||
+        "";
+
+    elements.activeItemIcon.className =
+
+        "fa-regular fa-file-lines";
+
+    updateStats(
+        item.content
+        ||
+        ""
+    );
+
+    applyFontStyle(
+        item.fontStyle
+        ||
+        "mono"
+    );
+
+    elements.fontStyle.value =
+
+        item.fontStyle
+        ||
+        "mono";
+}
+
+
+function updateStats(
+    text
+) {
+
+    const value =
+        text
+        ||
+        "";
+
+    const lines =
+
+        value
+        ?
+        value.split(
+            "\n"
+        ).length
+        :
+        0;
+
+    const words =
+
+        value
+        .trim()
+
+        ?
+
+        value
+        .trim()
+        .split(
+            /\s+/
+        )
+        .length
+
+        :
+
+        0;
+
+    elements.lineCount.textContent =
+        lines;
+
+    elements.wordCount.textContent =
+        words;
+
+    elements.characterCount.textContent =
+        value.length;
+}
+
+
+function setSaveStatus(
+    text,
+    saving = false
+) {
+
+    elements.saveStatus.innerHTML =
+
+        `
+        <i
+            class="
+                fa-solid
+                ${
+                    saving
+                    ?
+                    "fa-cloud-arrow-up"
+                    :
+                    "fa-cloud"
+                }
+            "
+        ></i>
+
+        ${escapeHtml(text)}
+        `;
+
+    elements.saveInfoText.textContent =
+        text;
+}
+
+
+function saveActiveFile(
+    silent = false
+) {
+
+    const item =
+        getActiveItem();
+
+    if (
+        !item
+        ||
+        item.type
+        !==
+        "file"
+    ) {
+
+        return;
+    }
+
+    item.name =
+        elements
+        .fileName
+        .value
+        .trim()
+        ||
+        "Untitled.txt";
+
+    item.content =
+        elements
+        .textEditor
+        .value;
+
+    item.updatedAt =
+        Date.now();
+
+    item.fontStyle =
+        elements
+        .fontStyle
+        .value;
+
+    saveItems();
+
+    renderItems();
+
+    setSaveStatus(
+        "Saved"
+    );
+
+    if (
+        !silent
+    ) {
+
+        showToast(
+            "File saved."
+        );
+    }
+}
+
+
+function queueAutoSave() {
+
+    setSaveStatus(
+        "Saving...",
+        true
+    );
+
+    clearTimeout(
+        saveTimer
+    );
+
+    saveTimer =
+        setTimeout(
+            () => {
+
+                saveActiveFile(
+                    true
+                );
+
+            },
+            550
+        );
+}
+
+
+function applyFontStyle(
+    style
+) {
+
+    elements.textEditor.classList.remove(
+
+        "editor-normal",
+
+        "editor-mono",
+
+        "editor-serif",
+
+        "editor-handwritten"
+
+    );
+
+    elements.textEditor.classList.add(
+
+        "editor-"
+        +
+        style
+
+    );
+}
+
 
 /* =================================
    Clear
 ================================= */
 
-async function clearContent() {
+function clearFile() {
 
-    if (!activeFileId) {
+    const item =
+        getActiveItem();
 
-        return;
-
-    }
-
-    const allowed =
-        await customConfirm(
-            "Clear file?",
-            "All text inside this file will be removed."
-        );
-
-    if (!allowed) {
+    if (
+        !item
+    ) {
 
         return;
-
     }
 
-    textEditor.value =
+    if (
+        !confirm(
+            "Clear all text in this file?"
+        )
+    ) {
+
+        return;
+    }
+
+    elements.textEditor.value =
         "";
 
-    updateFileContent();
-
-    showAppMessage(
-        "File cleared"
+    updateStats(
+        ""
     );
 
+    saveActiveFile(
+        true
+    );
+
+    showToast(
+        "File cleared."
+    );
 }
+
 
 /* =================================
-   Delete
+   Delete / Trash
 ================================= */
 
-async function deleteFile() {
+function deleteActiveFile() {
 
-    if (!activeFileId) {
+    const item =
+        getActiveItem();
 
-        return;
-
-    }
-
-    const file =
-        files.find(
-            item =>
-            item.id ===
-            activeFileId
-        );
-
-    if (!file) {
+    if (
+        !item
+    ) {
 
         return;
-
     }
 
-    const allowed =
-        await customConfirm(
-            "Move to trash?",
-            `"${file.name}" can be restored later.`
-        );
-
-    if (!allowed) {
+    if (
+        !confirm(
+            "Move this file to Trash?"
+        )
+    ) {
 
         return;
-
     }
 
-    files =
-        files.filter(
-            item =>
-            item.id !==
-            activeFileId
-        );
+    item.trashed =
+        true;
 
-    trash.unshift({
-        ...file,
-        deletedAt:
-            new Date()
-            .toISOString()
-    });
+    item.updatedAt =
+        Date.now();
 
-    activeFileId =
+    saveItems();
+
+    activeItemId =
         null;
 
-    saveAll();
-
-    showNoFile();
-
-    renderCurrentView();
-
-    showAppMessage(
-        "Moved to trash"
+    localStorage.removeItem(
+        STORAGE.activeId
     );
 
+    updateEditor();
+
+    renderItems();
+
+    showToast(
+        "Moved to Trash."
+    );
 }
+
+
+function deleteItemById(
+    id
+) {
+
+    const item =
+        items.find(
+            current =>
+            current.id
+            ===
+            id
+        );
+
+    if (
+        !item
+    ) {
+
+        return;
+    }
+
+    if (
+        currentView
+        ===
+        "trash"
+    ) {
+
+        if (
+            !confirm(
+                "Delete permanently?"
+            )
+        ) {
+
+            return;
+        }
+
+        items =
+            items.filter(
+                current =>
+                current.id
+                !==
+                id
+            );
+
+        showToast(
+            "Deleted permanently."
+        );
+
+    } else {
+
+        item.trashed =
+            true;
+
+        item.updatedAt =
+            Date.now();
+
+        showToast(
+            "Moved to Trash."
+        );
+    }
+
+    if (
+        activeItemId
+        ===
+        id
+    ) {
+
+        activeItemId =
+            null;
+
+        updateEditor();
+    }
+
+    saveItems();
+
+    renderItems();
+}
+
+
+function restoreItem(
+    id
+) {
+
+    const item =
+        items.find(
+            current =>
+            current.id
+            ===
+            id
+        );
+
+    if (
+        !item
+    ) {
+
+        return;
+    }
+
+    item.trashed =
+        false;
+
+    item.updatedAt =
+        Date.now();
+
+    saveItems();
+
+    renderItems();
+
+    showToast(
+        "Item restored."
+    );
+}
+
 
 /* =================================
    Download
@@ -1415,32 +1993,34 @@ async function deleteFile() {
 
 function downloadFile() {
 
-    if (!activeFileId) {
+    const item =
+        getActiveItem();
+
+    if (
+        !item
+    ) {
 
         return;
-
     }
 
-    const file =
-        files.find(
-            item =>
-            item.id ===
-            activeFileId
-        );
-
-    if (!file) {
-
-        return;
-
-    }
+    saveActiveFile(
+        true
+    );
 
     const blob =
         new Blob(
-            [file.content],
+
+            [
+                item.content
+                ||
+                ""
+            ],
+
             {
                 type:
-                "text/plain;charset=utf-8"
+                    "text/plain"
             }
+
         );
 
     const url =
@@ -1457,7 +2037,9 @@ function downloadFile() {
         url;
 
     link.download =
-        file.name;
+        item.name
+        ||
+        "file.txt";
 
     document.body.appendChild(
         link
@@ -1471,288 +2053,1512 @@ function downloadFile() {
         url
     );
 
-    showAppMessage(
-        "Download started"
+    showToast(
+        "Download started."
     );
-
 }
 
+
 /* =================================
-   Navigation
+   Upload
 ================================= */
 
-function setupNavigation() {
+function uploadFiles(
+    files
+) {
 
-    const navButtons =
-        document.querySelectorAll(
-            "[data-view]"
-        );
+    if (
+        !files
+        ||
+        !files.length
+    ) {
 
-    navButtons.forEach(
-        button => {
+        return;
+    }
 
-            button.addEventListener(
-                "click",
+    let finished =
+        0;
+
+    [
+        ...files
+    ]
+    .forEach(
+        file => {
+
+            const reader =
+                new FileReader();
+
+            reader.onload =
                 () => {
 
-                    currentView =
-                        button.dataset.view;
+                    const now =
+                        Date.now();
 
-                    navButtons.forEach(
-                        item =>
-                        item.classList.remove(
-                            "active"
-                        )
-                    );
+                    items.unshift({
 
-                    button.classList.add(
-                        "active"
-                    );
+                        id:
+                            createId(),
 
-                    if (
-                        currentView ===
-                        "files"
-                    ) {
+                        type:
+                            "file",
 
-                        renderFiles();
+                        name:
+                            file.name,
 
-                    }
+                        content:
 
-                    if (
-                        currentView ===
-                        "notes"
-                    ) {
+                            typeof reader.result
+                            ===
+                            "string"
 
-                        renderNotes();
+                            ?
 
-                    }
+                            reader.result
 
-                    if (
-                        currentView ===
-                        "trash"
-                    ) {
+                            :
 
-                        renderTrash();
+                            "[Binary file uploaded]",
 
-                    }
+                        uploaded:
+                            true,
 
-                    if (
-                        currentView ===
-                        "shared"
-                    ) {
+                        isNote:
+                            false,
 
-                        fileList.innerHTML = `
+                        trashed:
+                            false,
 
-                            <div class="empty-files">
+                        published:
+                            false,
 
-                                <i class="fa-solid fa-users"></i>
+                        sharedWith:
+                            [],
 
-                                <h3>
-                                    Shared With Me
-                                </h3>
+                        createdAt:
+                            now,
 
-                                <p>
-                                    Shared files will appear here after MongoDB is connected.
-                                </p>
+                        updatedAt:
+                            now
+                    });
 
-                            </div>
-
-                        `;
-
-                    }
+                    finished++;
 
                     if (
-                        currentView ===
-                        "published"
+                        finished
+                        ===
+                        files.length
                     ) {
 
-                        fileList.innerHTML = `
+                        saveItems();
 
-                            <div class="empty-files">
+                        renderItems();
 
-                                <i class="fa-solid fa-earth-americas"></i>
+                        showToast(
 
-                                <h3>
-                                    Explore
-                                </h3>
+                            finished
+                            +
+                            " file"
+                            +
+                            (
+                                finished
+                                ===
+                                1
+                                ?
+                                ""
+                                :
+                                "s"
+                            )
+                            +
+                            " uploaded."
 
-                                <p>
-                                    Published files will appear here after MongoDB is connected.
-                                </p>
-
-                            </div>
-
-                        `;
-
+                        );
                     }
 
-                }
+                };
+
+            reader.onerror =
+                () => {
+
+                    finished++;
+
+                };
+
+            reader.readAsText(
+                file
             );
 
         }
     );
-
 }
+
+
+/* =================================
+   Share
+================================= */
+
+function openShareModal() {
+
+    const item =
+        getActiveItem();
+
+    if (
+        !item
+    ) {
+
+        return;
+    }
+
+    elements.shareIdInput.value =
+        "";
+
+    renderSharedUsers();
+
+    openModal(
+        elements.shareModal
+    );
+}
+
+
+function renderSharedUsers() {
+
+    const item =
+        getActiveItem();
+
+    if (
+        !item
+    ) {
+
+        return;
+    }
+
+    if (
+        !item.sharedWith
+        ||
+        item.sharedWith.length
+        ===
+        0
+    ) {
+
+        elements
+        .sharedUsersList
+        .innerHTML =
+
+            `
+            <div class="empty-files">
+
+                <p>
+                    This file is not shared yet.
+                </p>
+
+            </div>
+            `;
+
+        return;
+    }
+
+    elements
+    .sharedUsersList
+    .innerHTML =
+
+        item
+        .sharedWith
+        .map(
+            user => `
+
+                <div
+                    class="
+                        permission-row
+                    "
+                >
+
+                    <span>
+
+                        ${
+                            escapeHtml(
+                                user.id
+                            )
+                        }
+
+                    </span>
+
+                    <button
+                        class="
+                            item-menu-btn
+                        "
+                        style="
+                            opacity:1
+                        "
+                        data-permission-id="
+                            ${user.id}
+                        "
+                        type="button"
+                    >
+
+                        <i
+                            class="
+                                fa-solid
+                                fa-gear
+                            "
+                        ></i>
+
+                    </button>
+
+                </div>
+
+            `
+        )
+        .join("");
+}
+
+
+function addSharedUser() {
+
+    const item =
+        getActiveItem();
+
+    if (
+        !item
+    ) {
+
+        return;
+    }
+
+    const id =
+        elements
+        .shareIdInput
+        .value
+        .trim()
+        .toUpperCase();
+
+    if (
+        !/^FF-[A-Z0-9]{6}-[A-Z0-9]{6}$/
+        .test(
+            id
+        )
+    ) {
+
+        showToast(
+            "Enter a valid FileForge ID.",
+            "warning"
+        );
+
+        return;
+    }
+
+    if (
+        id
+        ===
+        getDeviceId()
+    ) {
+
+        showToast(
+            "You cannot share with yourself.",
+            "warning"
+        );
+
+        return;
+    }
+
+    item.sharedWith =
+        item.sharedWith
+        ||
+        [];
+
+    if (
+        item.sharedWith.some(
+            user =>
+            user.id
+            ===
+            id
+        )
+    ) {
+
+        showToast(
+            "This user was already added.",
+            "warning"
+        );
+
+        return;
+    }
+
+    item.sharedWith.push({
+
+        id:
+
+            id,
+
+        permissions: {
+
+            view:
+                true,
+
+            edit:
+                false,
+
+            add:
+                false,
+
+            delete:
+                false,
+
+            download:
+                true
+        }
+    });
+
+    saveItems();
+
+    elements.shareIdInput.value =
+        "";
+
+    renderSharedUsers();
+
+    showToast(
+        "User added."
+    );
+}
+
+
+function openPermissions(
+    userId
+) {
+
+    const item =
+        getActiveItem();
+
+    if (
+        !item
+    ) {
+
+        return;
+    }
+
+    const user =
+        item
+        .sharedWith
+        .find(
+            current =>
+            current.id
+            ===
+            userId
+        );
+
+    if (
+        !user
+    ) {
+
+        return;
+    }
+
+    currentPermissionUser =
+        user;
+
+    const permissions =
+        user.permissions;
+
+    elements.permissionView.checked =
+        !!permissions.view;
+
+    elements.permissionEdit.checked =
+        !!permissions.edit;
+
+    elements.permissionAdd.checked =
+        !!permissions.add;
+
+    elements.permissionDelete.checked =
+        !!permissions.delete;
+
+    elements.permissionDownload.checked =
+        !!permissions.download;
+
+    elements.permissionAll.checked =
+
+        !!permissions.view
+
+        &&
+
+        !!permissions.edit
+
+        &&
+
+        !!permissions.add
+
+        &&
+
+        !!permissions.delete
+
+        &&
+
+        !!permissions.download;
+
+    openModal(
+        elements.permissionsModal
+    );
+}
+
+
+function savePermissions() {
+
+    if (
+        !currentPermissionUser
+    ) {
+
+        return;
+    }
+
+    const all =
+        elements.permissionAll.checked;
+
+    currentPermissionUser.permissions = {
+
+        view:
+
+            all
+            ||
+            elements.permissionView.checked,
+
+        edit:
+
+            all
+            ||
+            elements.permissionEdit.checked,
+
+        add:
+
+            all
+            ||
+            elements.permissionAdd.checked,
+
+        delete:
+
+            all
+            ||
+            elements.permissionDelete.checked,
+
+        download:
+
+            all
+            ||
+            elements.permissionDownload.checked
+    };
+
+    saveItems();
+
+    closeModal(
+        elements.permissionsModal
+    );
+
+    showToast(
+        "Permissions saved."
+    );
+}
+
+
+/* =================================
+   Publish
+================================= */
+
+function openPublishModal() {
+
+    const item =
+        getActiveItem();
+
+    if (
+        !item
+    ) {
+
+        return;
+    }
+
+    elements.publishDescription.value =
+
+        item.publishDescription
+        ||
+        "";
+
+    elements.publishVisibility.value =
+
+        item.publishVisibility
+        ||
+        "public";
+
+    elements.previewLines.value =
+
+        item.previewLines
+        ||
+        900;
+
+    openModal(
+        elements.publishModal
+    );
+}
+
+
+function publishFile() {
+
+    const item =
+        getActiveItem();
+
+    if (
+        !item
+    ) {
+
+        return;
+    }
+
+    item.published =
+        true;
+
+    item.publishDescription =
+
+        elements
+        .publishDescription
+        .value
+        .trim();
+
+    item.publishVisibility =
+
+        elements
+        .publishVisibility
+        .value;
+
+    item.previewLines =
+
+        Math.max(
+
+            1,
+
+            Math.min(
+
+                900,
+
+                Number(
+                    elements
+                    .previewLines
+                    .value
+                )
+                ||
+                1
+
+            )
+
+        );
+
+    item.updatedAt =
+        Date.now();
+
+    saveItems();
+
+    closeModal(
+        elements.publishModal
+    );
+
+    renderItems();
+
+    showToast(
+        "File published."
+    );
+}
+
+
+/* =================================
+   Item Menu
+================================= */
+
+function openItemMenu(
+    id
+) {
+
+    const item =
+        items.find(
+            current =>
+            current.id
+            ===
+            id
+        );
+
+    if (
+        !item
+    ) {
+
+        return;
+    }
+
+    if (
+        currentView
+        ===
+        "trash"
+    ) {
+
+        const action =
+            prompt(
+
+                "Type RESTORE to restore or DELETE to delete permanently."
+
+            );
+
+        if (
+            action
+            ===
+            "RESTORE"
+        ) {
+
+            restoreItem(
+                id
+            );
+
+        }
+
+        if (
+            action
+            ===
+            "DELETE"
+        ) {
+
+            deleteItemById(
+                id
+            );
+
+        }
+
+        return;
+    }
+
+    const action =
+        prompt(
+
+            "Type RENAME or DELETE."
+
+        );
+
+    if (
+        action
+        ===
+        "RENAME"
+    ) {
+
+        const name =
+            prompt(
+                "New name:",
+                item.name
+            );
+
+        if (
+            name
+            &&
+            name.trim()
+        ) {
+
+            item.name =
+                name
+                .trim()
+                .slice(
+                    0,
+                    100
+                );
+
+            item.updatedAt =
+                Date.now();
+
+            saveItems();
+
+            renderItems();
+
+            if (
+                activeItemId
+                ===
+                id
+            ) {
+
+                elements.fileName.value =
+                    item.name;
+            }
+
+            showToast(
+                "Item renamed."
+            );
+        }
+    }
+
+    if (
+        action
+        ===
+        "DELETE"
+    ) {
+
+        deleteItemById(
+            id
+        );
+    }
+}
+
+
+/* =================================
+   Online
+================================= */
+
+function updateOnlineCount() {
+
+    elements.onlineCount.textContent =
+        "1";
+}
+
 
 /* =================================
    Events
 ================================= */
 
-newFileBtn
-?.addEventListener(
-    "click",
-    openModal
-);
+function bindEvents() {
 
-createFileBtn
-?.addEventListener(
-    "click",
-    openModal
-);
+    elements.homeBtn
+    .addEventListener(
 
-closeModalBtn
-?.addEventListener(
-    "click",
-    closeModal
-);
+        "click",
 
-cancelFileBtn
-?.addEventListener(
-    "click",
-    closeModal
-);
+        () => {
 
-confirmCreateBtn
-?.addEventListener(
-    "click",
-    createFile
-);
-
-newFileName
-?.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key ===
-            "Enter"
-        ) {
-
-            createFile();
+            setView(
+                "files"
+            );
 
         }
 
-    }
-);
+    );
 
-newFileModal
-?.addEventListener(
-    "click",
-    event => {
 
-        if (
-            event.target ===
-            newFileModal
-        ) {
+    elements.profileBtn
+    .addEventListener(
 
-            closeModal();
+        "click",
 
-        }
+        openProfileSettings
 
-    }
-);
+    );
 
-textEditor
-?.addEventListener(
-    "input",
-    updateFileContent
-);
 
-fileName
-?.addEventListener(
-    "input",
-    renameFile
-);
+    elements.saveProfileBtn
+    .addEventListener(
 
-fileName
-?.addEventListener(
-    "blur",
-    renameFile
-);
+        "click",
 
-searchFiles
-?.addEventListener(
-    "input",
-    renderCurrentView
-);
+        saveFirstProfile
 
-clearBtn
-?.addEventListener(
-    "click",
-    clearContent
-);
+    );
 
-deleteBtn
-?.addEventListener(
-    "click",
-    deleteFile
-);
 
-downloadBtn
-?.addEventListener(
-    "click",
-    downloadFile
-);
+    elements.updateProfileBtn
+    .addEventListener(
 
-saveProfileBtn
-?.addEventListener(
-    "click",
-    createProfile
-);
+        "click",
 
-displayNameInput
-?.addEventListener(
-    "keydown",
-    event => {
+        updateProfile
 
-        if (
-            event.key ===
-            "Enter"
-        ) {
+    );
 
-            createProfile();
+
+    elements.copyIdBtn
+    .addEventListener(
+
+        "click",
+
+        async () => {
+
+            try {
+
+                await navigator
+                .clipboard
+                .writeText(
+
+                    getDeviceId()
+
+                );
+
+                showToast(
+                    "Device ID copied."
+                );
+
+            } catch {
+
+                showToast(
+                    "Could not copy the ID.",
+                    "error"
+                );
+
+            }
 
         }
 
-    }
-);
+    );
+
+
+    elements.newFileBtn
+    .addEventListener(
+
+        "click",
+
+        openNewFileModal
+
+    );
+
+
+    elements.createFileBtn
+    .addEventListener(
+
+        "click",
+
+        openNewFileModal
+
+    );
+
+
+    elements.emptyCreateBtn
+    .addEventListener(
+
+        "click",
+
+        openNewFileModal
+
+    );
+
+
+    elements.createFolderBtn
+    .addEventListener(
+
+        "click",
+
+        openFolderModal
+
+    );
+
+
+    elements.confirmCreateBtn
+    .addEventListener(
+
+        "click",
+
+        createFile
+
+    );
+
+
+    elements.confirmFolderBtn
+    .addEventListener(
+
+        "click",
+
+        createFolder
+
+    );
+
+
+    elements.searchFiles
+    .addEventListener(
+
+        "input",
+
+        renderItems
+
+    );
+
+
+    elements.fileList
+    .addEventListener(
+
+        "click",
+
+        event => {
+
+            const menu =
+                event
+                .target
+                .closest(
+                    "[data-menu-id]"
+                );
+
+            if (
+                menu
+            ) {
+
+                event
+                .preventDefault();
+
+                event
+                .stopPropagation();
+
+                openItemMenu(
+                    menu.dataset.menuId
+                );
+
+                return;
+            }
+
+            const item =
+                event
+                .target
+                .closest(
+                    "[data-item-id]"
+                );
+
+            if (
+                item
+            ) {
+
+                selectItem(
+                    item.dataset.itemId
+                );
+            }
+
+        }
+
+    );
+
+
+    document
+    .querySelectorAll(
+        ".nav-item"
+    )
+    .forEach(
+
+        button => {
+
+            button
+            .addEventListener(
+
+                "click",
+
+                () => {
+
+                    setView(
+
+                        button
+                        .dataset
+                        .view
+
+                    );
+
+                }
+
+            );
+
+        }
+
+    );
+
+
+    elements.fileName
+    .addEventListener(
+
+        "input",
+
+        () => {
+
+            queueAutoSave();
+
+        }
+
+    );
+
+
+    elements.textEditor
+    .addEventListener(
+
+        "input",
+
+        () => {
+
+            updateStats(
+
+                elements
+                .textEditor
+                .value
+
+            );
+
+            queueAutoSave();
+
+        }
+
+    );
+
+
+    elements.textEditor
+    .addEventListener(
+
+        "keydown",
+
+        event => {
+
+            if (
+                event.key
+                ===
+                "Tab"
+            ) {
+
+                event.preventDefault();
+
+                const start =
+                    elements
+                    .textEditor
+                    .selectionStart;
+
+                const end =
+                    elements
+                    .textEditor
+                    .selectionEnd;
+
+                const value =
+                    elements
+                    .textEditor
+                    .value;
+
+                elements
+                .textEditor
+                .value =
+
+                    value.slice(
+                        0,
+                        start
+                    )
+
+                    +
+
+                    "    "
+
+                    +
+
+                    value.slice(
+                        end
+                    );
+
+                elements
+                .textEditor
+                .selectionStart =
+
+                    start
+                    +
+                    4;
+
+                elements
+                .textEditor
+                .selectionEnd =
+
+                    start
+                    +
+                    4;
+
+                updateStats(
+
+                    elements
+                    .textEditor
+                    .value
+
+                );
+
+                queueAutoSave();
+
+            }
+
+        }
+
+    );
+
+
+    elements.fontStyle
+    .addEventListener(
+
+        "change",
+
+        () => {
+
+            applyFontStyle(
+
+                elements
+                .fontStyle
+                .value
+
+            );
+
+            queueAutoSave();
+
+        }
+
+    );
+
+
+    elements.clearBtn
+    .addEventListener(
+
+        "click",
+
+        clearFile
+
+    );
+
+
+    elements.deleteBtn
+    .addEventListener(
+
+        "click",
+
+        deleteActiveFile
+
+    );
+
+
+    elements.downloadBtn
+    .addEventListener(
+
+        "click",
+
+        downloadFile
+
+    );
+
+
+    elements.uploadBtn
+    .addEventListener(
+
+        "click",
+
+        () => {
+
+            elements
+            .fileUploadInput
+            .click();
+
+        }
+
+    );
+
+
+    elements.fileUploadInput
+    .addEventListener(
+
+        "change",
+
+        event => {
+
+            uploadFiles(
+
+                event
+                .target
+                .files
+
+            );
+
+            event.target.value =
+                "";
+
+        }
+
+    );
+
+
+    elements.shareBtn
+    .addEventListener(
+
+        "click",
+
+        openShareModal
+
+    );
+
+
+    elements.addSharedUserBtn
+    .addEventListener(
+
+        "click",
+
+        addSharedUser
+
+    );
+
+
+    elements.sharedUsersList
+    .addEventListener(
+
+        "click",
+
+        event => {
+
+            const button =
+                event
+                .target
+                .closest(
+                    "[data-permission-id]"
+                );
+
+            if (
+                button
+            ) {
+
+                openPermissions(
+
+                    button
+                    .dataset
+                    .permissionId
+
+                );
+
+            }
+
+        }
+
+    );
+
+
+    elements.permissionAll
+    .addEventListener(
+
+        "change",
+
+        () => {
+
+            const value =
+
+                elements
+                .permissionAll
+                .checked;
+
+            elements.permissionView.checked =
+                value;
+
+            elements.permissionEdit.checked =
+                value;
+
+            elements.permissionAdd.checked =
+                value;
+
+            elements.permissionDelete.checked =
+                value;
+
+            elements.permissionDownload.checked =
+                value;
+
+        }
+
+    );
+
+
+    elements.savePermissionsBtn
+    .addEventListener(
+
+        "click",
+
+        savePermissions
+
+    );
+
+
+    elements.publishBtn
+    .addEventListener(
+
+        "click",
+
+        openPublishModal
+
+    );
+
+
+    elements.confirmPublishBtn
+    .addEventListener(
+
+        "click",
+
+        publishFile
+
+    );
+
+
+    document
+    .querySelectorAll(
+        "[data-close]"
+    )
+    .forEach(
+
+        button => {
+
+            button
+            .addEventListener(
+
+                "click",
+
+                () => {
+
+                    closeModal(
+
+                        $(
+                            button
+                            .dataset
+                            .close
+                        )
+
+                    );
+
+                }
+
+            );
+
+        }
+
+    );
+
+
+    document
+    .querySelectorAll(
+        ".modal"
+    )
+    .forEach(
+
+        modal => {
+
+            modal
+            .addEventListener(
+
+                "click",
+
+                event => {
+
+                    if (
+                        event.target
+                        ===
+                        modal
+
+                        &&
+
+                        modal
+                        !==
+                        elements
+                        .profileModal
+                    ) {
+
+                        closeModal(
+                            modal
+                        );
+
+                    }
+
+                }
+
+            );
+
+        }
+
+    );
+
+
+    document
+    .addEventListener(
+
+        "keydown",
+
+        event => {
+
+            if (
+                event.key
+                ===
+                "Escape"
+            ) {
+
+                closeAllModals();
+
+            }
+
+        }
+
+    );
+
+
+    window
+    .addEventListener(
+
+        "beforeunload",
+
+        () => {
+
+            saveActiveFile(
+                true
+            );
+
+        }
+
+    );
+}
+
 
 /* =================================
    Start
 ================================= */
 
-loadData();
+function startApp() {
 
-setupNavigation();
+    loadItems();
 
-renderFiles();
+    activeItemId =
 
-if (
-    files.length > 0
-) {
+        localStorage.getItem(
+            STORAGE.activeId
+        );
 
-    openFile(
-        files[0].id
+    currentView =
+
+        localStorage.getItem(
+            STORAGE.view
+        )
+
+        ||
+
+        "files";
+
+    setupProfile();
+
+    bindEvents();
+
+    updateOnlineCount();
+
+    setView(
+        currentView
     );
 
-} else {
+    if (
+        activeItemId
+    ) {
 
-    showNoFile();
+        const item =
+            items.find(
+                current =>
 
+                    current.id
+                    ===
+                    activeItemId
+
+                    &&
+
+                    !current.trashed
+
+            );
+
+        if (
+            item
+        ) {
+
+            updateEditor();
+
+        }
+
+    }
+
+    setSaveStatus(
+        "Ready"
+    );
 }
 
-if (!userProfile) {
 
-    openProfileModal();
+document
+.addEventListener(
 
-}
+    "DOMContentLoaded",
+
+    startApp
+
+);
