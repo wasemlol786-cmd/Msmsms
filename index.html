@@ -1,1467 +1,286 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileForge</title>
 
-<meta charset="UTF-8">
+    <!-- Website Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
->
-
-<title>FileForge</title>
-
-<link
-rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
->
-
-<link
-rel="stylesheet"
-href="style.css"
->
-
+    <!-- Main CSS File -->
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
-
-<!-- ================================
-FileForge App
-================================= -->
-
+<!-- Main App -->
 <main class="app">
 
-
-<!-- Top Bar -->
-
-<header class="topbar">
-
-
-<button
-class="logo"
-id="homeBtn"
-type="button"
->
-
-<div class="logo-icon">
-
-<i class="fa-solid fa-file-lines"></i>
-
-</div>
-
-<div>
-
-<h1>FileForge</h1>
-
-<p>
-Create, organize and share.
-</p>
-
-</div>
-
-</button>
-
-
-<div class="topbar-right">
-
-
-<div class="online-box">
-
-<span class="online-dot"></span>
-
-<strong id="onlineCount">
-0
-</strong>
-
-<span>
-Online
-</span>
-
-</div>
-
-
-<button
-class="profile-btn"
-id="profileBtn"
-type="button"
->
-
-<span class="profile-avatar">
-
-<i class="fa-solid fa-user"></i>
-
-</span>
-
-<span class="profile-details">
-
-<strong id="profileName">
-FileForge User
-</strong>
-
-<small>
-My Profile
-</small>
-
-</span>
-
-</button>
-
-
-<button
-class="new-file-btn"
-id="newFileBtn"
-type="button"
->
-
-<i class="fa-solid fa-plus"></i>
-
-<span>
-New File
-</span>
-
-</button>
-
-
-</div>
-
-
-</header>
-
-
-
-<!-- Workspace -->
-
-<section class="workspace">
-
-
-<!-- Sidebar -->
-
-<aside class="sidebar">
-
-
-<nav class="sidebar-nav">
-
-
-<button
-class="nav-item active"
-data-view="files"
-type="button"
->
-
-<i class="fa-solid fa-folder"></i>
-
-<span>
-My Files
-</span>
-
-</button>
-
-
-<button
-class="nav-item"
-data-view="notes"
-type="button"
->
-
-<i class="fa-solid fa-note-sticky"></i>
-
-<span>
-My Notes
-</span>
-
-</button>
-
-
-<button
-class="nav-item"
-data-view="shared"
-type="button"
->
-
-<i class="fa-solid fa-users"></i>
-
-<span>
-Shared With Me
-</span>
-
-</button>
-
-
-<button
-class="nav-item"
-data-view="explore"
-type="button"
->
-
-<i class="fa-solid fa-earth-americas"></i>
-
-<span>
-Explore
-</span>
-
-</button>
-
-
-<button
-class="nav-item"
-data-view="trash"
-type="button"
->
-
-<i class="fa-solid fa-trash"></i>
-
-<span>
-Trash
-</span>
-
-<strong
-id="trashCount"
-class="trash-badge"
->
-
-0
-
-</strong>
-
-</button>
-
-
-</nav>
-
-
-
-<div class="sidebar-header">
-
-
-<div>
-
-<h2 id="sidebarTitle">
-My Files
-</h2>
-
-<span id="fileCount">
-0 items
-</span>
-
-</div>
-
-
-<div class="sidebar-header-actions">
-
-
-<button
-class="icon-btn"
-id="createFolderBtn"
-type="button"
-title="Create Folder"
->
-
-<i class="fa-solid fa-folder-plus"></i>
-
-</button>
-
-
-<button
-class="icon-btn"
-id="createFileBtn"
-type="button"
-title="Create File"
->
-
-<i class="fa-solid fa-file-circle-plus"></i>
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-
-<div class="search-box">
-
-
-<i class="fa-solid fa-magnifying-glass"></i>
-
-
-<input
-id="searchFiles"
-type="search"
-placeholder="Search..."
-autocomplete="off"
->
-
-
-</div>
-
-
-
-<div
-class="file-list"
-id="fileList"
->
-
-</div>
-
-
-
-<button
-class="upload-btn"
-id="uploadBtn"
-type="button"
->
-
-<i class="fa-solid fa-arrow-up-from-bracket"></i>
-
-Upload File
-
-</button>
-
-
-<input
-id="fileUploadInput"
-type="file"
-hidden
-multiple
->
-
-
-</aside>
-
-
-
-<!-- Main Editor -->
-
-<section class="editor-section">
-
-
-<header class="editor-header">
-
-
-<div class="file-title-area">
-
-
-<i
-id="activeItemIcon"
-class="fa-regular fa-file-lines"
-></i>
-
-
-<input
-id="fileName"
-type="text"
-placeholder="Select a file..."
-maxlength="100"
-autocomplete="off"
-disabled
->
-
-
-</div>
-
-
-
-<div class="editor-actions">
-
-
-<select
-id="fontStyle"
-disabled
->
-
-<option value="normal">
-
-Normal
-
-</option>
-
-<option value="mono">
-
-Monospace
-
-</option>
-
-<option value="serif">
-
-Serif
-
-</option>
-
-<option value="handwritten">
-
-Handwritten
-
-</option>
-
-</select>
-
-
-
-<span
-class="save-status"
-id="saveStatus"
->
-
-<i class="fa-solid fa-cloud"></i>
-
-Ready
-
-</span>
-
-
-
-<button
-class="action-btn"
-id="shareBtn"
-type="button"
-disabled
->
-
-<i class="fa-solid fa-user-plus"></i>
-
-<span>
-Share
-</span>
-
-</button>
-
-
-
-<button
-class="action-btn"
-id="downloadBtn"
-type="button"
-disabled
->
-
-<i class="fa-solid fa-download"></i>
-
-<span>
-Download
-</span>
-
-</button>
-
-
-
-<button
-class="action-btn"
-id="clearBtn"
-type="button"
-disabled
->
-
-<i class="fa-solid fa-eraser"></i>
-
-<span>
-Clear
-</span>
-
-</button>
-
-
-
-<button
-class="action-btn publish-btn"
-id="publishBtn"
-type="button"
-disabled
->
-
-<i class="fa-solid fa-globe"></i>
-
-<span>
-Publish
-</span>
-
-</button>
-
-
-
-<button
-class="action-btn delete-btn"
-id="deleteBtn"
-type="button"
-disabled
->
-
-<i class="fa-solid fa-trash"></i>
-
-<span>
-Delete
-</span>
-
-</button>
-
-
-</div>
-
-
-</header>
-
-
-
-<div class="editor-container">
-
-
-<textarea
-id="textEditor"
-placeholder="Select a file to start..."
-spellcheck="false"
-autocomplete="off"
-autocorrect="off"
-autocapitalize="off"
-disabled
-></textarea>
-
-
-<div
-class="editor-empty"
-id="editorEmpty"
->
-
-
-<i class="fa-regular fa-folder-open"></i>
-
-
-<h2>
-Your workspace is ready
-</h2>
-
-
-<p>
-
-Create a file, create a folder,
-or upload something from your device.
-
-</p>
-
-
-<button
-class="create-btn"
-id="emptyCreateBtn"
-type="button"
->
-
-<i class="fa-solid fa-plus"></i>
-
-Create Your First File
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-
-<footer class="editor-footer">
-
-
-<div class="stats">
-
-
-<span>
-
-<i class="fa-solid fa-align-left"></i>
-
-Lines:
-
-<strong id="lineCount">
-
-0
-
-</strong>
-
-</span>
-
-
-<span>
-
-<i class="fa-solid fa-font"></i>
-
-Words:
-
-<strong id="wordCount">
-
-0
-
-</strong>
-
-</span>
-
-
-<span>
-
-<i class="fa-solid fa-keyboard"></i>
-
-Characters:
-
-<strong id="characterCount">
-
-0
-
-</strong>
-
-</span>
-
-
-</div>
-
-
-
-<div class="save-info">
-
-
-<i class="fa-solid fa-cloud"></i>
-
-
-<span id="saveInfoText">
-
-Ready
-
-</span>
-
-
-</div>
-
-
-</footer>
-
-
-</section>
-
-
-</section>
-
+    <!-- Top Bar -->
+    <header class="topbar">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fa-solid fa-file-lines"></i>
+            </div>
+            <div>
+                <h1>FileForge</h1>
+                <p>Your personal workspace</p>
+            </div>
+        </div>
+
+        <div class="topbar-actions">
+            <!-- User Profile Button -->
+            <button class="profile-chip-btn" id="profileChipBtn" type="button" title="View Profile">
+                <i class="fa-solid fa-user"></i>
+                <span id="topbarUserName">User</span>
+            </button>
+
+            <!-- Mobile / Device File Upload -->
+            <label class="action-btn upload-btn-label" title="Upload File from Device">
+                <i class="fa-solid fa-file-arrow-up"></i>
+                <span>Upload</span>
+                <input type="file" id="mobileFileUpload" hidden>
+            </label>
+
+            <!-- New Folder Button -->
+            <button class="action-btn" id="newFolderBtn" type="button" title="New Folder">
+                <i class="fa-solid fa-folder-plus"></i>
+                <span>Folder</span>
+            </button>
+
+            <!-- New File Button -->
+            <button class="new-file-btn" id="newFileBtn" type="button">
+                <i class="fa-solid fa-plus"></i>
+                <span>New File</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Workspace -->
+    <section class="workspace">
+
+        <!-- Files Sidebar -->
+        <aside class="sidebar">
+
+            <!-- Sidebar Navigation Tabs -->
+            <div class="sidebar-tabs">
+                <button class="tab-btn active" id="tabFiles" type="button">
+                    <i class="fa-solid fa-folder"></i> Explorer
+                </button>
+                <button class="tab-btn" id="tabNotes" type="button">
+                    <i class="fa-solid fa-note-sticky"></i> Notes
+                </button>
+            </div>
+
+            <!-- Explorer View -->
+            <div class="tab-content" id="explorerView">
+                <div class="sidebar-header">
+                    <div>
+                        <h2 id="sidebarTitle">My Workspace</h2>
+                        <span id="fileCount">0 items</span>
+                    </div>
+
+                    <div class="sidebar-actions-fast">
+                        <button class="icon-btn" id="createFileBtn" type="button" title="Create File">
+                            <i class="fa-solid fa-file-circle-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Navigation Breadcrumbs -->
+                <div class="breadcrumbs" id="breadcrumbs">
+                    <span class="crumb active" data-folder-id="root"><i class="fa-solid fa-house"></i> Root</span>
+                </div>
+
+                <!-- Search -->
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search" id="searchFiles" placeholder="Search items..." autocomplete="off">
+                </div>
+
+                <!-- Files & Folders List -->
+                <div class="file-list" id="fileList">
+                    <div class="empty-files" id="emptyFiles">
+                        <i class="fa-regular fa-folder-open"></i>
+                        <h3>No items yet</h3>
+                        <p>Create a file or folder to start working.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Notes View -->
+            <div class="tab-content hidden" id="notesView">
+                <div class="sidebar-header">
+                    <div>
+                        <h2>Quick Notes</h2>
+                        <span>Personal Scratchpad</span>
+                    </div>
+                </div>
+                <div class="notes-container">
+                    <textarea id="quickNotesArea" placeholder="Write down quick scratchpad thoughts, code snippets, or reminders here..."></textarea>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Editor Section -->
+        <section class="editor-section">
+
+            <!-- Editor Header -->
+            <div class="editor-header">
+                <div class="file-title-area">
+                    <i class="fa-regular fa-file-lines" id="activeFileHeaderIcon"></i>
+                    <input type="text" id="fileName" value="Untitled File" placeholder="File name..." autocomplete="off">
+                </div>
+
+                <div class="editor-actions">
+                    <!-- Font Style Selector -->
+                    <div class="font-style-picker">
+                        <i class="fa-solid fa-font"></i>
+                        <select id="fontStyleSelect" title="Select Font Style">
+                            <option value="font-default">Normal (Monospace)</option>
+                            <option value="font-sans">Clean Sans-Serif</option>
+                            <option value="font-fancy">Fancy Cursive</option>
+                            <option value="font-serif">Classic Serif</option>
+                            <option value="font-code">Code Contrast</option>
+                        </select>
+                    </div>
+
+                    <span class="save-status" id="saveStatus">
+                        <i class="fa-solid fa-cloud"></i> Ready
+                    </span>
+
+                    <button class="action-btn" id="downloadBtn" type="button" title="Download File">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Download</span>
+                    </button>
+
+                    <button class="action-btn" id="clearBtn" type="button" title="Clear Content">
+                        <i class="fa-solid fa-eraser"></i>
+                        <span>Clear</span>
+                    </button>
+
+                    <button class="action-btn delete-btn" id="deleteBtn" type="button" title="Delete File">
+                        <i class="fa-solid fa-trash"></i>
+                        <span>Delete</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Text Editor -->
+            <div class="editor-container">
+                <textarea id="textEditor" class="font-default" placeholder="Start writing here..." spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+            </div>
+
+            <!-- Editor Footer -->
+            <footer class="editor-footer">
+                <div class="stats">
+                    <span><i class="fa-solid fa-align-left"></i> Lines: <strong id="lineCount">1</strong></span>
+                    <span><i class="fa-solid fa-font"></i> Words: <strong id="wordCount">0</strong></span>
+                    <span><i class="fa-solid fa-keyboard"></i> Characters: <strong id="characterCount">0</strong></span>
+                </div>
+
+                <div class="save-info">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Saved locally on this device</span>
+                </div>
+            </footer>
+
+        </section>
+
+    </section>
 
 </main>
 
-
-
-<!-- Create File -->
-
-<div
-class="modal"
-id="newFileModal"
->
-
-
-<div class="modal-box">
-
-
-<div class="modal-header">
-
-
-<div>
-
-<h2>
-Create New File
-</h2>
-
-<p>
-Choose a name and folder.
-</p>
-
+<!-- New File Modal -->
+<div class="modal" id="newFileModal" aria-hidden="true">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div>
+                <h2>Create New File</h2>
+                <p>Choose a name for your file.</p>
+            </div>
+            <button class="close-modal" id="closeModalBtn" type="button" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <label for="newFileName">File Name</label>
+            <input type="text" id="newFileName" placeholder="Example: index.js, app.py, notes.txt" maxlength="100" autocomplete="off">
+        </div>
+        <div class="modal-actions">
+            <button class="cancel-btn" id="cancelFileBtn" type="button">Cancel</button>
+            <button class="create-btn" id="confirmCreateBtn" type="button">
+                <i class="fa-solid fa-plus"></i> Create File
+            </button>
+        </div>
+    </div>
 </div>
 
-
-<button
-class="close-modal"
-data-close="newFileModal"
-type="button"
->
-
-<i class="fa-solid fa-xmark"></i>
-
-</button>
-
-
+<!-- New Folder Modal -->
+<div class="modal" id="newFolderModal" aria-hidden="true">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div>
+                <h2>Create Folder</h2>
+                <p>Enter folder name.</p>
+            </div>
+            <button class="close-modal" id="closeFolderModalBtn" type="button">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <label for="newFolderName">Folder Name</label>
+            <input type="text" id="newFolderName" placeholder="Example: Scripts, ProjectFiles" maxlength="100" autocomplete="off">
+        </div>
+        <div class="modal-actions">
+            <button class="cancel-btn" id="cancelFolderBtn" type="button">Cancel</button>
+            <button class="create-btn" id="confirmCreateFolderBtn" type="button">
+                <i class="fa-solid fa-folder-plus"></i> Create Folder
+            </button>
+        </div>
+    </div>
 </div>
 
-
-<div class="modal-content">
-
-
-<label>
-File Name
-</label>
-
-
-<input
-id="newFileName"
-type="text"
-placeholder="Example: ideas.txt"
-maxlength="100"
->
-
-
-<label>
-Folder
-</label>
-
-
-<select
-id="newFileFolder"
->
-
-<option value="root">
-
-My Files
-
-</option>
-
-</select>
-
-
+<!-- Custom Confirmation Dialog Modal -->
+<div class="modal" id="confirmModal" aria-hidden="true">
+    <div class="modal-box custom-dialog-box">
+        <div class="dialog-icon warning-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h2 id="confirmTitle">Are you sure?</h2>
+        <p id="confirmMessage">This action cannot be undone.</p>
+        <div class="modal-actions dialog-actions">
+            <button class="cancel-btn" id="confirmCancelBtn" type="button">Cancel</button>
+            <button class="create-btn delete-confirm-btn" id="confirmOkBtn" type="button">Confirm</button>
+        </div>
+    </div>
 </div>
 
+<!-- Profile / Welcome Modal -->
+<div class="modal" id="profileModal" aria-hidden="true">
+    <div class="modal-box profile-modal-box">
+        <div class="profile-welcome-icon">
+            <i class="fa-solid fa-user-gear"></i>
+        </div>
+        <h2>User Profile</h2>
+        <p>Manage your workspace display name.</p>
 
-<div class="modal-actions">
+        <div class="modal-content">
+            <label for="displayNameInput">Display Name</label>
+            <input type="text" id="displayNameInput" placeholder="Example: Malik" maxlength="30" autocomplete="off">
+            <small id="profileCooldownMsg">You can change your name once every 7 days.</small>
+        </div>
 
-
-<button
-class="cancel-btn"
-data-close="newFileModal"
-type="button"
->
-
-Cancel
-
-</button>
-
-
-<button
-class="create-btn"
-id="confirmCreateBtn"
-type="button"
->
-
-Create File
-
-</button>
-
-
+        <div class="modal-actions">
+            <button class="cancel-btn hidden" id="closeProfileBtn" type="button">Close</button>
+            <button class="create-btn" id="saveProfileBtn" type="button">
+                <i class="fa-solid fa-check"></i> Save Name
+            </button>
+        </div>
+    </div>
 </div>
 
-
-</div>
-
-
-</div>
-
-
-
-<!-- Create Folder -->
-
-<div
-class="modal"
-id="folderModal"
->
-
-
-<div class="modal-box">
-
-
-<div class="modal-header">
-
-
-<div>
-
-<h2>
-Create Folder
-</h2>
-
-<p>
-Organize your workspace.
-</p>
-
-</div>
-
-
-<button
-class="close-modal"
-data-close="folderModal"
-type="button"
->
-
-<i class="fa-solid fa-xmark"></i>
-
-</button>
-
-
-</div>
-
-
-<div class="modal-content">
-
-
-<label>
-Folder Name
-</label>
-
-
-<input
-id="folderNameInput"
-type="text"
-placeholder="Example: Projects"
-maxlength="80"
->
-
-
-</div>
-
-
-<div class="modal-actions">
-
-
-<button
-class="cancel-btn"
-data-close="folderModal"
-type="button"
->
-
-Cancel
-
-</button>
-
-
-<button
-class="create-btn"
-id="confirmFolderBtn"
-type="button"
->
-
-Create Folder
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-<!-- Profile -->
-
-<div
-class="modal"
-id="profileModal"
->
-
-
-<div class="modal-box profile-modal-box">
-
-
-<div class="profile-welcome-icon">
-
-<i class="fa-solid fa-file-lines"></i>
-
-</div>
-
-
-<h2>
-Welcome to FileForge
-</h2>
-
-
-<p>
-Choose your display name.
-</p>
-
-
-<div class="modal-content">
-
-
-<label>
-Display Name
-</label>
-
-
-<input
-id="displayNameInput"
-type="text"
-placeholder="Example: Mohamed"
-maxlength="30"
->
-
-
-<small>
-
-You can keep your name forever.
-After changing it,
-you must wait 7 days.
-
-</small>
-
-
-</div>
-
-
-<div class="modal-actions">
-
-
-<button
-class="create-btn"
-id="saveProfileBtn"
-type="button"
->
-
-Continue
-
-<i class="fa-solid fa-arrow-right"></i>
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-<!-- Profile Settings -->
-
-<div
-class="modal"
-id="profileSettingsModal"
->
-
-
-<div class="modal-box">
-
-
-<div class="modal-header">
-
-
-<div>
-
-<h2>
-My Profile
-</h2>
-
-<p>
-Your FileForge identity.
-</p>
-
-</div>
-
-
-<button
-class="close-modal"
-data-close="profileSettingsModal"
-type="button"
->
-
-<i class="fa-solid fa-xmark"></i>
-
-</button>
-
-
-</div>
-
-
-<div class="modal-content">
-
-
-<label>
-Display Name
-</label>
-
-
-<input
-id="profileNameInput"
-type="text"
-maxlength="30"
->
-
-
-<p
-id="nameChangeInfo"
-class="name-change-info"
->
-
-</p>
-
-
-<div class="profile-id-box">
-
-
-<div>
-
-<span>
-Your Device ID
-</span>
-
-<strong id="deviceIdText">
-
-Loading...
-
-</strong>
-
-</div>
-
-
-<button
-id="copyIdBtn"
-class="copy-id-btn"
-type="button"
->
-
-<i class="fa-regular fa-copy"></i>
-
-Copy
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-<div class="modal-actions">
-
-
-<button
-class="cancel-btn"
-data-close="profileSettingsModal"
-type="button"
->
-
-Cancel
-
-</button>
-
-
-<button
-class="create-btn"
-id="updateProfileBtn"
-type="button"
->
-
-Save Changes
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-<!-- Share -->
-
-<div
-class="modal"
-id="shareModal"
->
-
-
-<div class="modal-box">
-
-
-<div class="modal-header">
-
-
-<div>
-
-<h2>
-Share Workspace
-</h2>
-
-<p>
-Add someone using their FileForge ID.
-</p>
-
-</div>
-
-
-<button
-class="close-modal"
-data-close="shareModal"
-type="button"
->
-
-<i class="fa-solid fa-xmark"></i>
-
-</button>
-
-
-</div>
-
-
-<div class="modal-content">
-
-
-<label>
-FileForge ID
-</label>
-
-
-<input
-id="shareIdInput"
-type="text"
-placeholder="FF-XXXXXX-XXXXXX"
->
-
-
-<div
-id="sharedUsersList"
-class="shared-users-list"
->
-
-</div>
-
-
-</div>
-
-
-<div class="modal-actions">
-
-
-<button
-class="create-btn"
-id="addSharedUserBtn"
-type="button"
->
-
-<i class="fa-solid fa-user-plus"></i>
-
-Add User
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-<!-- Permissions -->
-
-<div
-class="modal"
-id="permissionsModal"
->
-
-
-<div class="modal-box">
-
-
-<div class="modal-header">
-
-
-<div>
-
-<h2>
-Permissions
-</h2>
-
-<p>
-Choose what this person can do.
-</p>
-
-</div>
-
-
-<button
-class="close-modal"
-data-close="permissionsModal"
-type="button"
->
-
-<i class="fa-solid fa-xmark"></i>
-
-</button>
-
-
-</div>
-
-
-<div
-class="modal-content permissions-list"
->
-
-
-<label>
-
-<input
-type="checkbox"
-id="permissionView"
->
-
-View
-
-</label>
-
-
-<label>
-
-<input
-type="checkbox"
-id="permissionEdit"
->
-
-Edit
-
-</label>
-
-
-<label>
-
-<input
-type="checkbox"
-id="permissionAdd"
->
-
-Add Files
-
-</label>
-
-
-<label>
-
-<input
-type="checkbox"
-id="permissionDelete"
->
-
-Delete
-
-</label>
-
-
-<label>
-
-<input
-type="checkbox"
-id="permissionDownload"
->
-
-Download
-
-</label>
-
-
-<label>
-
-<input
-type="checkbox"
-id="permissionAll"
->
-
-Full Access
-
-</label>
-
-
-</div>
-
-
-<div class="modal-actions">
-
-
-<button
-class="create-btn"
-id="savePermissionsBtn"
-type="button"
->
-
-Save Permissions
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-<!-- Publish -->
-
-<div
-class="modal"
-id="publishModal"
->
-
-
-<div class="modal-box">
-
-
-<div class="modal-header">
-
-
-<div>
-
-<h2>
-Publish File
-</h2>
-
-<p>
-Share your work with FileForge.
-</p>
-
-</div>
-
-
-<button
-class="close-modal"
-data-close="publishModal"
-type="button"
->
-
-<i class="fa-solid fa-xmark"></i>
-
-</button>
-
-
-</div>
-
-
-<div class="modal-content">
-
-
-<label>
-Description
-</label>
-
-
-<textarea
-id="publishDescription"
-placeholder="Describe your file..."
-maxlength="500"
-></textarea>
-
-
-<label>
-Visibility
-</label>
-
-
-<select
-id="publishVisibility"
->
-
-<option value="public">
-
-Public — everyone can download
-
-</option>
-
-<option value="private">
-
-Private — preview only
-
-</option>
-
-<option value="allowed">
-
-Selected users only
-
-</option>
-
-</select>
-
-
-<label>
-Preview lines
-</label>
-
-
-<input
-id="previewLines"
-type="number"
-value="900"
-min="1"
-max="900"
->
-
-
-</div>
-
-
-<div class="modal-actions">
-
-
-<button
-class="create-btn"
-id="confirmPublishBtn"
-type="button"
->
-
-<i class="fa-solid fa-globe"></i>
-
-Publish
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-<!-- Custom Notification -->
-
-<div
-id="toast"
-class="toast"
->
-
-<i
-id="toastIcon"
-class="fa-solid fa-circle-check"
-></i>
-
-<span id="toastText">
-
-Done
-
-</span>
-
-</div>
-
-
-
+<!-- Main JavaScript File -->
 <script src="script.js"></script>
-
 </body>
-
 </html>
