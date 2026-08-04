@@ -1,1418 +1,1466 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+>
 
-    <title>FileForge</title>
+<title>FileForge</title>
 
-    <!-- Website Icons -->
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-    >
+<link
+rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+>
 
-    <!-- Main CSS -->
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+<link
+rel="stylesheet"
+href="style.css"
+>
 
 </head>
-
 
 <body>
 
 
 <!-- =================================
-     Main Application
+FileForge App
 ================================= -->
 
 <main class="app">
 
 
-    <!-- =================================
-         Top Bar
-    ================================= -->
+<!-- Top Bar -->
 
-    <header class="topbar">
+<header class="topbar">
 
 
-        <!-- Logo -->
+<button
+class="logo"
+id="homeBtn"
+type="button"
+>
 
-        <button
-            class="logo"
-            id="homeBtn"
-            type="button"
-        >
+<div class="logo-icon">
 
-            <div class="logo-icon">
+<i class="fa-solid fa-file-lines"></i>
 
-                <i class="fa-solid fa-file-lines"></i>
+</div>
 
-            </div>
+<div>
 
+<h1>FileForge</h1>
 
-            <div class="logo-text">
+<p>
+Create, organize and share.
+</p>
 
-                <h1>FileForge</h1>
+</div>
 
-                <p>
-                    Create, organize and share.
-                </p>
+</button>
 
-            </div>
 
-        </button>
+<div class="topbar-right">
 
 
-        <!-- Online Users -->
+<div class="online-box">
 
-        <div
-            class="online-box"
-            title="Online users"
-        >
+<span class="online-dot"></span>
 
-            <span class="online-dot"></span>
+<strong id="onlineCount">
+0
+</strong>
 
-            <span id="onlineCount">
-                --
-            </span>
+<span>
+Online
+</span>
 
-            <span class="online-text">
-                Online
-            </span>
+</div>
 
-        </div>
 
+<button
+class="profile-btn"
+id="profileBtn"
+type="button"
+>
 
-        <!-- User Profile -->
+<span class="profile-avatar">
 
-        <button
-            class="profile-btn"
-            id="profileBtn"
-            type="button"
-        >
+<i class="fa-solid fa-user"></i>
 
-            <span class="profile-avatar">
+</span>
 
-                <i class="fa-solid fa-user"></i>
+<span class="profile-details">
 
-            </span>
+<strong id="profileName">
+FileForge User
+</strong>
 
+<small>
+My Profile
+</small>
 
-            <span class="profile-details">
+</span>
 
-                <strong id="profileName">
-                    FileForge User
-                </strong>
+</button>
 
-                <small>
-                    My Profile
-                </small>
 
-            </span>
+<button
+class="new-file-btn"
+id="newFileBtn"
+type="button"
+>
 
-        </button>
+<i class="fa-solid fa-plus"></i>
 
+<span>
+New File
+</span>
 
-        <!-- Create -->
+</button>
 
-        <button
-            class="new-file-btn"
-            id="newFileBtn"
-            type="button"
-        >
 
-            <i class="fa-solid fa-plus"></i>
+</div>
 
-            <span>
-                New
-            </span>
 
-        </button>
+</header>
 
 
-    </header>
 
+<!-- Workspace -->
 
+<section class="workspace">
 
-    <!-- =================================
-         Workspace
-    ================================= -->
 
-    <section class="workspace">
+<!-- Sidebar -->
 
+<aside class="sidebar">
 
-        <!-- =================================
-             Sidebar
-        ================================= -->
 
-        <aside class="sidebar">
+<nav class="sidebar-nav">
 
 
-            <!-- Navigation -->
+<button
+class="nav-item active"
+data-view="files"
+type="button"
+>
 
-            <nav class="sidebar-nav">
+<i class="fa-solid fa-folder"></i>
 
+<span>
+My Files
+</span>
 
-                <button
-                    class="nav-item active"
-                    data-view="files"
-                    type="button"
-                >
+</button>
 
-                    <i class="fa-solid fa-folder"></i>
 
-                    <span>
-                        My Files
-                    </span>
+<button
+class="nav-item"
+data-view="notes"
+type="button"
+>
 
-                </button>
+<i class="fa-solid fa-note-sticky"></i>
 
+<span>
+My Notes
+</span>
 
-                <button
-                    class="nav-item"
-                    data-view="notes"
-                    type="button"
-                >
+</button>
 
-                    <i class="fa-solid fa-note-sticky"></i>
 
-                    <span>
-                        My Notes
-                    </span>
+<button
+class="nav-item"
+data-view="shared"
+type="button"
+>
 
-                </button>
+<i class="fa-solid fa-users"></i>
 
+<span>
+Shared With Me
+</span>
 
-                <button
-                    class="nav-item"
-                    data-view="shared"
-                    type="button"
-                >
+</button>
 
-                    <i class="fa-solid fa-users"></i>
 
-                    <span>
-                        Shared With Me
-                    </span>
+<button
+class="nav-item"
+data-view="explore"
+type="button"
+>
 
-                </button>
+<i class="fa-solid fa-earth-americas"></i>
 
+<span>
+Explore
+</span>
 
-                <button
-                    class="nav-item"
-                    data-view="published"
-                    type="button"
-                >
+</button>
 
-                    <i class="fa-solid fa-earth-americas"></i>
 
-                    <span>
-                        Explore
-                    </span>
+<button
+class="nav-item"
+data-view="trash"
+type="button"
+>
 
-                </button>
+<i class="fa-solid fa-trash"></i>
 
+<span>
+Trash
+</span>
 
-                <button
-                    class="nav-item"
-                    data-view="trash"
-                    type="button"
-                >
+<strong
+id="trashCount"
+class="trash-badge"
+>
 
-                    <i class="fa-solid fa-trash"></i>
+0
 
-                    <span>
-                        Trash
-                    </span>
+</strong>
 
-                    <strong
-                        class="trash-badge"
-                        id="trashCount"
-                    >
-                        0
-                    </strong>
+</button>
 
-                </button>
 
+</nav>
 
-            </nav>
 
 
+<div class="sidebar-header">
 
-            <!-- Sidebar Header -->
 
-            <div class="sidebar-header">
+<div>
 
+<h2 id="sidebarTitle">
+My Files
+</h2>
 
-                <div>
+<span id="fileCount">
+0 items
+</span>
 
-                    <h2 id="sidebarTitle">
-                        My Files
-                    </h2>
+</div>
 
-                    <span id="itemCount">
-                        0 items
-                    </span>
 
-                </div>
+<div class="sidebar-header-actions">
 
 
-                <div class="sidebar-header-actions">
+<button
+class="icon-btn"
+id="createFolderBtn"
+type="button"
+title="Create Folder"
+>
 
+<i class="fa-solid fa-folder-plus"></i>
 
-                    <button
-                        class="icon-btn"
-                        id="createFolderBtn"
-                        type="button"
-                        title="New Folder"
-                    >
+</button>
 
-                        <i class="fa-solid fa-folder-plus"></i>
 
-                    </button>
+<button
+class="icon-btn"
+id="createFileBtn"
+type="button"
+title="Create File"
+>
 
+<i class="fa-solid fa-file-circle-plus"></i>
 
-                    <button
-                        class="icon-btn"
-                        id="createFileBtn"
-                        type="button"
-                        title="New File"
-                    >
+</button>
 
-                        <i class="fa-solid fa-file-circle-plus"></i>
 
-                    </button>
+</div>
 
 
-                </div>
+</div>
 
 
-            </div>
 
+<div class="search-box">
 
 
-            <!-- Search -->
+<i class="fa-solid fa-magnifying-glass"></i>
 
-            <div class="search-box">
 
-                <i class="fa-solid fa-magnifying-glass"></i>
+<input
+id="searchFiles"
+type="search"
+placeholder="Search..."
+autocomplete="off"
+>
 
-                <input
-                    id="searchFiles"
-                    type="search"
-                    placeholder="Search..."
-                    autocomplete="off"
-                >
 
-            </div>
+</div>
 
 
 
-            <!-- File List -->
+<div
+class="file-list"
+id="fileList"
+>
 
-            <div
-                class="file-list"
-                id="fileList"
-            >
+</div>
 
-                <!-- JavaScript adds files here -->
 
-            </div>
 
+<button
+class="upload-btn"
+id="uploadBtn"
+type="button"
+>
 
+<i class="fa-solid fa-arrow-up-from-bracket"></i>
 
-            <!-- Upload -->
+Upload File
 
-            <button
-                class="upload-btn"
-                id="uploadBtn"
-                type="button"
-            >
+</button>
 
-                <i class="fa-solid fa-arrow-up-from-bracket"></i>
 
-                Upload File
+<input
+id="fileUploadInput"
+type="file"
+hidden
+multiple
+>
 
-            </button>
 
+</aside>
 
-            <input
-                id="fileUploadInput"
-                type="file"
-                hidden
-                multiple
-            >
 
 
-        </aside>
+<!-- Main Editor -->
 
+<section class="editor-section">
 
 
-        <!-- =================================
-             Editor
-        ================================= -->
+<header class="editor-header">
 
-        <section class="editor-section">
 
+<div class="file-title-area">
 
-            <!-- Editor Header -->
 
-            <header class="editor-header">
+<i
+id="activeItemIcon"
+class="fa-regular fa-file-lines"
+></i>
 
 
-                <div class="file-title-area">
+<input
+id="fileName"
+type="text"
+placeholder="Select a file..."
+maxlength="100"
+autocomplete="off"
+disabled
+>
 
 
-                    <i
-                        class="fa-regular fa-file-lines"
-                        id="activeItemIcon"
-                    ></i>
+</div>
 
 
-                    <input
-                        id="fileName"
-                        type="text"
-                        value=""
-                        placeholder="Select or create a file..."
-                        maxlength="100"
-                        autocomplete="off"
-                        disabled
-                    >
 
+<div class="editor-actions">
 
-                </div>
 
+<select
+id="fontStyle"
+disabled
+>
 
+<option value="normal">
 
-                <div class="editor-actions">
+Normal
 
+</option>
 
-                    <!-- Font -->
+<option value="mono">
 
-                    <select
-                        id="fontStyle"
-                        title="Text style"
-                        disabled
-                    >
+Monospace
 
-                        <option value="normal">
-                            Normal
-                        </option>
+</option>
 
-                        <option value="mono">
-                            Monospace
-                        </option>
+<option value="serif">
 
-                        <option value="serif">
-                            Serif
-                        </option>
+Serif
 
-                        <option value="handwritten">
-                            Handwritten
-                        </option>
+</option>
 
-                    </select>
+<option value="handwritten">
 
+Handwritten
 
+</option>
 
-                    <!-- Save -->
+</select>
 
-                    <span
-                        class="save-status"
-                        id="saveStatus"
-                    >
 
-                        <i class="fa-solid fa-cloud"></i>
 
-                        Ready
+<span
+class="save-status"
+id="saveStatus"
+>
 
-                    </span>
+<i class="fa-solid fa-cloud"></i>
 
+Ready
 
+</span>
 
-                    <!-- Download -->
 
-                    <button
-                        class="action-btn"
-                        id="downloadBtn"
-                        type="button"
-                        disabled
-                    >
 
-                        <i class="fa-solid fa-download"></i>
+<button
+class="action-btn"
+id="shareBtn"
+type="button"
+disabled
+>
 
-                        <span>
-                            Download
-                        </span>
+<i class="fa-solid fa-user-plus"></i>
 
-                    </button>
+<span>
+Share
+</span>
 
+</button>
 
 
-                    <!-- Clear -->
 
-                    <button
-                        class="action-btn"
-                        id="clearBtn"
-                        type="button"
-                        disabled
-                    >
+<button
+class="action-btn"
+id="downloadBtn"
+type="button"
+disabled
+>
 
-                        <i class="fa-solid fa-eraser"></i>
+<i class="fa-solid fa-download"></i>
 
-                        <span>
-                            Clear
-                        </span>
+<span>
+Download
+</span>
 
-                    </button>
+</button>
 
 
 
-                    <!-- Rename -->
+<button
+class="action-btn"
+id="clearBtn"
+type="button"
+disabled
+>
 
-                    <button
-                        class="action-btn"
-                        id="renameBtn"
-                        type="button"
-                        disabled
-                    >
+<i class="fa-solid fa-eraser"></i>
 
-                        <i class="fa-solid fa-pen"></i>
+<span>
+Clear
+</span>
 
-                        <span>
-                            Rename
-                        </span>
+</button>
 
-                    </button>
 
 
+<button
+class="action-btn publish-btn"
+id="publishBtn"
+type="button"
+disabled
+>
 
-                    <!-- Publish -->
+<i class="fa-solid fa-globe"></i>
 
-                    <button
-                        class="action-btn publish-btn"
-                        id="publishBtn"
-                        type="button"
-                        disabled
-                    >
+<span>
+Publish
+</span>
 
-                        <i class="fa-solid fa-globe"></i>
+</button>
 
-                        <span>
-                            Publish
-                        </span>
 
-                    </button>
 
+<button
+class="action-btn delete-btn"
+id="deleteBtn"
+type="button"
+disabled
+>
 
+<i class="fa-solid fa-trash"></i>
 
-                    <!-- Delete -->
+<span>
+Delete
+</span>
 
-                    <button
-                        class="action-btn delete-btn"
-                        id="deleteBtn"
-                        type="button"
-                        disabled
-                    >
+</button>
 
-                        <i class="fa-solid fa-trash"></i>
 
-                        <span>
-                            Delete
-                        </span>
+</div>
 
-                    </button>
 
+</header>
 
-                </div>
 
 
-            </header>
+<div class="editor-container">
 
 
+<textarea
+id="textEditor"
+placeholder="Select a file to start..."
+spellcheck="false"
+autocomplete="off"
+autocorrect="off"
+autocapitalize="off"
+disabled
+></textarea>
 
-            <!-- Editor -->
 
-            <div class="editor-container">
+<div
+class="editor-empty"
+id="editorEmpty"
+>
 
 
-                <textarea
-                    id="textEditor"
-                    placeholder="Select a file to start..."
-                    spellcheck="false"
-                    autocomplete="off"
-                    autocorrect="off"
-                    autocapitalize="off"
-                    disabled
-                ></textarea>
+<i class="fa-regular fa-folder-open"></i>
 
 
-                <div
-                    class="editor-empty"
-                    id="editorEmpty"
-                >
+<h2>
+Your workspace is ready
+</h2>
 
-                    <i class="fa-regular fa-folder-open"></i>
 
-                    <h2>
-                        Your workspace is ready
-                    </h2>
+<p>
 
-                    <p>
-                        Create a file, create a folder,
-                        or upload something from your device.
-                    </p>
+Create a file, create a folder,
+or upload something from your device.
 
-                    <button
-                        id="emptyCreateBtn"
-                        class="create-btn"
-                        type="button"
-                    >
+</p>
 
-                        <i class="fa-solid fa-plus"></i>
 
-                        Create Your First File
+<button
+class="create-btn"
+id="emptyCreateBtn"
+type="button"
+>
 
-                    </button>
+<i class="fa-solid fa-plus"></i>
 
-                </div>
+Create Your First File
 
+</button>
 
-            </div>
 
+</div>
 
 
-            <!-- Editor Footer -->
+</div>
 
-            <footer class="editor-footer">
 
 
-                <div class="stats">
+<footer class="editor-footer">
 
 
-                    <span>
+<div class="stats">
 
-                        <i class="fa-solid fa-align-left"></i>
 
-                        Lines:
+<span>
 
-                        <strong id="lineCount">
-                            0
-                        </strong>
+<i class="fa-solid fa-align-left"></i>
 
-                    </span>
+Lines:
 
+<strong id="lineCount">
 
-                    <span>
+0
 
-                        <i class="fa-solid fa-font"></i>
+</strong>
 
-                        Words:
+</span>
 
-                        <strong id="wordCount">
-                            0
-                        </strong>
 
-                    </span>
+<span>
 
+<i class="fa-solid fa-font"></i>
 
-                    <span>
+Words:
 
-                        <i class="fa-solid fa-keyboard"></i>
+<strong id="wordCount">
 
-                        Characters:
+0
 
-                        <strong id="characterCount">
-                            0
-                        </strong>
+</strong>
 
-                    </span>
+</span>
 
 
-                </div>
+<span>
 
+<i class="fa-solid fa-keyboard"></i>
 
+Characters:
 
-                <div class="save-info">
+<strong id="characterCount">
 
+0
 
-                    <i class="fa-solid fa-shield-halved"></i>
+</strong>
 
+</span>
 
-                    <span id="saveInfoText">
 
-                        Saved on this device
+</div>
 
-                    </span>
 
 
-                </div>
+<div class="save-info">
 
 
-            </footer>
+<i class="fa-solid fa-cloud"></i>
 
 
-        </section>
+<span id="saveInfoText">
 
+Ready
 
-    </section>
+</span>
+
+
+</div>
+
+
+</footer>
+
+
+</section>
+
+
+</section>
 
 
 </main>
 
 
 
-<!-- =================================
-     Create File Modal
-================================= -->
+<!-- Create File -->
 
 <div
-    class="modal"
-    id="newFileModal"
-    aria-hidden="true"
+class="modal"
+id="newFileModal"
 >
 
 
-    <div class="modal-box">
+<div class="modal-box">
 
 
-        <div class="modal-header">
+<div class="modal-header">
 
 
-            <div>
+<div>
 
-                <h2>
-                    Create New File
-                </h2>
+<h2>
+Create New File
+</h2>
 
-                <p>
-                    Choose a name and location.
-                </p>
+<p>
+Choose a name and folder.
+</p>
 
-            </div>
-
-
-            <button
-                class="close-modal"
-                data-close-modal="newFileModal"
-                type="button"
-            >
-
-                <i class="fa-solid fa-xmark"></i>
-
-            </button>
+</div>
 
 
-        </div>
+<button
+class="close-modal"
+data-close="newFileModal"
+type="button"
+>
+
+<i class="fa-solid fa-xmark"></i>
+
+</button>
 
 
-
-        <div class="modal-content">
-
-
-            <label for="newFileName">
-
-                File Name
-
-            </label>
+</div>
 
 
-            <input
-                id="newFileName"
-                type="text"
-                placeholder="Example: ideas.txt"
-                maxlength="100"
-                autocomplete="off"
-            >
+<div class="modal-content">
 
 
-            <label for="newFileFolder">
-
-                Folder
-
-            </label>
+<label>
+File Name
+</label>
 
 
-            <select id="newFileFolder">
-
-                <option value="root">
-
-                    My Files
-
-                </option>
-
-            </select>
+<input
+id="newFileName"
+type="text"
+placeholder="Example: ideas.txt"
+maxlength="100"
+>
 
 
-        </div>
+<label>
+Folder
+</label>
 
 
+<select
+id="newFileFolder"
+>
 
-        <div class="modal-actions">
+<option value="root">
 
+My Files
 
-            <button
-                class="cancel-btn"
-                data-close-modal="newFileModal"
-                type="button"
-            >
+</option>
 
-                Cancel
-
-            </button>
+</select>
 
 
-            <button
-                class="create-btn"
-                id="confirmCreateBtn"
-                type="button"
-            >
-
-                <i class="fa-solid fa-plus"></i>
-
-                Create File
-
-            </button>
+</div>
 
 
-        </div>
+<div class="modal-actions">
 
 
-    </div>
+<button
+class="cancel-btn"
+data-close="newFileModal"
+type="button"
+>
+
+Cancel
+
+</button>
+
+
+<button
+class="create-btn"
+id="confirmCreateBtn"
+type="button"
+>
+
+Create File
+
+</button>
+
+
+</div>
+
+
+</div>
 
 
 </div>
 
 
 
-<!-- =================================
-     Create Folder Modal
-================================= -->
+<!-- Create Folder -->
 
 <div
-    class="modal"
-    id="newFolderModal"
-    aria-hidden="true"
+class="modal"
+id="folderModal"
 >
 
 
-    <div class="modal-box">
+<div class="modal-box">
 
 
-        <div class="modal-header">
+<div class="modal-header">
 
 
-            <div>
+<div>
 
-                <h2>
-                    Create Folder
-                </h2>
+<h2>
+Create Folder
+</h2>
 
-                <p>
-                    Organize your files.
-                </p>
+<p>
+Organize your workspace.
+</p>
 
-            </div>
-
-
-            <button
-                class="close-modal"
-                data-close-modal="newFolderModal"
-                type="button"
-            >
-
-                <i class="fa-solid fa-xmark"></i>
-
-            </button>
+</div>
 
 
-        </div>
+<button
+class="close-modal"
+data-close="folderModal"
+type="button"
+>
+
+<i class="fa-solid fa-xmark"></i>
+
+</button>
 
 
-
-        <div class="modal-content">
-
-
-            <label for="newFolderName">
-
-                Folder Name
-
-            </label>
+</div>
 
 
-            <input
-                id="newFolderName"
-                type="text"
-                placeholder="Example: Projects"
-                maxlength="80"
-                autocomplete="off"
-            >
+<div class="modal-content">
 
 
-        </div>
+<label>
+Folder Name
+</label>
 
 
-
-        <div class="modal-actions">
-
-
-            <button
-                class="cancel-btn"
-                data-close-modal="newFolderModal"
-                type="button"
-            >
-
-                Cancel
-
-            </button>
+<input
+id="folderNameInput"
+type="text"
+placeholder="Example: Projects"
+maxlength="80"
+>
 
 
-            <button
-                class="create-btn"
-                id="confirmFolderBtn"
-                type="button"
-            >
-
-                <i class="fa-solid fa-folder-plus"></i>
-
-                Create Folder
-
-            </button>
+</div>
 
 
-        </div>
+<div class="modal-actions">
 
 
-    </div>
+<button
+class="cancel-btn"
+data-close="folderModal"
+type="button"
+>
+
+Cancel
+
+</button>
+
+
+<button
+class="create-btn"
+id="confirmFolderBtn"
+type="button"
+>
+
+Create Folder
+
+</button>
+
+
+</div>
+
+
+</div>
 
 
 </div>
 
 
 
-<!-- =================================
-     Profile Setup
-================================= -->
+<!-- Profile -->
 
 <div
-    class="modal"
-    id="profileModal"
-    aria-hidden="true"
+class="modal"
+id="profileModal"
 >
 
 
-    <div class="modal-box profile-modal-box">
+<div class="modal-box profile-modal-box">
 
 
-        <div class="profile-welcome-icon">
+<div class="profile-welcome-icon">
 
-            <i class="fa-solid fa-file-lines"></i>
+<i class="fa-solid fa-file-lines"></i>
 
-        </div>
-
-
-        <h2>
-            Welcome to FileForge
-        </h2>
+</div>
 
 
-        <p>
-            Choose a display name for your workspace.
-        </p>
+<h2>
+Welcome to FileForge
+</h2>
 
 
-        <div class="modal-content">
+<p>
+Choose your display name.
+</p>
 
 
-            <label for="displayNameInput">
-
-                Display Name
-
-            </label>
+<div class="modal-content">
 
 
-            <input
-                id="displayNameInput"
-                type="text"
-                placeholder="Example: Mohamed"
-                maxlength="30"
-                autocomplete="off"
-            >
+<label>
+Display Name
+</label>
 
 
-            <small>
-
-                You can keep your name forever.
-                The 7-day timer only starts
-                after you change it.
-
-            </small>
-
-
-        </div>
+<input
+id="displayNameInput"
+type="text"
+placeholder="Example: Mohamed"
+maxlength="30"
+>
 
 
-        <div class="modal-actions">
+<small>
+
+You can keep your name forever.
+After changing it,
+you must wait 7 days.
+
+</small>
 
 
-            <button
-                class="create-btn"
-                id="saveProfileBtn"
-                type="button"
-            >
-
-                Continue
-
-                <i class="fa-solid fa-arrow-right"></i>
-
-            </button>
+</div>
 
 
-        </div>
+<div class="modal-actions">
 
 
-    </div>
+<button
+class="create-btn"
+id="saveProfileBtn"
+type="button"
+>
+
+Continue
+
+<i class="fa-solid fa-arrow-right"></i>
+
+</button>
+
+
+</div>
+
+
+</div>
 
 
 </div>
 
 
 
-<!-- =================================
-     Profile Settings
-================================= -->
+<!-- Profile Settings -->
 
 <div
-    class="modal"
-    id="profileSettingsModal"
-    aria-hidden="true"
+class="modal"
+id="profileSettingsModal"
 >
 
 
-    <div class="modal-box">
+<div class="modal-box">
 
 
-        <div class="modal-header">
+<div class="modal-header">
 
 
-            <div>
+<div>
 
-                <h2>
-                    My Profile
-                </h2>
+<h2>
+My Profile
+</h2>
 
-                <p>
-                    Your FileForge identity.
-                </p>
+<p>
+Your FileForge identity.
+</p>
 
-            </div>
+</div>
 
 
-            <button
-                class="close-modal"
-                data-close-modal="profileSettingsModal"
-                type="button"
-            >
+<button
+class="close-modal"
+data-close="profileSettingsModal"
+type="button"
+>
 
-                <i class="fa-solid fa-xmark"></i>
+<i class="fa-solid fa-xmark"></i>
 
-            </button>
+</button>
 
 
-        </div>
+</div>
 
 
+<div class="modal-content">
 
-        <div class="modal-content">
 
+<label>
+Display Name
+</label>
 
-            <label for="profileNameInput">
 
-                Display Name
+<input
+id="profileNameInput"
+type="text"
+maxlength="30"
+>
 
-            </label>
 
+<p
+id="nameChangeInfo"
+class="name-change-info"
+>
 
-            <input
-                id="profileNameInput"
-                type="text"
-                maxlength="30"
-                autocomplete="off"
-            >
+</p>
 
 
-            <p
-                class="name-change-info"
-                id="nameChangeInfo"
-            >
+<div class="profile-id-box">
 
-                Loading...
 
-            </p>
+<div>
 
+<span>
+Your Device ID
+</span>
 
+<strong id="deviceIdText">
 
-            <div class="profile-id-box">
+Loading...
 
+</strong>
 
-                <div>
+</div>
 
-                    <span>
 
-                        Your Device ID
+<button
+id="copyIdBtn"
+class="copy-id-btn"
+type="button"
+>
 
-                    </span>
+<i class="fa-regular fa-copy"></i>
 
+Copy
 
-                    <strong id="deviceIdText">
+</button>
 
-                        Loading...
 
-                    </strong>
+</div>
 
 
-                </div>
+</div>
 
 
-                <button
-                    class="copy-id-btn"
-                    id="copyIdBtn"
-                    type="button"
-                >
+<div class="modal-actions">
 
-                    <i class="fa-regular fa-copy"></i>
 
-                    Copy
+<button
+class="cancel-btn"
+data-close="profileSettingsModal"
+type="button"
+>
 
-                </button>
+Cancel
 
+</button>
 
-            </div>
 
+<button
+class="create-btn"
+id="updateProfileBtn"
+type="button"
+>
 
-        </div>
+Save Changes
 
+</button>
 
 
-        <div class="modal-actions">
+</div>
 
 
-            <button
-                class="cancel-btn"
-                data-close-modal="profileSettingsModal"
-                type="button"
-            >
-
-                Cancel
-
-            </button>
-
-
-            <button
-                class="create-btn"
-                id="updateProfileBtn"
-                type="button"
-            >
-
-                <i class="fa-solid fa-check"></i>
-
-                Save Changes
-
-            </button>
-
-
-        </div>
-
-
-    </div>
+</div>
 
 
 </div>
 
 
 
-<!-- =================================
-     Confirm Modal
-================================= -->
+<!-- Share -->
 
 <div
-    class="modal"
-    id="confirmModal"
-    aria-hidden="true"
+class="modal"
+id="shareModal"
 >
 
 
-    <div class="modal-box confirm-modal-box">
+<div class="modal-box">
 
 
-        <div
-            class="confirm-icon"
-            id="confirmIcon"
-        >
-
-            <i class="fa-solid fa-circle-question"></i>
-
-        </div>
+<div class="modal-header">
 
 
-        <h2 id="confirmTitle">
+<div>
 
-            Are you sure?
+<h2>
+Share Workspace
+</h2>
 
-        </h2>
+<p>
+Add someone using their FileForge ID.
+</p>
 
-
-        <p id="confirmMessage">
-
-            Please confirm this action.
-
-        </p>
-
-
-        <div class="modal-actions">
+</div>
 
 
-            <button
-                class="cancel-btn"
-                id="confirmCancelBtn"
-                type="button"
-            >
+<button
+class="close-modal"
+data-close="shareModal"
+type="button"
+>
 
-                Cancel
+<i class="fa-solid fa-xmark"></i>
 
-            </button>
-
-
-            <button
-                class="delete-confirm-btn"
-                id="confirmActionBtn"
-                type="button"
-            >
-
-                Confirm
-
-            </button>
+</button>
 
 
-        </div>
+</div>
 
 
-    </div>
+<div class="modal-content">
+
+
+<label>
+FileForge ID
+</label>
+
+
+<input
+id="shareIdInput"
+type="text"
+placeholder="FF-XXXXXX-XXXXXX"
+>
+
+
+<div
+id="sharedUsersList"
+class="shared-users-list"
+>
+
+</div>
+
+
+</div>
+
+
+<div class="modal-actions">
+
+
+<button
+class="create-btn"
+id="addSharedUserBtn"
+type="button"
+>
+
+<i class="fa-solid fa-user-plus"></i>
+
+Add User
+
+</button>
+
+
+</div>
+
+
+</div>
 
 
 </div>
 
 
 
-<!-- =================================
-     Publish Modal
-================================= -->
+<!-- Permissions -->
 
 <div
-    class="modal"
-    id="publishModal"
-    aria-hidden="true"
+class="modal"
+id="permissionsModal"
 >
 
 
-    <div class="modal-box">
+<div class="modal-box">
 
 
-        <div class="modal-header">
+<div class="modal-header">
 
 
-            <div>
+<div>
 
-                <h2>
-                    Publish File
-                </h2>
+<h2>
+Permissions
+</h2>
 
-                <p>
-                    Share your work with FileForge.
-                </p>
+<p>
+Choose what this person can do.
+</p>
 
-            </div>
+</div>
 
 
-            <button
-                class="close-modal"
-                data-close-modal="publishModal"
-                type="button"
-            >
+<button
+class="close-modal"
+data-close="permissionsModal"
+type="button"
+>
 
-                <i class="fa-solid fa-xmark"></i>
+<i class="fa-solid fa-xmark"></i>
 
-            </button>
+</button>
 
 
-        </div>
+</div>
 
 
+<div
+class="modal-content permissions-list"
+>
 
-        <div class="modal-content">
 
+<label>
 
-            <label for="publishDescription">
+<input
+type="checkbox"
+id="permissionView"
+>
 
-                Description
+View
 
-            </label>
+</label>
 
 
-            <textarea
-                id="publishDescription"
-                placeholder="Tell people about this file..."
-                maxlength="500"
-            ></textarea>
+<label>
 
+<input
+type="checkbox"
+id="permissionEdit"
+>
 
-            <label>
+Edit
 
-                Visibility
+</label>
 
-            </label>
 
+<label>
 
-            <div class="visibility-options">
+<input
+type="checkbox"
+id="permissionAdd"
+>
 
+Add Files
 
-                <label class="visibility-option">
+</label>
 
 
-                    <input
-                        type="radio"
-                        name="visibility"
-                        value="public"
-                        checked
-                    >
+<label>
 
+<input
+type="checkbox"
+id="permissionDelete"
+>
 
-                    <span>
+Delete
 
-                        <i class="fa-solid fa-earth-americas"></i>
+</label>
 
-                        <strong>
-                            Public
-                        </strong>
 
-                        Anyone can view and download.
+<label>
 
-                    </span>
+<input
+type="checkbox"
+id="permissionDownload"
+>
 
+Download
 
-                </label>
+</label>
 
 
+<label>
 
-                <label class="visibility-option">
+<input
+type="checkbox"
+id="permissionAll"
+>
 
+Full Access
 
-                    <input
-                        type="radio"
-                        name="visibility"
-                        value="private"
-                    >
+</label>
 
 
-                    <span>
+</div>
 
-                        <i class="fa-solid fa-lock"></i>
 
-                        <strong>
-                            Private
-                        </strong>
+<div class="modal-actions">
 
-                        Only allowed users can download.
 
-                    </span>
+<button
+class="create-btn"
+id="savePermissionsBtn"
+type="button"
+>
 
+Save Permissions
 
-                </label>
+</button>
 
 
-            </div>
+</div>
 
 
-        </div>
-
-
-
-        <div class="modal-actions">
-
-
-            <button
-                class="cancel-btn"
-                data-close-modal="publishModal"
-                type="button"
-            >
-
-                Cancel
-
-            </button>
-
-
-            <button
-                class="create-btn"
-                id="confirmPublishBtn"
-                type="button"
-            >
-
-                <i class="fa-solid fa-paper-plane"></i>
-
-                Publish
-
-            </button>
-
-
-        </div>
-
-
-    </div>
+</div>
 
 
 </div>
 
 
 
-<!-- =================================
-     Toast
-================================= -->
+<!-- Publish -->
 
 <div
-    class="toast"
-    id="toast"
-    aria-live="polite"
+class="modal"
+id="publishModal"
 >
 
-    <i
-        class="fa-solid fa-circle-check"
-        id="toastIcon"
-    ></i>
 
-    <span id="toastMessage">
+<div class="modal-box">
 
-        Done
 
-    </span>
+<div class="modal-header">
+
+
+<div>
+
+<h2>
+Publish File
+</h2>
+
+<p>
+Share your work with FileForge.
+</p>
+
+</div>
+
+
+<button
+class="close-modal"
+data-close="publishModal"
+type="button"
+>
+
+<i class="fa-solid fa-xmark"></i>
+
+</button>
+
+
+</div>
+
+
+<div class="modal-content">
+
+
+<label>
+Description
+</label>
+
+
+<textarea
+id="publishDescription"
+placeholder="Describe your file..."
+maxlength="500"
+></textarea>
+
+
+<label>
+Visibility
+</label>
+
+
+<select
+id="publishVisibility"
+>
+
+<option value="public">
+
+Public — everyone can download
+
+</option>
+
+<option value="private">
+
+Private — preview only
+
+</option>
+
+<option value="allowed">
+
+Selected users only
+
+</option>
+
+</select>
+
+
+<label>
+Preview lines
+</label>
+
+
+<input
+id="previewLines"
+type="number"
+value="900"
+min="1"
+max="900"
+>
+
+
+</div>
+
+
+<div class="modal-actions">
+
+
+<button
+class="create-btn"
+id="confirmPublishBtn"
+type="button"
+>
+
+<i class="fa-solid fa-globe"></i>
+
+Publish
+
+</button>
+
+
+</div>
+
+
+</div>
+
 
 </div>
 
 
 
-<!-- Main JavaScript -->
+<!-- Custom Notification -->
+
+<div
+id="toast"
+class="toast"
+>
+
+<i
+id="toastIcon"
+class="fa-solid fa-circle-check"
+></i>
+
+<span id="toastText">
+
+Done
+
+</span>
+
+</div>
+
+
 
 <script src="script.js"></script>
-
 
 </body>
 
