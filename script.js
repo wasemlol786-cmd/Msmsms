@@ -1,3564 +1,637 @@
 /* =================================
-   FileForge — Complete Script
+FileForge - Main JavaScript
 ================================= */
-
-"use strict";
 
 /* =================================
-   Elements
+Elements
 ================================= */
+const newFileBtn = document.getElementById("newFileBtn");
+const createFileBtn = document.getElementById("createFileBtn");
+const newFolderBtn = document.getElementById("newFolderBtn");
+const mobileFileUpload = document.getElementById("mobileFileUpload");
 
-const $ = (id) => document.getElementById(id);
+const newFileModal = document.getElementById("newFileModal");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const cancelFileBtn = document.getElementById("cancelFileBtn");
+const confirmCreateBtn = document.getElementById("confirmCreateBtn");
+const newFileName = document.getElementById("newFileName");
 
-const elements = {
-    homeBtn: $("homeBtn"),
+const newFolderModal = document.getElementById("newFolderModal");
+const closeFolderModalBtn = document.getElementById("closeFolderModalBtn");
+const cancelFolderBtn = document.getElementById("cancelFolderBtn");
+const confirmCreateFolderBtn = document.getElementById("confirmCreateFolderBtn");
+const newFolderName = document.getElementById("newFolderName");
 
-    profileBtn: $("profileBtn"),
-    profileName: $("profileName"),
+const confirmModal = document.getElementById("confirmModal");
+const confirmTitle = document.getElementById("confirmTitle");
+const confirmMessage = document.getElementById("confirmMessage");
+const confirmCancelBtn = document.getElementById("confirmCancelBtn");
+const confirmOkBtn = document.getElementById("confirmOkBtn");
 
-    onlineCount: $("onlineCount"),
+const fileList = document.getElementById("fileList");
+const fileCount = document.getElementById("fileCount");
+const searchFiles = document.getElementById("searchFiles");
+const breadcrumbs = document.getElementById("breadcrumbs");
 
-    newFileBtn: $("newFileBtn"),
-    createFileBtn: $("createFileBtn"),
-    createFolderBtn: $("createFolderBtn"),
-    emptyCreateBtn: $("emptyCreateBtn"),
+const fileName = document.getElementById("fileName");
+const textEditor = document.getElementById("textEditor");
+const activeFileHeaderIcon = document.getElementById("activeFileHeaderIcon");
+const fontStyleSelect = document.getElementById("fontStyleSelect");
 
-    fileList: $("fileList"),
-    fileCount: $("fileCount"),
-    sidebarTitle: $("sidebarTitle"),
+const lineCount = document.getElementById("lineCount");
+const wordCount = document.getElementById("wordCount");
+const characterCount = document.getElementById("characterCount");
+const saveStatus = document.getElementById("saveStatus");
 
-    searchFiles: $("searchFiles"),
+const downloadBtn = document.getElementById("downloadBtn");
+const clearBtn = document.getElementById("clearBtn");
+const deleteBtn = document.getElementById("deleteBtn");
 
-    uploadBtn: $("uploadBtn"),
-    fileUploadInput: $("fileUploadInput"),
-
-    activeItemIcon: $("activeItemIcon"),
-    fileName: $("fileName"),
-
-    textEditor: $("textEditor"),
-    editorEmpty: $("editorEmpty"),
-
-    fontStyle: $("fontStyle"),
-
-    saveStatus: $("saveStatus"),
-    saveInfoText: $("saveInfoText"),
-
-    lineCount: $("lineCount"),
-    wordCount: $("wordCount"),
-    characterCount: $("characterCount"),
-
-    shareBtn: $("shareBtn"),
-    downloadBtn: $("downloadBtn"),
-    clearBtn: $("clearBtn"),
-    publishBtn: $("publishBtn"),
-    deleteBtn: $("deleteBtn"),
-
-    trashCount: $("trashCount"),
-
-    newFileModal: $("newFileModal"),
-    newFileName: $("newFileName"),
-    newFileFolder: $("newFileFolder"),
-    confirmCreateBtn: $("confirmCreateBtn"),
-
-    folderModal: $("folderModal"),
-    folderNameInput: $("folderNameInput"),
-    confirmFolderBtn: $("confirmFolderBtn"),
-
-    profileModal: $("profileModal"),
-    displayNameInput: $("displayNameInput"),
-    saveProfileBtn: $("saveProfileBtn"),
-
-    profileSettingsModal: $("profileSettingsModal"),
-    profileNameInput: $("profileNameInput"),
-    nameChangeInfo: $("nameChangeInfo"),
-    deviceIdText: $("deviceIdText"),
-    copyIdBtn: $("copyIdBtn"),
-    updateProfileBtn: $("updateProfileBtn"),
-
-    shareModal: $("shareModal"),
-    shareIdInput: $("shareIdInput"),
-    sharedUsersList: $("sharedUsersList"),
-    addSharedUserBtn: $("addSharedUserBtn"),
-
-    permissionsModal: $("permissionsModal"),
-
-    permissionView: $("permissionView"),
-    permissionEdit: $("permissionEdit"),
-    permissionAdd: $("permissionAdd"),
-    permissionDelete: $("permissionDelete"),
-    permissionDownload: $("permissionDownload"),
-    permissionAll: $("permissionAll"),
-
-    savePermissionsBtn: $("savePermissionsBtn"),
-
-    publishModal: $("publishModal"),
-    publishDescription: $("publishDescription"),
-    publishVisibility: $("publishVisibility"),
-    previewLines: $("previewLines"),
-    confirmPublishBtn: $("confirmPublishBtn"),
-
-    toast: $("toast"),
-    toastIcon: $("toastIcon"),
-    toastText: $("toastText")
-};
-
+const tabFiles = document.getElementById("tabFiles");
+const tabNotes = document.getElementById("tabNotes");
+const explorerView = document.getElementById("explorerView");
+const notesView = document.getElementById("notesView");
+const quickNotesArea = document.getElementById("quickNotesArea");
 
 /* =================================
-   Storage Keys
+Profile Elements
 ================================= */
+const profileModal = document.getElementById("profileModal");
+const displayNameInput = document.getElementById("displayNameInput");
+const saveProfileBtn = document.getElementById("saveProfileBtn");
+const closeProfileBtn = document.getElementById("closeProfileBtn");
+const profileChipBtn = document.getElementById("profileChipBtn");
+const topbarUserName = document.getElementById("topbarUserName");
+const profileCooldownMsg = document.getElementById("profileCooldownMsg");
 
-const STORAGE = {
-    items: "fileforge_items",
-    profile: "fileforge_profile",
-    deviceId: "fileforge_device_id",
-    activeId: "fileforge_active_id",
-    view: "fileforge_view"
-};
+const PROFILE_KEY = "fileforge_profile_v2";
+const STORAGE_KEY = "fileforge_files_v2";
+const NOTES_KEY = "fileforge_quick_notes_v1";
 
-
-/* =================================
-   App Data
-================================= */
-
+let userProfile = null;
 let items = [];
-
-let activeItemId = null;
-
-let currentView = "files";
-
-let saveTimer = null;
-
-let currentPermissionUser = null;
-
+let activeFileId = null;
+let currentFolderId = "root";
+let onConfirmCallback = null;
 
 /* =================================
-   Helpers
+Extension & Icon Mapper
 ================================= */
+function getFileIconClass(filename) {
+    if (!filename.includes(".")) return "fa-regular fa-file-code";
+    const ext = filename.split(".").pop().toLowerCase();
 
-function createId() {
+    const iconMap = {
+        js: "fa-brands fa-js",
+        ts: "fa-solid fa-code",
+        py: "fa-brands fa-python",
+        html: "fa-brands fa-html5",
+        css: "fa-brands fa-css3-alt",
+        json: "fa-solid fa-code",
+        cpp: "fa-solid fa-c",
+        c: "fa-solid fa-c",
+        java: "fa-brands fa-java",
+        php: "fa-brands fa-php",
+        react: "fa-brands fa-react",
+        vue: "fa-brands fa-vuejs",
+        md: "fa-solid fa-file-pen",
+        txt: "fa-regular fa-file-lines"
+    };
 
-    return (
-        Date.now()
-        .toString(36)
-        +
-        Math.random()
-        .toString(36)
-        .slice(2, 9)
-    );
+    return iconMap[ext] || "fa-regular fa-file-code";
 }
 
-
-function escapeHtml(value) {
-
-    const div = document.createElement("div");
-
-    div.textContent = String(value);
-
-    return div.innerHTML;
-}
-
-
-function getDateText(time) {
-
-    const date = new Date(time);
-
-    return date.toLocaleDateString(
-        undefined,
-        {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        }
-    );
-}
-
-
-function getDeviceId() {
-
-    let id = localStorage.getItem(
-        STORAGE.deviceId
-    );
-
-    if (id) {
-
-        return id;
-    }
-
-    const letters =
-        "ABCDEFGHJKLMNPQRSTUVWXYZ";
-
-    const numbers =
-        "23456789";
-
-    function randomPart(
-        characters,
-        length
-    ) {
-
-        let result = "";
-
-        for (
-            let i = 0;
-            i < length;
-            i++
-        ) {
-
-            result +=
-                characters[
-                    Math.floor(
-                        Math.random()
-                        *
-                        characters.length
-                    )
-                ];
+/* =================================
+Load & Save Data
+================================= */
+function loadData() {
+    try {
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            const parsed = JSON.parse(savedData);
+            if (Array.isArray(parsed)) items = parsed;
         }
 
-        return result;
-    }
-
-    id =
-        "FF-"
-        +
-        randomPart(
-            letters + numbers,
-            6
-        )
-        +
-        "-"
-        +
-        randomPart(
-            letters + numbers,
-            6
-        );
-
-    localStorage.setItem(
-        STORAGE.deviceId,
-        id
-    );
-
-    return id;
-}
-
-
-function getProfile() {
-
-    try {
-
-        return JSON.parse(
-            localStorage.getItem(
-                STORAGE.profile
-            )
-        );
-
-    } catch {
-
-        return null;
-    }
-}
-
-
-function saveProfile(
-    profile
-) {
-
-    localStorage.setItem(
-        STORAGE.profile,
-        JSON.stringify(profile)
-    );
-}
-
-
-function saveItems() {
-
-    localStorage.setItem(
-        STORAGE.items,
-        JSON.stringify(items)
-    );
-}
-
-
-function loadItems() {
-
-    try {
-
-        const saved =
-            JSON.parse(
-                localStorage.getItem(
-                    STORAGE.items
-                )
-            );
-
-        items =
-            Array.isArray(saved)
-            ? saved
-            : [];
-
-    } catch {
-
+        const savedNotes = localStorage.getItem(NOTES_KEY);
+        if (savedNotes) quickNotesArea.value = savedNotes;
+    } catch (e) {
+        console.error("Load error:", e);
         items = [];
     }
 }
 
-
-function getActiveItem() {
-
-    return items.find(
-        item =>
-        item.id === activeItemId
-    );
+function saveData() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        showSavedStatus();
+    } catch (e) {
+        console.error("Save error:", e);
+        saveStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Save failed`;
+    }
 }
 
+let statusTimer;
+function showSavedStatus() {
+    clearTimeout(statusTimer);
+    saveStatus.innerHTML = `<i class="fa-solid fa-cloud-check"></i> Saved`;
+    statusTimer = setTimeout(() => {
+        saveStatus.innerHTML = `<i class="fa-solid fa-cloud"></i> Ready`;
+    }, 1500);
+}
 
-function showToast(
-    message,
-    type = "success"
-) {
+/* =================================
+Custom Dialog Modal
+================================= */
+function customConfirm(title, message, callback) {
+    confirmTitle.textContent = title;
+    confirmMessage.textContent = message;
+    onConfirmCallback = callback;
+    confirmModal.classList.add("show");
+    confirmModal.setAttribute("aria-hidden", "false");
+}
 
-    const icons = {
+function closeConfirmModal() {
+    confirmModal.classList.remove("show");
+    confirmModal.setAttribute("aria-hidden", "true");
+    onConfirmCallback = null;
+}
 
-        success:
-            "fa-circle-check",
+confirmCancelBtn.addEventListener("click", closeConfirmModal);
+confirmOkBtn.addEventListener("click", () => {
+    if (onConfirmCallback) onConfirmCallback();
+    closeConfirmModal();
+});
 
-        error:
-            "fa-circle-xmark",
+/* =================================
+Create Items (File / Folder)
+================================= */
+function createFile(name, content = "") {
+    let fileNameVal = name ? name.trim() : newFileName.value.trim();
+    if (!fileNameVal) fileNameVal = "untitled.txt";
 
-        warning:
-            "fa-triangle-exclamation",
-
-        info:
-            "fa-circle-info"
+    const newFile = {
+        id: Date.now().toString() + Math.random().toString(36).slice(2),
+        type: "file",
+        name: fileNameVal,
+        content: content,
+        parentId: currentFolderId,
+        fontStyle: "font-default",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
     };
 
-    elements.toastIcon.className =
-        "fa-solid "
-        +
-        (
-            icons[type]
-            ||
-            icons.success
-        );
+    items.unshift(newFile);
+    activeFileId = newFile.id;
 
-    elements.toastText.textContent =
-        message;
-
-    elements.toast.classList.add(
-        "show"
-    );
-
-    clearTimeout(
-        showToast.timer
-    );
-
-    showToast.timer =
-        setTimeout(
-            () => {
-
-                elements.toast
-                .classList
-                .remove(
-                    "show"
-                );
-
-            },
-            2600
-        );
+    saveData();
+    renderExplorer();
+    openActiveFile();
+    closeModal(newFileModal);
 }
-
-
-function openModal(
-    modal
-) {
-
-    if (!modal) {
-
-        return;
-    }
-
-    modal.classList.add(
-        "show"
-    );
-}
-
-
-function closeModal(
-    modal
-) {
-
-    if (!modal) {
-
-        return;
-    }
-
-    modal.classList.remove(
-        "show"
-    );
-}
-
-
-function closeAllModals() {
-
-    document
-    .querySelectorAll(
-        ".modal"
-    )
-    .forEach(
-        modal => {
-
-            modal.classList.remove(
-                "show"
-            );
-
-        }
-    );
-}
-
-
-/* =================================
-   Profile
-================================= */
-
-function setupProfile() {
-
-    const profile =
-        getProfile();
-
-    const deviceId =
-        getDeviceId();
-
-    elements.deviceIdText.textContent =
-        deviceId;
-
-    if (
-        !profile
-        ||
-        !profile.name
-    ) {
-
-        openModal(
-            elements.profileModal
-        );
-
-        setTimeout(
-            () => {
-
-                elements
-                .displayNameInput
-                .focus();
-
-            },
-            100
-        );
-
-        return;
-    }
-
-    elements.profileName.textContent =
-        profile.name;
-}
-
-
-function saveFirstProfile() {
-
-    const name =
-        elements
-        .displayNameInput
-        .value
-        .trim();
-
-    if (
-        name.length < 2
-    ) {
-
-        showToast(
-            "Enter a name with at least 2 characters.",
-            "warning"
-        );
-
-        return;
-    }
-
-    const profile = {
-
-        name:
-
-            name.slice(
-                0,
-                30
-            ),
-
-        lastNameChange:
-
-            Date.now()
-    };
-
-    saveProfile(
-        profile
-    );
-
-    elements.profileName.textContent =
-        profile.name;
-
-    closeModal(
-        elements.profileModal
-    );
-
-    showToast(
-        "Welcome to FileForge!"
-    );
-}
-
-
-function openProfileSettings() {
-
-    const profile =
-        getProfile();
-
-    if (!profile) {
-
-        openModal(
-            elements.profileModal
-        );
-
-        return;
-    }
-
-    elements.profileNameInput.value =
-        profile.name;
-
-    elements.deviceIdText.textContent =
-        getDeviceId();
-
-    const week =
-        7
-        *
-        24
-        *
-        60
-        *
-        60
-        *
-        1000;
-
-    const remaining =
-        week
-        -
-        (
-            Date.now()
-            -
-            profile.lastNameChange
-        );
-
-    if (
-        remaining > 0
-    ) {
-
-        const days =
-            Math.ceil(
-                remaining
-                /
-                (
-                    24
-                    *
-                    60
-                    *
-                    60
-                    *
-                    1000
-                )
-            );
-
-        elements
-        .nameChangeInfo
-        .textContent =
-
-            "You can change your name again in "
-            +
-            days
-            +
-            " day"
-            +
-            (
-                days === 1
-                ? ""
-                : "s"
-            )
-            +
-            ".";
-
-    } else {
-
-        elements
-        .nameChangeInfo
-        .textContent =
-
-            "You can change your display name now.";
-    }
-
-    openModal(
-        elements.profileSettingsModal
-    );
-}
-
-
-function updateProfile() {
-
-    const profile =
-        getProfile();
-
-    if (!profile) {
-
-        return;
-    }
-
-    const name =
-        elements
-        .profileNameInput
-        .value
-        .trim();
-
-    if (
-        name.length < 2
-    ) {
-
-        showToast(
-            "Enter a valid display name.",
-            "warning"
-        );
-
-        return;
-    }
-
-    if (
-        name === profile.name
-    ) {
-
-        closeModal(
-            elements
-            .profileSettingsModal
-        );
-
-        return;
-    }
-
-    const week =
-        7
-        *
-        24
-        *
-        60
-        *
-        60
-        *
-        1000;
-
-    if (
-        Date.now()
-        -
-        profile.lastNameChange
-        <
-        week
-    ) {
-
-        showToast(
-            "Your name can only be changed once every 7 days.",
-            "warning"
-        );
-
-        return;
-    }
-
-    profile.name =
-        name.slice(
-            0,
-            30
-        );
-
-    profile.lastNameChange =
-        Date.now();
-
-    saveProfile(
-        profile
-    );
-
-    elements.profileName.textContent =
-        profile.name;
-
-    closeModal(
-        elements
-        .profileSettingsModal
-    );
-
-    showToast(
-        "Profile updated."
-    );
-}
-
-
-/* =================================
-   Views
-================================= */
-
-const viewData = {
-
-    files: {
-
-        title:
-            "My Files",
-
-        icon:
-            "fa-folder"
-    },
-
-    notes: {
-
-        title:
-            "My Notes",
-
-        icon:
-            "fa-note-sticky"
-    },
-
-    shared: {
-
-        title:
-            "Shared With Me",
-
-        icon:
-            "fa-users"
-    },
-
-    explore: {
-
-        title:
-            "Explore",
-
-        icon:
-            "fa-earth-americas"
-    },
-
-    trash: {
-
-        title:
-            "Trash",
-
-        icon:
-            "fa-trash"
-    }
-};
-
-
-function setView(
-    view
-) {
-
-    currentView =
-        view;
-
-    localStorage.setItem(
-        STORAGE.view,
-        view
-    );
-
-    document
-    .querySelectorAll(
-        ".nav-item"
-    )
-    .forEach(
-        button => {
-
-            button
-            .classList
-            .toggle(
-
-                "active",
-
-                button.dataset.view
-                ===
-                view
-
-            );
-
-        }
-    );
-
-    elements.sidebarTitle.textContent =
-        viewData[view]
-        .title;
-
-    activeItemId = null;
-
-    localStorage.removeItem(
-        STORAGE.activeId
-    );
-
-    updateEditor();
-
-    renderItems();
-}
-
-
-/* =================================
-   Items
-================================= */
-
-function getVisibleItems() {
-
-    if (
-        currentView
-        ===
-        "trash"
-    ) {
-
-        return items.filter(
-            item =>
-            item.trashed
-        );
-    }
-
-    if (
-        currentView
-        ===
-        "notes"
-    ) {
-
-        return items.filter(
-            item =>
-
-                !item.trashed
-
-                &&
-
-                item.type
-                ===
-                "file"
-
-                &&
-
-                item.isNote
-        );
-    }
-
-    if (
-        currentView
-        ===
-        "shared"
-    ) {
-
-        return items.filter(
-            item =>
-
-                !item.trashed
-
-                &&
-
-                item.sharedWith
-
-                &&
-
-                item.sharedWith.length
-                >
-                0
-        );
-    }
-
-    if (
-        currentView
-        ===
-        "explore"
-    ) {
-
-        return items.filter(
-            item =>
-
-                !item.trashed
-
-                &&
-
-                item.published
-        );
-    }
-
-    return items.filter(
-        item =>
-        !item.trashed
-    );
-}
-
-
-function getSearchItems() {
-
-    const query =
-        elements
-        .searchFiles
-        .value
-        .trim()
-        .toLowerCase();
-
-    let result =
-        getVisibleItems();
-
-    if (
-        !query
-    ) {
-
-        return result;
-    }
-
-    return result.filter(
-        item =>
-
-            item.name
-            .toLowerCase()
-            .includes(
-                query
-            )
-    );
-}
-
-
-function renderItems() {
-
-    const visible =
-        getSearchItems();
-
-    elements.fileCount.textContent =
-
-        visible.length
-        +
-        (
-            visible.length
-            ===
-            1
-            ? " item"
-            : " items"
-        );
-
-    elements.trashCount.textContent =
-
-        items.filter(
-            item =>
-            item.trashed
-        ).length;
-
-    if (
-        visible.length
-        ===
-        0
-    ) {
-
-        elements.fileList.innerHTML = `
-
-            <div class="empty-files">
-
-                <i class="fa-regular fa-folder-open"></i>
-
-                <h3>
-                    No items here
-                </h3>
-
-                <p>
-                    Create a file or folder to get started.
-                </p>
-
-            </div>
-
-        `;
-
-        return;
-    }
-
-    const sorted =
-        [
-            ...visible
-        ]
-        .sort(
-            (
-                a,
-                b
-            ) => {
-
-                if (
-                    a.type
-                    !==
-                    b.type
-                ) {
-
-                    return (
-                        a.type
-                        ===
-                        "folder"
-                    )
-                    ? -1
-                    : 1;
-                }
-
-                return (
-                    b.updatedAt
-                    -
-                    a.updatedAt
-                );
-
-            }
-        );
-
-    elements.fileList.innerHTML =
-
-        sorted
-        .map(
-            item => {
-
-                const isFolder =
-
-                    item.type
-                    ===
-                    "folder";
-
-                const active =
-
-                    item.id
-                    ===
-                    activeItemId;
-
-                const icon =
-
-                    isFolder
-
-                    ? "fa-folder"
-
-                    : (
-                        item.uploaded
-
-                        ? "fa-file-arrow-up"
-
-                        : "fa-file-lines"
-                    );
-
-                return `
-
-                    <button
-                        class="
-                            file-item
-                            ${
-                                isFolder
-                                ?
-                                "folder-item"
-                                :
-                                ""
-                            }
-                            ${
-                                active
-                                ?
-                                "active"
-                                :
-                                ""
-                            }
-                        "
-                        data-item-id="
-                            ${item.id}
-                        "
-                        type="button"
-                    >
-
-                        <span
-                            class="
-                                file-item-icon
-                            "
-                        >
-
-                            <i
-                                class="
-                                    fa-solid
-                                    ${icon}
-                                "
-                            ></i>
-
-                        </span>
-
-                        <span
-                            class="
-                                file-item-info
-                            "
-                        >
-
-                            <span
-                                class="
-                                    file-item-name
-                                "
-                            >
-
-                                ${
-                                    escapeHtml(
-                                        item.name
-                                    )
-                                }
-
-                            </span>
-
-                            <span
-                                class="
-                                    file-item-date
-                                "
-                            >
-
-                                ${
-                                    getDateText(
-                                        item.updatedAt
-                                    )
-                                }
-
-                            </span>
-
-                        </span>
-
-                        <button
-                            class="
-                                item-menu-btn
-                            "
-                            data-menu-id="
-                                ${item.id}
-                            "
-                            type="button"
-                            title="Options"
-                        >
-
-                            <i
-                                class="
-                                    fa-solid
-                                    fa-ellipsis
-                                "
-                            ></i>
-
-                        </button>
-
-                    </button>
-
-                `;
-
-            }
-        )
-        .join("");
-}
-
-
-/* =================================
-   Create File
-================================= */
-
-function updateFolderOptions() {
-
-    const folders =
-        items.filter(
-            item =>
-
-                item.type
-                ===
-                "folder"
-
-                &&
-
-                !item.trashed
-        );
-
-    elements.newFileFolder.innerHTML =
-
-        `
-        <option value="root">
-            My Files
-        </option>
-        `
-
-        +
-
-        folders
-        .map(
-            folder => `
-
-                <option
-                    value="
-                        ${folder.id}
-                    "
-                >
-
-                    ${
-                        escapeHtml(
-                            folder.name
-                        )
-                    }
-
-                </option>
-
-            `
-        )
-        .join("");
-}
-
-
-function openNewFileModal() {
-
-    updateFolderOptions();
-
-    elements.newFileName.value =
-        "";
-
-    openModal(
-        elements.newFileModal
-    );
-
-    setTimeout(
-        () => {
-
-            elements
-            .newFileName
-            .focus();
-
-        },
-        100
-    );
-}
-
-
-function createFile() {
-
-    let name =
-        elements
-        .newFileName
-        .value
-        .trim();
-
-    if (
-        !name
-    ) {
-
-        showToast(
-            "Enter a file name.",
-            "warning"
-        );
-
-        return;
-    }
-
-    if (
-        !name.includes(
-            "."
-        )
-    ) {
-
-        name +=
-            ".txt";
-    }
-
-    const now =
-        Date.now();
-
-    const item = {
-
-        id:
-            createId(),
-
-        type:
-            "file",
-
-        name:
-            name.slice(
-                0,
-                100
-            ),
-
-        content:
-            "",
-
-        folder:
-            elements
-            .newFileFolder
-            .value,
-
-        isNote:
-            currentView
-            ===
-            "notes",
-
-        uploaded:
-            false,
-
-        trashed:
-            false,
-
-        published:
-            false,
-
-        sharedWith:
-            [],
-
-        createdAt:
-            now,
-
-        updatedAt:
-            now
-    };
-
-    items.unshift(
-        item
-    );
-
-    saveItems();
-
-    closeModal(
-        elements.newFileModal
-    );
-
-    activeItemId =
-        item.id;
-
-    localStorage.setItem(
-        STORAGE.activeId,
-        item.id
-    );
-
-    renderItems();
-
-    updateEditor();
-
-    showToast(
-        "File created."
-    );
-}
-
-
-/* =================================
-   Create Folder
-================================= */
-
-function openFolderModal() {
-
-    elements.folderNameInput.value =
-        "";
-
-    openModal(
-        elements.folderModal
-    );
-
-    setTimeout(
-        () => {
-
-            elements
-            .folderNameInput
-            .focus();
-
-        },
-        100
-    );
-}
-
 
 function createFolder() {
-
-    const name =
-        elements
-        .folderNameInput
-        .value
-        .trim();
-
-    if (
-        !name
-    ) {
-
-        showToast(
-            "Enter a folder name.",
-            "warning"
-        );
-
-        return;
-    }
-
-    const now =
-        Date.now();
-
-    items.unshift({
-
-        id:
-            createId(),
-
-        type:
-            "folder",
-
-        name:
-            name.slice(
-                0,
-                80
-            ),
-
-        content:
-            "",
-
-        trashed:
-            false,
-
-        published:
-            false,
-
-        sharedWith:
-            [],
-
-        createdAt:
-            now,
-
-        updatedAt:
-            now
-    });
-
-    saveItems();
-
-    closeModal(
-        elements.folderModal
-    );
-
-    renderItems();
-
-    showToast(
-        "Folder created."
-    );
-}
-
-
-/* =================================
-   Select Item
-================================= */
-
-function selectItem(
-    id
-) {
-
-    const item =
-        items.find(
-            current =>
-            current.id
-            ===
-            id
-        );
-
-    if (
-        !item
-    ) {
-
-        return;
-    }
-
-    if (
-        item.type
-        ===
-        "folder"
-    ) {
-
-        showToast(
-            "Folders are ready for organization.",
-            "info"
-        );
-
-        return;
-    }
-
-    activeItemId =
-        id;
-
-    localStorage.setItem(
-        STORAGE.activeId,
-        id
-    );
-
-    updateEditor();
-
-    renderItems();
-}
-
-
-/* =================================
-   Editor
-================================= */
-
-function setEditorEnabled(
-    enabled
-) {
-
-    elements.fileName.disabled =
-        !enabled;
-
-    elements.textEditor.disabled =
-        !enabled;
-
-    elements.fontStyle.disabled =
-        !enabled;
-
-    elements.shareBtn.disabled =
-        !enabled;
-
-    elements.downloadBtn.disabled =
-        !enabled;
-
-    elements.clearBtn.disabled =
-        !enabled;
-
-    elements.publishBtn.disabled =
-        !enabled;
-
-    elements.deleteBtn.disabled =
-        !enabled;
-}
-
-
-function updateEditor() {
-
-    const item =
-        getActiveItem();
-
-    if (
-        !item
-        ||
-        item.type
-        !==
-        "file"
-        ||
-        item.trashed
-    ) {
-
-        setEditorEnabled(
-            false
-        );
-
-        elements.fileName.value =
-            "";
-
-        elements.textEditor.value =
-            "";
-
-        elements.editorEmpty
-        .classList
-        .add(
-            "show"
-        );
-
-        elements.activeItemIcon.className =
-
-            "fa-regular "
-            +
-            (
-                viewData[
-                    currentView
-                ]?.icon
-                ||
-                "fa-file-lines"
-            );
-
-        updateStats(
-            ""
-        );
-
-        return;
-    }
-
-    setEditorEnabled(
-        true
-    );
-
-    elements.editorEmpty
-    .classList
-    .remove(
-        "show"
-    );
-
-    elements.fileName.value =
-        item.name;
-
-    elements.textEditor.value =
-        item.content
-        ||
-        "";
-
-    elements.activeItemIcon.className =
-
-        "fa-regular fa-file-lines";
-
-    updateStats(
-        item.content
-        ||
-        ""
-    );
-
-    applyFontStyle(
-        item.fontStyle
-        ||
-        "mono"
-    );
-
-    elements.fontStyle.value =
-
-        item.fontStyle
-        ||
-        "mono";
-}
-
-
-function updateStats(
-    text
-) {
-
-    const value =
-        text
-        ||
-        "";
-
-    const lines =
-
-        value
-        ?
-        value.split(
-            "\n"
-        ).length
-        :
-        0;
-
-    const words =
-
-        value
-        .trim()
-
-        ?
-
-        value
-        .trim()
-        .split(
-            /\s+/
-        )
-        .length
-
-        :
-
-        0;
-
-    elements.lineCount.textContent =
-        lines;
-
-    elements.wordCount.textContent =
-        words;
-
-    elements.characterCount.textContent =
-        value.length;
-}
-
-
-function setSaveStatus(
-    text,
-    saving = false
-) {
-
-    elements.saveStatus.innerHTML =
-
-        `
-        <i
-            class="
-                fa-solid
-                ${
-                    saving
-                    ?
-                    "fa-cloud-arrow-up"
-                    :
-                    "fa-cloud"
-                }
-            "
-        ></i>
-
-        ${escapeHtml(text)}
-        `;
-
-    elements.saveInfoText.textContent =
-        text;
-}
-
-
-function saveActiveFile(
-    silent = false
-) {
-
-    const item =
-        getActiveItem();
-
-    if (
-        !item
-        ||
-        item.type
-        !==
-        "file"
-    ) {
-
-        return;
-    }
-
-    item.name =
-        elements
-        .fileName
-        .value
-        .trim()
-        ||
-        "Untitled.txt";
-
-    item.content =
-        elements
-        .textEditor
-        .value;
-
-    item.updatedAt =
-        Date.now();
-
-    item.fontStyle =
-        elements
-        .fontStyle
-        .value;
-
-    saveItems();
-
-    renderItems();
-
-    setSaveStatus(
-        "Saved"
-    );
-
-    if (
-        !silent
-    ) {
-
-        showToast(
-            "File saved."
-        );
-    }
-}
-
-
-function queueAutoSave() {
-
-    setSaveStatus(
-        "Saving...",
-        true
-    );
-
-    clearTimeout(
-        saveTimer
-    );
-
-    saveTimer =
-        setTimeout(
-            () => {
-
-                saveActiveFile(
-                    true
-                );
-
-            },
-            550
-        );
-}
-
-
-function applyFontStyle(
-    style
-) {
-
-    elements.textEditor.classList.remove(
-
-        "editor-normal",
-
-        "editor-mono",
-
-        "editor-serif",
-
-        "editor-handwritten"
-
-    );
-
-    elements.textEditor.classList.add(
-
-        "editor-"
-        +
-        style
-
-    );
-}
-
-
-/* =================================
-   Clear
-================================= */
-
-function clearFile() {
-
-    const item =
-        getActiveItem();
-
-    if (
-        !item
-    ) {
-
-        return;
-    }
-
-    if (
-        !confirm(
-            "Clear all text in this file?"
-        )
-    ) {
-
-        return;
-    }
-
-    elements.textEditor.value =
-        "";
-
-    updateStats(
-        ""
-    );
-
-    saveActiveFile(
-        true
-    );
-
-    showToast(
-        "File cleared."
-    );
-}
-
-
-/* =================================
-   Delete / Trash
-================================= */
-
-function deleteActiveFile() {
-
-    const item =
-        getActiveItem();
-
-    if (
-        !item
-    ) {
-
-        return;
-    }
-
-    if (
-        !confirm(
-            "Move this file to Trash?"
-        )
-    ) {
-
-        return;
-    }
-
-    item.trashed =
-        true;
-
-    item.updatedAt =
-        Date.now();
-
-    saveItems();
-
-    activeItemId =
-        null;
-
-    localStorage.removeItem(
-        STORAGE.activeId
-    );
-
-    updateEditor();
-
-    renderItems();
-
-    showToast(
-        "Moved to Trash."
-    );
-}
-
-
-function deleteItemById(
-    id
-) {
-
-    const item =
-        items.find(
-            current =>
-            current.id
-            ===
-            id
-        );
-
-    if (
-        !item
-    ) {
-
-        return;
-    }
-
-    if (
-        currentView
-        ===
-        "trash"
-    ) {
-
-        if (
-            !confirm(
-                "Delete permanently?"
-            )
-        ) {
-
-            return;
-        }
-
-        items =
-            items.filter(
-                current =>
-                current.id
-                !==
-                id
-            );
-
-        showToast(
-            "Deleted permanently."
-        );
-
-    } else {
-
-        item.trashed =
-            true;
-
-        item.updatedAt =
-            Date.now();
-
-        showToast(
-            "Moved to Trash."
-        );
-    }
-
-    if (
-        activeItemId
-        ===
-        id
-    ) {
-
-        activeItemId =
-            null;
-
-        updateEditor();
-    }
-
-    saveItems();
-
-    renderItems();
-}
-
-
-function restoreItem(
-    id
-) {
-
-    const item =
-        items.find(
-            current =>
-            current.id
-            ===
-            id
-        );
-
-    if (
-        !item
-    ) {
-
-        return;
-    }
-
-    item.trashed =
-        false;
-
-    item.updatedAt =
-        Date.now();
-
-    saveItems();
-
-    renderItems();
-
-    showToast(
-        "Item restored."
-    );
-}
-
-
-/* =================================
-   Download
-================================= */
-
-function downloadFile() {
-
-    const item =
-        getActiveItem();
-
-    if (
-        !item
-    ) {
-
-        return;
-    }
-
-    saveActiveFile(
-        true
-    );
-
-    const blob =
-        new Blob(
-
-            [
-                item.content
-                ||
-                ""
-            ],
-
-            {
-                type:
-                    "text/plain"
-            }
-
-        );
-
-    const url =
-        URL.createObjectURL(
-            blob
-        );
-
-    const link =
-        document.createElement(
-            "a"
-        );
-
-    link.href =
-        url;
-
-    link.download =
-        item.name
-        ||
-        "file.txt";
-
-    document.body.appendChild(
-        link
-    );
-
-    link.click();
-
-    link.remove();
-
-    URL.revokeObjectURL(
-        url
-    );
-
-    showToast(
-        "Download started."
-    );
-}
-
-
-/* =================================
-   Upload
-================================= */
-
-function uploadFiles(
-    files
-) {
-
-    if (
-        !files
-        ||
-        !files.length
-    ) {
-
-        return;
-    }
-
-    let finished =
-        0;
-
-    [
-        ...files
-    ]
-    .forEach(
-        file => {
-
-            const reader =
-                new FileReader();
-
-            reader.onload =
-                () => {
-
-                    const now =
-                        Date.now();
-
-                    items.unshift({
-
-                        id:
-                            createId(),
-
-                        type:
-                            "file",
-
-                        name:
-                            file.name,
-
-                        content:
-
-                            typeof reader.result
-                            ===
-                            "string"
-
-                            ?
-
-                            reader.result
-
-                            :
-
-                            "[Binary file uploaded]",
-
-                        uploaded:
-                            true,
-
-                        isNote:
-                            false,
-
-                        trashed:
-                            false,
-
-                        published:
-                            false,
-
-                        sharedWith:
-                            [],
-
-                        createdAt:
-                            now,
-
-                        updatedAt:
-                            now
-                    });
-
-                    finished++;
-
-                    if (
-                        finished
-                        ===
-                        files.length
-                    ) {
-
-                        saveItems();
-
-                        renderItems();
-
-                        showToast(
-
-                            finished
-                            +
-                            " file"
-                            +
-                            (
-                                finished
-                                ===
-                                1
-                                ?
-                                ""
-                                :
-                                "s"
-                            )
-                            +
-                            " uploaded."
-
-                        );
-                    }
-
-                };
-
-            reader.onerror =
-                () => {
-
-                    finished++;
-
-                };
-
-            reader.readAsText(
-                file
-            );
-
-        }
-    );
-}
-
-
-/* =================================
-   Share
-================================= */
-
-function openShareModal() {
-
-    const item =
-        getActiveItem();
-
-    if (
-        !item
-    ) {
-
-        return;
-    }
-
-    elements.shareIdInput.value =
-        "";
-
-    renderSharedUsers();
-
-    openModal(
-        elements.shareModal
-    );
-}
-
-
-function renderSharedUsers() {
-
-    const item =
-        getActiveItem();
-
-    if (
-        !item
-    ) {
-
-        return;
-    }
-
-    if (
-        !item.sharedWith
-        ||
-        item.sharedWith.length
-        ===
-        0
-    ) {
-
-        elements
-        .sharedUsersList
-        .innerHTML =
-
-            `
-            <div class="empty-files">
-
-                <p>
-                    This file is not shared yet.
-                </p>
-
-            </div>
-            `;
-
-        return;
-    }
-
-    elements
-    .sharedUsersList
-    .innerHTML =
-
-        item
-        .sharedWith
-        .map(
-            user => `
-
-                <div
-                    class="
-                        permission-row
-                    "
-                >
-
-                    <span>
-
-                        ${
-                            escapeHtml(
-                                user.id
-                            )
-                        }
-
-                    </span>
-
-                    <button
-                        class="
-                            item-menu-btn
-                        "
-                        style="
-                            opacity:1
-                        "
-                        data-permission-id="
-                            ${user.id}
-                        "
-                        type="button"
-                    >
-
-                        <i
-                            class="
-                                fa-solid
-                                fa-gear
-                            "
-                        ></i>
-
-                    </button>
-
-                </div>
-
-            `
-        )
-        .join("");
-}
-
-
-function addSharedUser() {
-
-    const item =
-        getActiveItem();
-
-    if (
-        !item
-    ) {
-
-        return;
-    }
-
-    const id =
-        elements
-        .shareIdInput
-        .value
-        .trim()
-        .toUpperCase();
-
-    if (
-        !/^FF-[A-Z0-9]{6}-[A-Z0-9]{6}$/
-        .test(
-            id
-        )
-    ) {
-
-        showToast(
-            "Enter a valid FileForge ID.",
-            "warning"
-        );
-
-        return;
-    }
-
-    if (
-        id
-        ===
-        getDeviceId()
-    ) {
-
-        showToast(
-            "You cannot share with yourself.",
-            "warning"
-        );
-
-        return;
-    }
-
-    item.sharedWith =
-        item.sharedWith
-        ||
-        [];
-
-    if (
-        item.sharedWith.some(
-            user =>
-            user.id
-            ===
-            id
-        )
-    ) {
-
-        showToast(
-            "This user was already added.",
-            "warning"
-        );
-
-        return;
-    }
-
-    item.sharedWith.push({
-
-        id:
-
-            id,
-
-        permissions: {
-
-            view:
-                true,
-
-            edit:
-                false,
-
-            add:
-                false,
-
-            delete:
-                false,
-
-            download:
-                true
-        }
-    });
-
-    saveItems();
-
-    elements.shareIdInput.value =
-        "";
-
-    renderSharedUsers();
-
-    showToast(
-        "User added."
-    );
-}
-
-
-function openPermissions(
-    userId
-) {
-
-    const item =
-        getActiveItem();
-
-    if (
-        !item
-    ) {
-
-        return;
-    }
-
-    const user =
-        item
-        .sharedWith
-        .find(
-            current =>
-            current.id
-            ===
-            userId
-        );
-
-    if (
-        !user
-    ) {
-
-        return;
-    }
-
-    currentPermissionUser =
-        user;
-
-    const permissions =
-        user.permissions;
-
-    elements.permissionView.checked =
-        !!permissions.view;
-
-    elements.permissionEdit.checked =
-        !!permissions.edit;
-
-    elements.permissionAdd.checked =
-        !!permissions.add;
-
-    elements.permissionDelete.checked =
-        !!permissions.delete;
-
-    elements.permissionDownload.checked =
-        !!permissions.download;
-
-    elements.permissionAll.checked =
-
-        !!permissions.view
-
-        &&
-
-        !!permissions.edit
-
-        &&
-
-        !!permissions.add
-
-        &&
-
-        !!permissions.delete
-
-        &&
-
-        !!permissions.download;
-
-    openModal(
-        elements.permissionsModal
-    );
-}
-
-
-function savePermissions() {
-
-    if (
-        !currentPermissionUser
-    ) {
-
-        return;
-    }
-
-    const all =
-        elements.permissionAll.checked;
-
-    currentPermissionUser.permissions = {
-
-        view:
-
-            all
-            ||
-            elements.permissionView.checked,
-
-        edit:
-
-            all
-            ||
-            elements.permissionEdit.checked,
-
-        add:
-
-            all
-            ||
-            elements.permissionAdd.checked,
-
-        delete:
-
-            all
-            ||
-            elements.permissionDelete.checked,
-
-        download:
-
-            all
-            ||
-            elements.permissionDownload.checked
+    let folderNameVal = newFolderName.value.trim();
+    if (!folderNameVal) folderNameVal = "New Folder";
+
+    const newFolder = {
+        id: Date.now().toString() + Math.random().toString(36).slice(2),
+        type: "folder",
+        name: folderNameVal,
+        parentId: currentFolderId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
     };
 
-    saveItems();
-
-    closeModal(
-        elements.permissionsModal
-    );
-
-    showToast(
-        "Permissions saved."
-    );
+    items.unshift(newFolder);
+    saveData();
+    renderExplorer();
+    closeModal(newFolderModal);
 }
 
+/* =================================
+Mobile File Upload
+================================= */
+mobileFileUpload.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        createFile(file.name, event.target.result);
+    };
+    reader.readAsText(file);
+    mobileFileUpload.value = "";
+});
 
 /* =================================
-   Publish
+Explorer / Folder Logic
 ================================= */
+function openFolder(folderId) {
+    currentFolderId = folderId;
+    renderExplorer();
+    renderBreadcrumbs();
+}
 
-function openPublishModal() {
+function renderBreadcrumbs() {
+    breadcrumbs.innerHTML = "";
+    let path = [];
+    let curr = currentFolderId;
 
-    const item =
-        getActiveItem();
+    while (curr !== "root") {
+        const folderObj = items.find((i) => i.id === curr && i.type === "folder");
+        if (folderObj) {
+            path.unshift(folderObj);
+            curr = folderObj.parentId;
+        } else {
+            curr = "root";
+        }
+    }
 
-    if (
-        !item
-    ) {
+    // Root
+    const rootSpan = document.createElement("span");
+    rootSpan.className = `crumb ${currentFolderId === "root" ? "active" : ""}`;
+    rootSpan.innerHTML = `<i class="fa-solid fa-house"></i> Root`;
+    rootSpan.onclick = () => openFolder("root");
+    breadcrumbs.appendChild(rootSpan);
 
+    path.forEach((f, idx) => {
+        const sep = document.createElement("span");
+        sep.textContent = " / ";
+        breadcrumbs.appendChild(sep);
+
+        const span = document.createElement("span");
+        span.className = `crumb ${idx === path.length - 1 ? "active" : ""}`;
+        span.textContent = f.name;
+        span.onclick = () => openFolder(f.id);
+        breadcrumbs.appendChild(span);
+    });
+}
+
+function renderExplorer() {
+    fileList.innerHTML = "";
+    const searchText = searchFiles.value.trim().toLowerCase();
+
+    let currentItems = items.filter((item) => {
+        if (searchText) {
+            return item.name.toLowerCase().includes(searchText);
+        }
+        return item.parentId === currentFolderId;
+    });
+
+    fileCount.textContent = `${currentItems.length} items`;
+
+    if (currentItems.length === 0) {
+        fileList.innerHTML = `
+            <div class="empty-files">
+                <i class="fa-regular fa-folder-open"></i>
+                <h3>No files or folders</h3>
+                <p>Add a file or folder to keep organized.</p>
+            </div>
+        `;
         return;
     }
 
-    elements.publishDescription.value =
+    currentItems.forEach((item) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `file-item ${item.id === activeFileId ? "active" : ""}`;
 
-        item.publishDescription
-        ||
-        "";
+        const iconDiv = document.createElement("div");
+        iconDiv.className = "file-item-icon";
 
-    elements.publishVisibility.value =
+        if (item.type === "folder") {
+            iconDiv.innerHTML = `<i class="fa-solid fa-folder" style="color: #f7d070;"></i>`;
+        } else {
+            const iconClass = getFileIconClass(item.name);
+            iconDiv.innerHTML = `<i class="${iconClass}"></i>`;
+        }
 
-        item.publishVisibility
-        ||
-        "public";
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "file-item-info";
 
-    elements.previewLines.value =
+        const titleDiv = document.createElement("div");
+        titleDiv.className = "file-item-name";
+        titleDiv.textContent = item.name;
 
-        item.previewLines
-        ||
-        900;
+        const dateDiv = document.createElement("div");
+        dateDiv.className = "file-item-date";
+        dateDiv.textContent = formatDate(item.updatedAt);
 
-    openModal(
-        elements.publishModal
-    );
+        infoDiv.append(titleDiv, dateDiv);
+        btn.append(iconDiv, infoDiv);
+
+        btn.onclick = () => {
+            if (item.type === "folder") {
+                openFolder(item.id);
+            } else {
+                enableEditor();
+                openFile(item.id);
+            }
+        };
+
+        fileList.appendChild(btn);
+    });
 }
 
+/* =================================
+File Operations
+================================= */
+function openFile(id) {
+    const selected = items.find((i) => i.id === id && i.type === "file");
+    if (!selected) return;
 
-function publishFile() {
+    activeFileId = selected.id;
+    fileName.value = selected.name;
+    textEditor.value = selected.content || "";
 
-    const item =
-        getActiveItem();
+    const iconClass = getFileIconClass(selected.name);
+    activeFileHeaderIcon.className = iconClass;
 
-    if (
-        !item
-    ) {
+    fontStyleSelect.value = selected.fontStyle || "font-default";
+    textEditor.className = selected.fontStyle || "font-default";
 
+    updateStatistics();
+    renderExplorer();
+}
+
+function openActiveFile() {
+    if (!activeFileId) {
+        showNoFile();
         return;
     }
-
-    item.published =
-        true;
-
-    item.publishDescription =
-
-        elements
-        .publishDescription
-        .value
-        .trim();
-
-    item.publishVisibility =
-
-        elements
-        .publishVisibility
-        .value;
-
-    item.previewLines =
-
-        Math.max(
-
-            1,
-
-            Math.min(
-
-                900,
-
-                Number(
-                    elements
-                    .previewLines
-                    .value
-                )
-                ||
-                1
-
-            )
-
-        );
-
-    item.updatedAt =
-        Date.now();
-
-    saveItems();
-
-    closeModal(
-        elements.publishModal
-    );
-
-    renderItems();
-
-    showToast(
-        "File published."
-    );
+    openFile(activeFileId);
 }
 
+function showNoFile() {
+    fileName.value = "No file selected";
+    textEditor.value = "";
+    fileName.disabled = true;
+    textEditor.disabled = true;
+    activeFileHeaderIcon.className = "fa-regular fa-file-lines";
+    updateStatistics();
+}
+
+function enableEditor() {
+    fileName.disabled = false;
+    textEditor.disabled = false;
+}
+
+function updateFileContent() {
+    if (!activeFileId) return;
+    const activeFile = items.find((i) => i.id === activeFileId);
+    if (!activeFile) return;
+
+    activeFile.content = textEditor.value;
+    activeFile.updatedAt = new Date().toISOString();
+
+    saveData();
+    updateStatistics();
+}
+
+function renameFile() {
+    if (!activeFileId) return;
+    const activeFile = items.find((i) => i.id === activeFileId);
+    if (!activeFile) return;
+
+    let newName = fileName.value.trim();
+    if (!newName) {
+        newName = "untitled.txt";
+        fileName.value = newName;
+    }
+
+    activeFile.name = newName;
+    activeFile.updatedAt = new Date().toISOString();
+
+    activeFileHeaderIcon.className = getFileIconClass(newName);
+
+    saveData();
+    renderExplorer();
+}
+
+fontStyleSelect.addEventListener("change", (e) => {
+    const style = e.target.value;
+    textEditor.className = style;
+
+    if (activeFileId) {
+        const activeFile = items.find((i) => i.id === activeFileId);
+        if (activeFile) {
+            activeFile.fontStyle = style;
+            saveData();
+        }
+    }
+});
 
 /* =================================
-   Item Menu
+Statistics & Helper
 ================================= */
+function updateStatistics() {
+    const content = textEditor.value;
+    const lines = content === "" ? 1 : content.split("\n").length;
+    const cleanText = content.trim();
+    const words = cleanText === "" ? 0 : cleanText.split(/\s+/).length;
 
-function openItemMenu(
-    id
-) {
-
-    const item =
-        items.find(
-            current =>
-            current.id
-            ===
-            id
-        );
-
-    if (
-        !item
-    ) {
-
-        return;
-    }
-
-    if (
-        currentView
-        ===
-        "trash"
-    ) {
-
-        const action =
-            prompt(
-
-                "Type RESTORE to restore or DELETE to delete permanently."
-
-            );
-
-        if (
-            action
-            ===
-            "RESTORE"
-        ) {
-
-            restoreItem(
-                id
-            );
-
-        }
-
-        if (
-            action
-            ===
-            "DELETE"
-        ) {
-
-            deleteItemById(
-                id
-            );
-
-        }
-
-        return;
-    }
-
-    const action =
-        prompt(
-
-            "Type RENAME or DELETE."
-
-        );
-
-    if (
-        action
-        ===
-        "RENAME"
-    ) {
-
-        const name =
-            prompt(
-                "New name:",
-                item.name
-            );
-
-        if (
-            name
-            &&
-            name.trim()
-        ) {
-
-            item.name =
-                name
-                .trim()
-                .slice(
-                    0,
-                    100
-                );
-
-            item.updatedAt =
-                Date.now();
-
-            saveItems();
-
-            renderItems();
-
-            if (
-                activeItemId
-                ===
-                id
-            ) {
-
-                elements.fileName.value =
-                    item.name;
-            }
-
-            showToast(
-                "Item renamed."
-            );
-        }
-    }
-
-    if (
-        action
-        ===
-        "DELETE"
-    ) {
-
-        deleteItemById(
-            id
-        );
-    }
+    lineCount.textContent = lines;
+    wordCount.textContent = words;
+    characterCount.textContent = content.length;
 }
 
+function formatDate(date) {
+    const time = new Date(date);
+    if (Number.isNaN(time.getTime())) return "Saved";
+    return time.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+}
 
 /* =================================
-   Online
+Clear / Delete Buttons
 ================================= */
-
-function updateOnlineCount() {
-
-    elements.onlineCount.textContent =
-        "1";
+function clearContent() {
+    if (!activeFileId) return;
+    customConfirm("Clear Content", "Are you sure you want to clear all text in this file?", () => {
+        textEditor.value = "";
+        updateFileContent();
+    });
 }
 
-
-/* =================================
-   Events
-================================= */
-
-function bindEvents() {
-
-    elements.homeBtn
-    .addEventListener(
-
-        "click",
-
-        () => {
-
-            setView(
-                "files"
-            );
-
-        }
-
-    );
-
-
-    elements.profileBtn
-    .addEventListener(
-
-        "click",
-
-        openProfileSettings
-
-    );
-
-
-    elements.saveProfileBtn
-    .addEventListener(
-
-        "click",
-
-        saveFirstProfile
-
-    );
-
-
-    elements.updateProfileBtn
-    .addEventListener(
-
-        "click",
-
-        updateProfile
-
-    );
-
-
-    elements.copyIdBtn
-    .addEventListener(
-
-        "click",
-
-        async () => {
-
-            try {
-
-                await navigator
-                .clipboard
-                .writeText(
-
-                    getDeviceId()
-
-                );
-
-                showToast(
-                    "Device ID copied."
-                );
-
-            } catch {
-
-                showToast(
-                    "Could not copy the ID.",
-                    "error"
-                );
-
-            }
-
-        }
-
-    );
-
-
-    elements.newFileBtn
-    .addEventListener(
-
-        "click",
-
-        openNewFileModal
-
-    );
-
-
-    elements.createFileBtn
-    .addEventListener(
-
-        "click",
-
-        openNewFileModal
-
-    );
-
-
-    elements.emptyCreateBtn
-    .addEventListener(
-
-        "click",
-
-        openNewFileModal
-
-    );
-
-
-    elements.createFolderBtn
-    .addEventListener(
-
-        "click",
-
-        openFolderModal
-
-    );
-
-
-    elements.confirmCreateBtn
-    .addEventListener(
-
-        "click",
-
-        createFile
-
-    );
-
-
-    elements.confirmFolderBtn
-    .addEventListener(
-
-        "click",
-
-        createFolder
-
-    );
-
-
-    elements.searchFiles
-    .addEventListener(
-
-        "input",
-
-        renderItems
-
-    );
-
-
-    elements.fileList
-    .addEventListener(
-
-        "click",
-
-        event => {
-
-            const menu =
-                event
-                .target
-                .closest(
-                    "[data-menu-id]"
-                );
-
-            if (
-                menu
-            ) {
-
-                event
-                .preventDefault();
-
-                event
-                .stopPropagation();
-
-                openItemMenu(
-                    menu.dataset.menuId
-                );
-
-                return;
-            }
-
-            const item =
-                event
-                .target
-                .closest(
-                    "[data-item-id]"
-                );
-
-            if (
-                item
-            ) {
-
-                selectItem(
-                    item.dataset.itemId
-                );
-            }
-
-        }
-
-    );
-
-
-    document
-    .querySelectorAll(
-        ".nav-item"
-    )
-    .forEach(
-
-        button => {
-
-            button
-            .addEventListener(
-
-                "click",
-
-                () => {
-
-                    setView(
-
-                        button
-                        .dataset
-                        .view
-
-                    );
-
-                }
-
-            );
-
-        }
-
-    );
-
-
-    elements.fileName
-    .addEventListener(
-
-        "input",
-
-        () => {
-
-            queueAutoSave();
-
-        }
-
-    );
-
-
-    elements.textEditor
-    .addEventListener(
-
-        "input",
-
-        () => {
-
-            updateStats(
-
-                elements
-                .textEditor
-                .value
-
-            );
-
-            queueAutoSave();
-
-        }
-
-    );
-
-
-    elements.textEditor
-    .addEventListener(
-
-        "keydown",
-
-        event => {
-
-            if (
-                event.key
-                ===
-                "Tab"
-            ) {
-
-                event.preventDefault();
-
-                const start =
-                    elements
-                    .textEditor
-                    .selectionStart;
-
-                const end =
-                    elements
-                    .textEditor
-                    .selectionEnd;
-
-                const value =
-                    elements
-                    .textEditor
-                    .value;
-
-                elements
-                .textEditor
-                .value =
-
-                    value.slice(
-                        0,
-                        start
-                    )
-
-                    +
-
-                    "    "
-
-                    +
-
-                    value.slice(
-                        end
-                    );
-
-                elements
-                .textEditor
-                .selectionStart =
-
-                    start
-                    +
-                    4;
-
-                elements
-                .textEditor
-                .selectionEnd =
-
-                    start
-                    +
-                    4;
-
-                updateStats(
-
-                    elements
-                    .textEditor
-                    .value
-
-                );
-
-                queueAutoSave();
-
-            }
-
-        }
-
-    );
-
-
-    elements.fontStyle
-    .addEventListener(
-
-        "change",
-
-        () => {
-
-            applyFontStyle(
-
-                elements
-                .fontStyle
-                .value
-
-            );
-
-            queueAutoSave();
-
-        }
-
-    );
-
-
-    elements.clearBtn
-    .addEventListener(
-
-        "click",
-
-        clearFile
-
-    );
-
-
-    elements.deleteBtn
-    .addEventListener(
-
-        "click",
-
-        deleteActiveFile
-
-    );
-
-
-    elements.downloadBtn
-    .addEventListener(
-
-        "click",
-
-        downloadFile
-
-    );
-
-
-    elements.uploadBtn
-    .addEventListener(
-
-        "click",
-
-        () => {
-
-            elements
-            .fileUploadInput
-            .click();
-
-        }
-
-    );
-
-
-    elements.fileUploadInput
-    .addEventListener(
-
-        "change",
-
-        event => {
-
-            uploadFiles(
-
-                event
-                .target
-                .files
-
-            );
-
-            event.target.value =
-                "";
-
-        }
-
-    );
-
-
-    elements.shareBtn
-    .addEventListener(
-
-        "click",
-
-        openShareModal
-
-    );
-
-
-    elements.addSharedUserBtn
-    .addEventListener(
-
-        "click",
-
-        addSharedUser
-
-    );
-
-
-    elements.sharedUsersList
-    .addEventListener(
-
-        "click",
-
-        event => {
-
-            const button =
-                event
-                .target
-                .closest(
-                    "[data-permission-id]"
-                );
-
-            if (
-                button
-            ) {
-
-                openPermissions(
-
-                    button
-                    .dataset
-                    .permissionId
-
-                );
-
-            }
-
-        }
-
-    );
-
-
-    elements.permissionAll
-    .addEventListener(
-
-        "change",
-
-        () => {
-
-            const value =
-
-                elements
-                .permissionAll
-                .checked;
-
-            elements.permissionView.checked =
-                value;
-
-            elements.permissionEdit.checked =
-                value;
-
-            elements.permissionAdd.checked =
-                value;
-
-            elements.permissionDelete.checked =
-                value;
-
-            elements.permissionDownload.checked =
-                value;
-
-        }
-
-    );
-
-
-    elements.savePermissionsBtn
-    .addEventListener(
-
-        "click",
-
-        savePermissions
-
-    );
-
-
-    elements.publishBtn
-    .addEventListener(
-
-        "click",
-
-        openPublishModal
-
-    );
-
-
-    elements.confirmPublishBtn
-    .addEventListener(
-
-        "click",
-
-        publishFile
-
-    );
-
-
-    document
-    .querySelectorAll(
-        "[data-close]"
-    )
-    .forEach(
-
-        button => {
-
-            button
-            .addEventListener(
-
-                "click",
-
-                () => {
-
-                    closeModal(
-
-                        $(
-                            button
-                            .dataset
-                            .close
-                        )
-
-                    );
-
-                }
-
-            );
-
-        }
-
-    );
-
-
-    document
-    .querySelectorAll(
-        ".modal"
-    )
-    .forEach(
-
-        modal => {
-
-            modal
-            .addEventListener(
-
-                "click",
-
-                event => {
-
-                    if (
-                        event.target
-                        ===
-                        modal
-
-                        &&
-
-                        modal
-                        !==
-                        elements
-                        .profileModal
-                    ) {
-
-                        closeModal(
-                            modal
-                        );
-
-                    }
-
-                }
-
-            );
-
-        }
-
-    );
-
-
-    document
-    .addEventListener(
-
-        "keydown",
-
-        event => {
-
-            if (
-                event.key
-                ===
-                "Escape"
-            ) {
-
-                closeAllModals();
-
-            }
-
-        }
-
-    );
-
-
-    window
-    .addEventListener(
-
-        "beforeunload",
-
-        () => {
-
-            saveActiveFile(
-                true
-            );
-
-        }
-
-    );
+function deleteFile() {
+    if (!activeFileId) return;
+    const activeFile = items.find((i) => i.id === activeFileId);
+    const title = activeFile ? activeFile.name : "this file";
+
+    customConfirm("Delete Item", `Are you sure you want to delete "${title}"?`, () => {
+        items = items.filter((i) => i.id !== activeFileId);
+        const remainingFiles = items.filter((i) => i.type === "file");
+        activeFileId = remainingFiles.length > 0 ? remainingFiles[0].id : null;
+
+        saveData();
+        renderExplorer();
+        openActiveFile();
+    });
 }
 
+function downloadFile() {
+    if (!activeFileId) return;
+    const activeFile = items.find((i) => i.id === activeFileId);
+    if (!activeFile) return;
+
+    const fileBlob = new Blob([activeFile.content], { type: "text/plain;charset=utf-8" });
+    const downloadUrl = URL.createObjectURL(fileBlob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = activeFile.name;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(downloadUrl);
+}
 
 /* =================================
-   Start
+Sidebar Tabs (Explorer / Notes)
 ================================= */
+tabFiles.addEventListener("click", () => {
+    tabFiles.classList.add("active");
+    tabNotes.classList.remove("active");
+    explorerView.classList.remove("hidden");
+    notesView.classList.add("hidden");
+});
 
-function startApp() {
+tabNotes.addEventListener("click", () => {
+    tabNotes.classList.add("active");
+    tabFiles.classList.remove("active");
+    notesView.classList.remove("hidden");
+    explorerView.classList.add("hidden");
+});
 
-    loadItems();
+quickNotesArea.addEventListener("input", () => {
+    localStorage.setItem(NOTES_KEY, quickNotesArea.value);
+});
 
-    activeItemId =
+/* =================================
+Modals
+================================= */
+function openModal(modal) {
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden", "false");
+}
 
-        localStorage.getItem(
-            STORAGE.activeId
-        );
+function closeModal(modal) {
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden", "true");
+}
 
-    currentView =
+newFileBtn.onclick = () => openModal(newFileModal);
+createFileBtn.onclick = () => openModal(newFileModal);
+closeModalBtn.onclick = () => closeModal(newFileModal);
+cancelFileBtn.onclick = () => closeModal(newFileModal);
+confirmCreateBtn.onclick = () => createFile();
 
-        localStorage.getItem(
-            STORAGE.view
-        )
+newFolderBtn.onclick = () => openModal(newFolderModal);
+closeFolderModalBtn.onclick = () => closeModal(newFolderModal);
+cancelFolderBtn.onclick = () => closeModal(newFolderModal);
+confirmCreateFolderBtn.onclick = () => createFolder();
 
-        ||
+/* =================================
+User Profile System
+================================= */
+function loadProfile() {
+    try {
+        const saved = localStorage.getItem(PROFILE_KEY);
+        if (saved) userProfile = JSON.parse(saved);
+    } catch (e) {
+        console.error("Profile load error:", e);
+    }
+}
 
-        "files";
+function saveProfile() {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(userProfile));
+    updateProfileUI();
+}
 
-    setupProfile();
+function canChangeName() {
+    if (!userProfile || !userProfile.nameChangedAt) return true;
+    const lastChanged = new Date(userProfile.nameChangedAt).getTime();
+    const now = Date.now();
+    const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+    return now - lastChanged >= SEVEN_DAYS;
+}
 
-    bindEvents();
+function updateProfileUI() {
+    if (userProfile && userProfile.displayName) {
+        topbarUserName.textContent = userProfile.displayName;
+    }
+}
 
-    updateOnlineCount();
+function openProfileModal() {
+    if (userProfile) {
+        displayNameInput.value = userProfile.displayName;
+        closeProfileBtn.classList.remove("hidden");
 
-    setView(
-        currentView
-    );
-
-    if (
-        activeItemId
-    ) {
-
-        const item =
-            items.find(
-                current =>
-
-                    current.id
-                    ===
-                    activeItemId
-
-                    &&
-
-                    !current.trashed
-
-            );
-
-        if (
-            item
-        ) {
-
-            updateEditor();
-
+        if (!canChangeName()) {
+            displayNameInput.disabled = true;
+            saveProfileBtn.disabled = true;
+            profileCooldownMsg.textContent = "You can only change your name once every 7 days.";
+            profileCooldownMsg.style.color = "#ff5268";
+        } else {
+            displayNameInput.disabled = false;
+            saveProfileBtn.disabled = false;
+            profileCooldownMsg.textContent = "You can change your display name now.";
+            profileCooldownMsg.style.color = "#38d996";
         }
+    } else {
+        closeProfileBtn.classList.add("hidden");
+    }
+    openModal(profileModal);
+}
 
+saveProfileBtn.addEventListener("click", () => {
+    let nameVal = displayNameInput.value.trim();
+    if (!nameVal) nameVal = "Malik";
+
+    if (!userProfile) {
+        userProfile = {
+            displayName: nameVal,
+            createdAt: new Date().toISOString(),
+            nameChangedAt: new Date().toISOString()
+        };
+    } else {
+        if (!canChangeName()) return;
+        userProfile.displayName = nameVal;
+        userProfile.nameChangedAt = new Date().toISOString();
     }
 
-    setSaveStatus(
-        "Ready"
-    );
+    saveProfile();
+    closeModal(profileModal);
+});
+
+profileChipBtn.onclick = openProfileModal;
+closeProfileBtn.onclick = () => closeModal(profileModal);
+
+/* =================================
+Event Listeners & Init
+================================= */
+textEditor.addEventListener("input", updateFileContent);
+fileName.addEventListener("input", renameFile);
+searchFiles.addEventListener("input", renderExplorer);
+
+clearBtn.addEventListener("click", clearContent);
+deleteBtn.addEventListener("click", deleteFile);
+downloadBtn.addEventListener("click", downloadFile);
+
+loadProfile();
+loadData();
+renderBreadcrumbs();
+renderExplorer();
+
+if (userProfile) {
+    updateProfileUI();
+} else {
+    openProfileModal();
 }
 
-
-document
-.addEventListener(
-
-    "DOMContentLoaded",
-
-    startApp
-
-);
+const initialFiles = items.filter((i) => i.type === "file");
+if (initialFiles.length > 0) {
+    activeFileId = initialFiles[0].id;
+    enableEditor();
+    openActiveFile();
+} else {
+    showNoFile();
+}
