@@ -1,1973 +1,1758 @@
 /* =================================
-FileForge - Main Styles
-================================= */
+   FileForge - Main JavaScript
+   المرحلة الحالية:
+   ملفات + فولدرات + مذكرات + مهملات
+   رفع + تحميل + نشر + بروفايل + ID
+   ================================= */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap");
-
-/* =================================
-Reset
-================================= */
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html,
-body {
-    width: 100%;
-    height: 100%;
-}
+const $ = (id) => document.getElementById(id);
 
 /* =================================
-Colors
+   Elements
 ================================= */
 
-:root {
-    --background: #090b10;
-    --background-soft: #10131a;
+const newFileBtn = $("newFileBtn");
+const createFileBtn = $("createFileBtn");
 
-    --panel: #141821;
-    --panel-light: #1a1f2a;
-    --panel-hover: #202634;
+const newFileModal = $("newFileModal");
+const closeModalBtn = $("closeModalBtn");
+const cancelFileBtn = $("cancelFileBtn");
+const confirmCreateBtn = $("confirmCreateBtn");
+const newFileName = $("newFileName");
 
-    --border: #282f3d;
-    --border-light: #394355;
+const fileList = $("fileList");
+const emptyFiles = $("emptyFiles");
+const fileCount = $("fileCount");
+const searchFiles = $("searchFiles");
 
-    --text: #f3f5f8;
-    --text-soft: #9ba4b5;
-    --text-dark: #687184;
+const fileName = $("fileName");
+const textEditor = $("textEditor");
 
-    --primary: #6d5dfc;
-    --primary-light: #887cff;
+const lineCount = $("lineCount");
+const wordCount = $("wordCount");
+const characterCount = $("characterCount");
 
-    --danger: #ff5268;
-    --danger-dark: #d93b50;
+const saveStatus = $("saveStatus");
 
-    --success: #38d996;
-    --warning: #ffbd4a;
+const downloadBtn = $("downloadBtn");
+const clearBtn = $("clearBtn");
+const deleteBtn = $("deleteBtn");
 
-    --shadow:
-        0 20px 60px
-        rgba(0, 0, 0, 0.38);
-}
+const profileModal = $("profileModal");
+const displayNameInput = $("displayNameInput");
+const saveProfileBtn = $("saveProfileBtn");
 
 /* =================================
-Body
+   Storage Keys
 ================================= */
 
-body {
-    color: var(--text);
-
-    font-family:
-        "Inter",
-        Arial,
-        sans-serif;
-
-    background:
-        radial-gradient(
-            circle at top right,
-            rgba(109, 93, 252, 0.15),
-            transparent 35%
-        ),
-        radial-gradient(
-            circle at bottom left,
-            rgba(56, 217, 150, 0.05),
-            transparent 30%
-        ),
-        var(--background);
-
-    overflow: hidden;
-}
+const FILES_KEY = "fileforge_files_v2";
+const PROFILE_KEY = "fileforge_profile_v2";
+const NOTES_KEY = "fileforge_notes_v2";
+const FOLDERS_KEY = "fileforge_folders_v2";
+const TRASH_KEY = "fileforge_trash_v2";
+const POSTS_KEY = "fileforge_posts_v2";
 
 /* =================================
-App
+   Data
 ================================= */
 
-.app {
-    width: 100%;
-    height: 100dvh;
+let files = [];
+let notes = [];
+let folders = [];
+let trash = [];
+let posts = [];
 
-    display: flex;
-    flex-direction: column;
+let activeFileId = null;
 
-    padding: 18px;
-}
+let userProfile = null;
+
+let currentView = "files";
+
+let statusTimer;
 
 /* =================================
-Top Bar
+   Helpers
 ================================= */
 
-.topbar {
-    width: 100%;
-    min-height: 78px;
+function createId(prefix = "FF") {
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    const random = Math.random()
+        .toString(36)
+        .slice(2, 10)
+        .toUpperCase();
 
-    gap: 18px;
+    const time = Date.now()
+        .toString(36)
+        .slice(-7)
+        .toUpperCase();
 
-    padding: 13px 18px;
+    return `${prefix}-${random}-${time}`;
 
-    background:
-        rgba(20, 24, 33, 0.9);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 18px;
-
-    box-shadow:
-        var(--shadow);
-
-    backdrop-filter:
-        blur(18px);
-
-    margin-bottom: 14px;
 }
 
-.logo {
-    display: flex;
-    align-items: center;
+function escapeHtml(text) {
 
-    gap: 13px;
+    const element =
+        document.createElement("div");
 
-    min-width: 0;
+    element.textContent =
+        String(text ?? "");
+
+    return element.innerHTML;
+
 }
 
-.logo-icon {
-    width: 47px;
-    height: 47px;
+function formatDate(date) {
 
-    display: grid;
-    place-items: center;
+    const time =
+        new Date(date);
 
-    flex-shrink: 0;
+    if (
+        Number.isNaN(
+            time.getTime()
+        )
+    ) {
 
-    color: white;
+        return "Unknown date";
 
-    font-size: 19px;
+    }
 
-    background:
-        linear-gradient(
-            135deg,
-            var(--primary-light),
-            var(--primary)
+    return time.toLocaleString(
+        "en-US",
+        {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "2-digit"
+        }
+    );
+
+}
+
+function showAppMessage(
+    message,
+    type = "success"
+) {
+
+    let toast =
+        document.querySelector(
+            ".fileforge-toast"
         );
 
-    border-radius: 14px;
+    if (!toast) {
 
-    box-shadow:
-        0 8px 25px
-        rgba(109, 93, 252, 0.3);
-}
+        toast =
+            document.createElement("div");
 
-.logo h1 {
-    font-size: 19px;
-    font-weight: 800;
+        toast.className =
+            "fileforge-toast";
 
-    letter-spacing: -0.6px;
-}
-
-.logo p {
-    color: var(--text-soft);
-
-    font-size: 11px;
-
-    margin-top: 4px;
-}
-
-/* =================================
-Top Actions
-================================= */
-
-.top-actions {
-    display: flex;
-    align-items: center;
-
-    gap: 9px;
-}
-
-.online-users {
-    display: flex;
-    align-items: center;
-
-    gap: 8px;
-
-    color: var(--text-soft);
-
-    font-size: 11px;
-
-    padding: 10px 13px;
-
-    background:
-        var(--background-soft);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 11px;
-}
-
-.online-dot {
-    width: 8px;
-    height: 8px;
-
-    background:
-        var(--success);
-
-    border-radius: 50%;
-
-    box-shadow:
-        0 0 10px
-        rgba(56, 217, 150, 0.7);
-}
-
-.profile-btn {
-    height: 43px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 9px;
-
-    color: var(--text);
-
-    background:
-        var(--panel-light);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 12px;
-
-    padding: 0 13px;
-
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-.profile-btn:hover {
-    border-color:
-        var(--primary);
-
-    background:
-        rgba(109, 93, 252, 0.1);
-}
-
-.profile-avatar {
-    width: 28px;
-    height: 28px;
-
-    display: grid;
-    place-items: center;
-
-    color: white;
-
-    background:
-        var(--primary);
-
-    border-radius: 9px;
-
-    font-size: 11px;
-    font-weight: 800;
-}
-
-.new-file-btn {
-    height: 43px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 9px;
-
-    color: white;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--primary-light),
-            var(--primary)
+        document.body.appendChild(
+            toast
         );
 
-    border: none;
-
-    border-radius: 12px;
-
-    padding: 0 16px;
-
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 700;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 8px 24px
-        rgba(109, 93, 252, 0.25);
-
-    transition: 0.2s;
-}
-
-.new-file-btn:hover {
-    transform:
-        translateY(-2px);
-
-    filter:
-        brightness(1.1);
-}
-
-/* =================================
-Navigation
-================================= */
-
-.navigation {
-    display: flex;
-    align-items: center;
-
-    gap: 7px;
-
-    overflow-x: auto;
-
-    padding: 0 3px 13px;
-}
-
-.navigation::-webkit-scrollbar {
-    display: none;
-}
-
-.nav-btn {
-    height: 39px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 8px;
-
-    flex-shrink: 0;
-
-    color: var(--text-soft);
-
-    background:
-        transparent;
-
-    border:
-        1px solid
-        transparent;
-
-    border-radius: 11px;
-
-    padding: 0 14px;
-
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: 650;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-.nav-btn:hover {
-    color: white;
-
-    background:
-        rgba(255, 255, 255, 0.04);
-
-    border-color:
-        var(--border);
-}
-
-.nav-btn.active {
-    color: white;
-
-    background:
-        rgba(109, 93, 252, 0.15);
-
-    border-color:
-        rgba(109, 93, 252, 0.35);
-}
-
-.nav-btn i {
-    color:
-        var(--primary-light);
-}
-
-/* =================================
-Workspace
-================================= */
-
-.workspace {
-    flex: 1;
-
-    min-height: 0;
-
-    display: grid;
-
-    grid-template-columns:
-        295px
-        minmax(0, 1fr);
-
-    gap: 14px;
-}
-
-/* =================================
-Sidebar
-================================= */
-
-.sidebar {
-    min-width: 0;
-
-    display: flex;
-    flex-direction: column;
-
-    overflow: hidden;
-
-    background:
-        rgba(20, 24, 33, 0.9);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 18px;
-
-    box-shadow:
-        var(--shadow);
-}
-
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 10px;
-
-    padding:
-        18px
-        16px
-        13px;
-}
-
-.sidebar-header h2 {
-    font-size: 15px;
-    font-weight: 750;
-}
-
-.sidebar-header span {
-    display: block;
-
-    color:
-        var(--text-soft);
-
-    font-size: 10px;
-
-    margin-top: 4px;
-}
-
-.sidebar-buttons {
-    display: flex;
-    gap: 6px;
-}
-
-.icon-btn {
-    width: 37px;
-    height: 37px;
-
-    display: grid;
-    place-items: center;
-
-    color:
-        var(--primary-light);
-
-    background:
-        rgba(109, 93, 252, 0.1);
-
-    border:
-        1px solid
-        rgba(109, 93, 252, 0.25);
-
-    border-radius: 10px;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-.icon-btn:hover {
-    color: white;
-
-    background:
-        var(--primary);
-
-    transform:
-        translateY(-2px);
-}
-
-/* =================================
-Search
-================================= */
-
-.search-box {
-    position: relative;
-
-    margin:
-        0
-        14px
-        12px;
-}
-
-.search-box i {
-    position: absolute;
-
-    top: 50%;
-    left: 13px;
-
-    transform:
-        translateY(-50%);
-
-    color:
-        var(--text-dark);
-
-    font-size: 12px;
-
-    pointer-events: none;
-}
-
-.search-box input {
-    width: 100%;
-    height: 42px;
-
-    color:
-        var(--text);
-
-    background:
-        var(--background-soft);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 11px;
-
-    outline: none;
-
-    padding:
-        0
-        13px
-        0
-        37px;
-
-    font-family: inherit;
-    font-size: 11px;
-
-    transition: 0.2s;
-}
-
-.search-box input:focus {
-    border-color:
-        var(--primary);
-
-    box-shadow:
-        0 0 0 3px
-        rgba(109, 93, 252, 0.1);
-}
-
-/* =================================
-File List
-================================= */
-
-.file-list {
-    flex: 1;
-
-    min-height: 0;
-
-    overflow-y: auto;
-
-    padding:
-        4px
-        9px
-        14px;
-}
-
-.file-list::-webkit-scrollbar {
-    width: 5px;
-}
-
-.file-list::-webkit-scrollbar-thumb {
-    background:
-        var(--border-light);
-
-    border-radius: 20px;
-}
-
-.file-item {
-    width: 100%;
-
-    display: flex;
-    align-items: center;
-
-    gap: 10px;
-
-    color:
-        var(--text);
-
-    background:
-        transparent;
-
-    border:
-        1px solid
-        transparent;
-
-    border-radius: 11px;
-
-    padding: 11px;
-
-    margin-bottom: 5px;
-
-    text-align: left;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-.file-item:hover {
-    background:
-        rgba(255, 255, 255, 0.035);
-
-    border-color:
-        var(--border);
-}
-
-.file-item.active {
-    background:
-        rgba(109, 93, 252, 0.13);
-
-    border-color:
-        rgba(109, 93, 252, 0.3);
-}
-
-.file-item-icon {
-    width: 37px;
-    height: 37px;
-
-    display: grid;
-    place-items: center;
-
-    flex-shrink: 0;
-
-    color:
-        var(--primary-light);
-
-    background:
-        rgba(109, 93, 252, 0.1);
-
-    border-radius: 10px;
-}
-
-.folder-item .file-item-icon {
-    color:
-        var(--warning);
-
-    background:
-        rgba(255, 189, 74, 0.1);
-}
-
-.file-item-info {
-    flex: 1;
-
-    min-width: 0;
-}
-
-.file-item-name {
-    overflow: hidden;
-
-    text-overflow:
-        ellipsis;
-
-    white-space:
-        nowrap;
-
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.file-item-date {
-    color:
-        var(--text-dark);
-
-    font-size: 9px;
-
-    margin-top: 4px;
-}
-
-.empty-files {
-    min-height: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    flex-direction: column;
-
-    text-align: center;
-
-    padding: 25px;
-}
-
-.empty-files i {
-    color:
-        var(--text-dark);
-
-    font-size: 35px;
-
-    margin-bottom: 13px;
-}
-
-.empty-files h3 {
-    font-size: 13px;
-}
-
-.empty-files p {
-    max-width: 190px;
-
-    color:
-        var(--text-soft);
-
-    font-size: 10px;
-
-    line-height: 1.6;
-
-    margin-top: 7px;
-}
-
-/* =================================
-Editor
-================================= */
-
-.editor-section {
-    min-width: 0;
-
-    display: flex;
-    flex-direction: column;
-
-    overflow: hidden;
-
-    background:
-        rgba(20, 24, 33, 0.92);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 18px;
-
-    box-shadow:
-        var(--shadow);
-}
-
-.editor-header {
-    min-height: 70px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 14px;
-
-    padding:
-        12px
-        17px;
-
-    border-bottom:
-        1px solid
-        var(--border);
-}
-
-.file-title-area {
-    min-width: 0;
-    flex: 1;
-
-    display: flex;
-    align-items: center;
-
-    gap: 9px;
-}
-
-.file-title-area > i {
-    color:
-        var(--primary-light);
-
-    flex-shrink: 0;
-}
-
-.file-title-area input {
-    width: 100%;
-
-    min-width: 0;
-
-    color:
-        var(--text);
-
-    background:
-        transparent;
-
-    border:
-        1px solid
-        transparent;
-
-    border-radius: 8px;
-
-    outline: none;
-
-    padding: 8px;
-
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 700;
-
-    transition: 0.2s;
-}
-
-.file-title-area input:focus {
-    background:
-        var(--background-soft);
-
-    border-color:
-        var(--border-light);
-}
-
-.editor-actions {
-    display: flex;
-    align-items: center;
-
-    gap: 7px;
-
-    flex-shrink: 0;
-}
-
-.save-status {
-    display: flex;
-    align-items: center;
-
-    gap: 6px;
-
-    color:
-        var(--text-soft);
-
-    font-size: 10px;
-
-    margin-right: 4px;
-}
-
-.save-status i {
-    color:
-        var(--success);
-}
-
-.action-btn {
-    height: 37px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 7px;
-
-    color:
-        var(--text-soft);
-
-    background:
-        var(--panel-light);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 10px;
-
-    padding: 0 11px;
-
-    font-family: inherit;
-    font-size: 10px;
-    font-weight: 650;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-.action-btn:hover {
-    color: white;
-
-    background:
-        var(--panel-hover);
-
-    border-color:
-        var(--border-light);
-}
-
-.publish-btn:hover {
-    color: white;
-
-    background:
-        var(--primary);
-
-    border-color:
-        var(--primary);
-}
-
-.delete-btn:hover {
-    color: white;
-
-    background:
-        var(--danger);
-
-    border-color:
-        var(--danger);
-}
-
-/* =================================
-Editor Tools
-================================= */
-
-.editor-tools {
-    display: flex;
-    align-items: center;
-
-    gap: 8px;
-
-    padding:
-        9px
-        15px;
-
-    background:
-        rgba(8, 10, 15, 0.3);
-
-    border-bottom:
-        1px solid
-        var(--border);
-}
-
-.font-select {
-    height: 34px;
-
-    color:
-        var(--text-soft);
-
-    background:
-        var(--panel-light);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 9px;
-
-    outline: none;
-
-    padding:
-        0
-        10px;
-
-    font-family: inherit;
-    font-size: 10px;
-
-    cursor: pointer;
-}
-
-.tool-label {
-    color:
-        var(--text-dark);
-
-    font-size: 10px;
-}
-
-/* =================================
-Text Editor
-================================= */
-
-.editor-container {
-    flex: 1;
-
-    min-height: 0;
-
-    padding: 14px;
-}
-
-#textEditor {
-    width: 100%;
-    height: 100%;
-
-    min-height: 250px;
-
-    display: block;
-
-    resize: none;
-
-    color:
-        #e9edf5;
-
-    background:
-        #0c0f15;
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 13px;
-
-    outline: none;
-
-    padding: 18px;
-
-    font-family:
-        "JetBrains Mono",
-        "Consolas",
-        monospace;
-
-    font-size: 13px;
-
-    line-height: 1.75;
-
-    tab-size: 4;
-
-    white-space:
-        pre;
-
-    overflow:
-        auto;
-
-    transition: 0.2s;
-}
-
-#textEditor:focus {
-    border-color:
-        rgba(109, 93, 252, 0.7);
-
-    box-shadow:
-        0 0 0 3px
-        rgba(109, 93, 252, 0.1);
-}
-
-/* =================================
-Footer
-================================= */
-
-.editor-footer {
-    min-height: 50px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 12px;
-
-    padding:
-        9px
-        17px;
-
-    color:
-        var(--text-dark);
-
-    background:
-        rgba(8, 10, 15, 0.4);
-
-    border-top:
-        1px solid
-        var(--border);
-
-    font-size: 9px;
-}
-
-.stats {
-    display: flex;
-    align-items: center;
-
-    gap: 17px;
-
-    flex-wrap: wrap;
-}
-
-.stats span,
-.save-info {
-    display: flex;
-    align-items: center;
-
-    gap: 6px;
-}
-
-.stats i {
-    color:
-        var(--primary-light);
-}
-
-.stats strong {
-    color:
-        var(--text-soft);
-}
-
-.save-info i {
-    color:
-        var(--success);
-}
-
-/* =================================
-Modal
-================================= */
-
-.modal {
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 100;
-
-    display: none;
-    align-items: center;
-    justify-content: center;
-
-    padding: 18px;
-
-    background:
-        rgba(0, 0, 0, 0.76);
-
-    backdrop-filter:
-        blur(9px);
-}
-
-.modal.show {
-    display: flex;
-}
-
-.modal-box {
-    width: 100%;
-
-    max-width: 440px;
-
-    max-height:
-        calc(100dvh - 36px);
-
-    overflow-y: auto;
-
-    background:
-        #151923;
-
-    border:
-        1px solid
-        var(--border-light);
-
-    border-radius: 18px;
-
-    box-shadow:
-        0 30px 90px
-        rgba(0, 0, 0, 0.65);
-
-    animation:
-        modalOpen
-        0.2s
-        ease;
-}
-
-@keyframes modalOpen {
-
-    from {
-        opacity: 0;
-
-        transform:
-            scale(0.94)
-            translateY(10px);
     }
 
-    to {
-        opacity: 1;
+    toast.textContent =
+        message;
 
-        transform:
-            scale(1)
-            translateY(0);
-    }
-}
+    toast.dataset.type =
+        type;
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
+    toast.classList.add(
+        "show"
+    );
 
-    gap: 18px;
+    clearTimeout(
+        toast.timer
+    );
 
-    padding: 20px;
+    toast.timer =
+        setTimeout(
+            () => {
 
-    border-bottom:
-        1px solid
-        var(--border);
-}
+                toast.classList.remove(
+                    "show"
+                );
 
-.modal-header h2 {
-    font-size: 16px;
-}
-
-.modal-header p {
-    color:
-        var(--text-soft);
-
-    font-size: 10px;
-
-    margin-top: 6px;
-}
-
-.close-modal {
-    width: 35px;
-    height: 35px;
-
-    display: grid;
-    place-items: center;
-
-    color:
-        var(--text-soft);
-
-    background:
-        var(--panel-light);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 10px;
-
-    cursor: pointer;
-}
-
-.close-modal:hover {
-    color: white;
-
-    background:
-        var(--danger);
-
-    border-color:
-        var(--danger);
-}
-
-.modal-content {
-    padding: 21px;
-}
-
-.modal-content label {
-    display: block;
-
-    color:
-        var(--text-soft);
-
-    font-size: 10px;
-    font-weight: 600;
-
-    margin-bottom: 8px;
-}
-
-.modal-content input,
-.modal-content textarea,
-.modal-content select {
-    width: 100%;
-
-    color:
-        var(--text);
-
-    background:
-        var(--background-soft);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 10px;
-
-    outline: none;
-
-    padding: 12px;
-
-    font-family: inherit;
-    font-size: 11px;
-
-    transition: 0.2s;
-}
-
-.modal-content input {
-    height: 45px;
-}
-
-.modal-content textarea {
-    min-height: 100px;
-
-    resize: vertical;
-}
-
-.modal-content input:focus,
-.modal-content textarea:focus,
-.modal-content select:focus {
-    border-color:
-        var(--primary);
-
-    box-shadow:
-        0 0 0 3px
-        rgba(109, 93, 252, 0.1);
-}
-
-.modal-content small {
-    display: block;
-
-    color:
-        var(--text-dark);
-
-    font-size: 9px;
-
-    margin-top: 8px;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-
-    gap: 9px;
-
-    padding:
-        14px
-        20px;
-
-    border-top:
-        1px solid
-        var(--border);
-}
-
-.cancel-btn,
-.create-btn,
-.danger-btn {
-    height: 40px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 7px;
-
-    border-radius: 10px;
-
-    padding: 0 15px;
-
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-.cancel-btn {
-    color:
-        var(--text-soft);
-
-    background:
-        var(--panel-light);
-
-    border:
-        1px solid
-        var(--border);
-}
-
-.create-btn {
-    color: white;
-
-    background:
-        var(--primary);
-
-    border:
-        1px solid
-        var(--primary);
-}
-
-.danger-btn {
-    color: white;
-
-    background:
-        var(--danger);
-
-    border:
-        1px solid
-        var(--danger);
-}
-
-.create-btn:hover,
-.danger-btn:hover {
-    filter:
-        brightness(1.1);
-
-    transform:
-        translateY(-1px);
-}
-
-/* =================================
-Profile
-================================= */
-
-.profile-modal-box {
-    max-width: 430px;
-
-    text-align: center;
-
-    padding-top: 26px;
-}
-
-.profile-welcome-icon {
-    width: 67px;
-    height: 67px;
-
-    display: grid;
-    place-items: center;
-
-    margin:
-        0
-        auto
-        17px;
-
-    color: white;
-
-    font-size: 26px;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--primary-light),
-            var(--primary)
+            },
+            2500
         );
 
-    border-radius: 20px;
-}
-
-.profile-modal-box h2 {
-    font-size: 20px;
-}
-
-.profile-modal-box > p {
-    color:
-        var(--text-soft);
-
-    font-size: 11px;
-
-    margin-top: 8px;
-}
-
-.profile-modal-box .modal-content {
-    text-align: left;
-
-    padding:
-        21px
-        25px
-        10px;
-}
-
-.profile-modal-box .modal-actions {
-    justify-content: center;
-
-    border-top: none;
-
-    padding:
-        12px
-        25px
-        24px;
-}
-
-.profile-modal-box .create-btn {
-    width: 100%;
-    height: 44px;
 }
 
 /* =================================
-Device ID
+   Custom Confirm
 ================================= */
 
-.device-id-box {
-    display: flex;
-    align-items: center;
+function customConfirm(
+    title,
+    message
+) {
 
-    gap: 9px;
+    return new Promise(
+        resolve => {
 
-    margin-top: 12px;
+            const old =
+                document.querySelector(
+                    ".confirm-overlay"
+                );
 
-    padding: 11px;
+            if (old) {
 
-    background:
-        var(--background-soft);
+                old.remove();
 
-    border:
-        1px solid
-        var(--border);
+            }
 
-    border-radius: 10px;
-}
+            const overlay =
+                document.createElement(
+                    "div"
+                );
 
-.device-id-text {
-    flex: 1;
+            overlay.className =
+                "confirm-overlay";
 
-    overflow: hidden;
+            overlay.innerHTML = `
 
-    color:
-        var(--primary-light);
+                <div class="confirm-box">
 
-    font-family:
-        "JetBrains Mono",
-        monospace;
+                    <div class="confirm-icon">
 
-    font-size: 10px;
+                        <i class="fa-solid fa-triangle-exclamation"></i>
 
-    text-overflow:
-        ellipsis;
+                    </div>
 
-    white-space:
-        nowrap;
-}
+                    <h2>
+                        ${escapeHtml(title)}
+                    </h2>
 
-.copy-id-btn {
-    width: 34px;
-    height: 34px;
+                    <p>
+                        ${escapeHtml(message)}
+                    </p>
 
-    display: grid;
-    place-items: center;
+                    <div class="confirm-actions">
 
-    color:
-        var(--text-soft);
+                        <button
+                            class="cancel-btn"
+                            type="button"
+                        >
+                            Cancel
+                        </button>
 
-    background:
-        var(--panel-light);
+                        <button
+                            class="create-btn confirm-danger"
+                            type="button"
+                        >
+                            Continue
+                        </button>
 
-    border:
-        1px solid
-        var(--border);
+                    </div>
 
-    border-radius: 8px;
+                </div>
 
-    cursor: pointer;
+            `;
+
+            const buttons =
+                overlay.querySelectorAll(
+                    "button"
+                );
+
+            buttons[0]
+            .addEventListener(
+                "click",
+                () => {
+
+                    overlay.remove();
+
+                    resolve(false);
+
+                }
+            );
+
+            buttons[1]
+            .addEventListener(
+                "click",
+                () => {
+
+                    overlay.remove();
+
+                    resolve(true);
+
+                }
+            );
+
+            document.body.appendChild(
+                overlay
+            );
+
+        }
+    );
+
 }
 
 /* =================================
-Trash
+   Local Storage
 ================================= */
 
-.trash-item {
-    opacity: 0.8;
+function loadData() {
+
+    try {
+
+        files =
+            JSON.parse(
+                localStorage.getItem(
+                    FILES_KEY
+                )
+                || "[]"
+            );
+
+        notes =
+            JSON.parse(
+                localStorage.getItem(
+                    NOTES_KEY
+                )
+                || "[]"
+            );
+
+        folders =
+            JSON.parse(
+                localStorage.getItem(
+                    FOLDERS_KEY
+                )
+                || "[]"
+            );
+
+        trash =
+            JSON.parse(
+                localStorage.getItem(
+                    TRASH_KEY
+                )
+                || "[]"
+            );
+
+        posts =
+            JSON.parse(
+                localStorage.getItem(
+                    POSTS_KEY
+                )
+                || "[]"
+            );
+
+        userProfile =
+            JSON.parse(
+                localStorage.getItem(
+                    PROFILE_KEY
+                )
+                || "null"
+            );
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+        files = [];
+        notes = [];
+        folders = [];
+        trash = [];
+        posts = [];
+
+    }
+
 }
 
-.trash-actions {
-    display: flex;
-    gap: 6px;
+function saveAll() {
 
-    margin-left: auto;
-}
+    try {
 
-.small-action-btn {
-    width: 31px;
-    height: 31px;
+        localStorage.setItem(
+            FILES_KEY,
+            JSON.stringify(files)
+        );
 
-    display: grid;
-    place-items: center;
+        localStorage.setItem(
+            NOTES_KEY,
+            JSON.stringify(notes)
+        );
 
-    color:
-        var(--text-soft);
+        localStorage.setItem(
+            FOLDERS_KEY,
+            JSON.stringify(folders)
+        );
 
-    background:
-        var(--panel-light);
+        localStorage.setItem(
+            TRASH_KEY,
+            JSON.stringify(trash)
+        );
 
-    border:
-        1px solid
-        var(--border);
+        localStorage.setItem(
+            POSTS_KEY,
+            JSON.stringify(posts)
+        );
 
-    border-radius: 8px;
+        if (userProfile) {
 
-    cursor: pointer;
-}
+            localStorage.setItem(
+                PROFILE_KEY,
+                JSON.stringify(
+                    userProfile
+                )
+            );
 
-.small-action-btn.restore:hover {
-    color: white;
+        }
 
-    background:
-        var(--success);
+        showSavedStatus();
 
-    border-color:
-        var(--success);
-}
+    } catch (error) {
 
-.small-action-btn.delete-forever:hover {
-    color: white;
+        console.error(
+            error
+        );
 
-    background:
-        var(--danger);
+        showAppMessage(
+            "Could not save data",
+            "error"
+        );
 
-    border-color:
-        var(--danger);
+    }
+
 }
 
 /* =================================
-Publish
+   Save Status
 ================================= */
 
-.publish-options {
-    display: grid;
+function showSavedStatus() {
 
-    gap: 10px;
+    if (!saveStatus) {
 
-    margin-top: 10px;
-}
+        return;
 
-.publish-option {
-    display: flex;
-    align-items: center;
+    }
 
-    gap: 11px;
+    clearTimeout(
+        statusTimer
+    );
 
-    padding: 13px;
+    saveStatus.innerHTML = `
+        <i class="fa-solid fa-cloud-check"></i>
+        Saved
+    `;
 
-    background:
-        var(--background-soft);
+    statusTimer =
+        setTimeout(
+            () => {
 
-    border:
-        1px solid
-        var(--border);
+                saveStatus.innerHTML = `
+                    <i class="fa-solid fa-cloud"></i>
+                    Ready
+                `;
 
-    border-radius: 11px;
+            },
+            1500
+        );
 
-    cursor: pointer;
-}
-
-.publish-option:hover {
-    border-color:
-        var(--primary);
-}
-
-.publish-option input {
-    width: auto;
-
-    accent-color:
-        var(--primary);
-}
-
-.publish-option i {
-    color:
-        var(--primary-light);
-}
-
-.publish-option strong {
-    display: block;
-
-    font-size: 11px;
-}
-
-.publish-option span {
-    display: block;
-
-    color:
-        var(--text-dark);
-
-    font-size: 9px;
-
-    margin-top: 4px;
 }
 
 /* =================================
-Toast
+   Profile
 ================================= */
 
-.toast-container {
-    position: fixed;
+function createDeviceId() {
 
-    right: 18px;
-    bottom: 18px;
+    return createId(
+        "FF"
+    );
 
-    z-index: 500;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 9px;
-
-    pointer-events: none;
 }
 
-.toast {
-    min-width: 240px;
+function createProfile() {
 
-    display: flex;
-    align-items: center;
+    let name =
+        displayNameInput
+        .value
+        .trim();
 
-    gap: 10px;
+    if (!name) {
 
-    color:
-        var(--text);
+        name =
+            "FileForge User";
 
-    background:
-        #171c26;
-
-    border:
-        1px solid
-        var(--border-light);
-
-    border-radius: 12px;
-
-    padding: 12px;
-
-    box-shadow:
-        var(--shadow);
-
-    animation:
-        toastIn
-        0.25s
-        ease;
-}
-
-.toast i {
-    color:
-        var(--success);
-}
-
-.toast.error i {
-    color:
-        var(--danger);
-}
-
-@keyframes toastIn {
-
-    from {
-        opacity: 0;
-
-        transform:
-            translateX(25px);
     }
 
-    to {
-        opacity: 1;
+    userProfile = {
 
-        transform:
-            translateX(0);
+        displayName:
+            name,
+
+        deviceId:
+            createDeviceId(),
+
+        createdAt:
+            new Date()
+            .toISOString(),
+
+        nameChangedAt:
+            new Date()
+            .toISOString()
+
+    };
+
+    saveAll();
+
+    closeProfileModal();
+
+    showAppMessage(
+        `Welcome, ${name}!`
+    );
+
+}
+
+function openProfileModal() {
+
+    if (!profileModal) {
+
+        return;
+
     }
+
+    profileModal
+    .classList
+    .add("show");
+
+    profileModal
+    .setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    setTimeout(
+        () => {
+
+            displayNameInput
+            ?.focus();
+
+        },
+        150
+    );
+
+}
+
+function closeProfileModal() {
+
+    profileModal
+    ?.classList
+    .remove("show");
+
+    profileModal
+    ?.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
 }
 
 /* =================================
-Mobile
+   File Creation
 ================================= */
 
-@media (max-width: 850px) {
+function openModal() {
 
-    body {
-        overflow: auto;
+    newFileModal
+    ?.classList
+    .add("show");
+
+    newFileModal
+    ?.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    if (newFileName) {
+
+        newFileName.value =
+            "";
+
     }
 
-    .app {
-        height: auto;
+    setTimeout(
+        () => {
 
-        min-height: 100dvh;
+            newFileName
+            ?.focus();
 
-        padding: 10px;
-    }
+        },
+        100
+    );
 
-    .topbar {
-        min-height: 68px;
-
-        padding:
-            10px
-            12px;
-
-        border-radius: 14px;
-    }
-
-    .logo-icon {
-        width: 41px;
-        height: 41px;
-    }
-
-    .logo h1 {
-        font-size: 16px;
-    }
-
-    .logo p,
-    .online-users,
-    .profile-name,
-    .new-file-btn span {
-        display: none;
-    }
-
-    .profile-btn {
-        width: 42px;
-
-        padding: 0;
-
-        display: grid;
-        place-items: center;
-    }
-
-    .profile-avatar {
-        width: 29px;
-        height: 29px;
-    }
-
-    .new-file-btn {
-        width: 42px;
-
-        padding: 0;
-
-        display: grid;
-        place-items: center;
-    }
-
-    .workspace {
-        display: flex;
-
-        flex-direction: column;
-
-        min-height: auto;
-    }
-
-    .sidebar {
-        min-height: 250px;
-
-        max-height: 330px;
-
-        border-radius: 14px;
-    }
-
-    .editor-section {
-        min-height: 620px;
-
-        border-radius: 14px;
-    }
-
-    .editor-header {
-        align-items: flex-start;
-
-        flex-direction: column;
-
-        padding: 12px;
-    }
-
-    .file-title-area {
-        width: 100%;
-    }
-
-    .editor-actions {
-        width: 100%;
-
-        overflow-x: auto;
-
-        padding-bottom: 2px;
-    }
-
-    .save-status {
-        display: none;
-    }
-
-    .action-btn {
-        flex-shrink: 0;
-    }
-
-    .editor-container {
-        min-height: 420px;
-
-        padding: 10px;
-    }
-
-    #textEditor {
-        min-height: 420px;
-
-        padding: 14px;
-
-        font-size: 12px;
-    }
-
-    .editor-footer {
-        align-items: flex-start;
-
-        flex-direction: column;
-
-        padding: 11px 13px;
-    }
 }
 
-@media (max-width: 450px) {
+function closeModal() {
 
-    .app {
-        padding: 7px;
+    newFileModal
+    ?.classList
+    .remove("show");
+
+    newFileModal
+    ?.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+}
+
+function createFile() {
+
+    let name =
+        newFileName
+        .value
+        .trim();
+
+    if (!name) {
+
+        name =
+            "Untitled File";
+
     }
 
-    .topbar {
-        margin-bottom: 9px;
+    const now =
+        new Date()
+        .toISOString();
+
+    const file = {
+
+        id:
+            createId("FILE"),
+
+        name,
+
+        content: "",
+
+        folderId:
+            null,
+
+        ownerId:
+            userProfile
+            ?.deviceId
+            || "LOCAL",
+
+        createdAt:
+            now,
+
+        updatedAt:
+            now
+
+    };
+
+    files.unshift(
+        file
+    );
+
+    activeFileId =
+        file.id;
+
+    currentView =
+        "files";
+
+    saveAll();
+
+    closeModal();
+
+    enableEditor();
+
+    renderCurrentView();
+
+    openFile(
+        file.id
+    );
+
+    showAppMessage(
+        "File created"
+    );
+
+}
+
+/* =================================
+   Open File
+================================= */
+
+function openFile(id) {
+
+    const file =
+        files.find(
+            item =>
+            item.id === id
+        );
+
+    if (!file) {
+
+        return;
+
     }
 
-    .navigation {
-        padding-bottom: 9px;
+    activeFileId =
+        file.id;
+
+    enableEditor();
+
+    fileName.value =
+        file.name;
+
+    textEditor.value =
+        file.content;
+
+    updateStatistics();
+
+    renderCurrentView();
+
+}
+
+/* =================================
+   Editor
+================================= */
+
+function enableEditor() {
+
+    fileName.disabled =
+        false;
+
+    textEditor.disabled =
+        false;
+
+    downloadBtn.disabled =
+        false;
+
+    clearBtn.disabled =
+        false;
+
+    deleteBtn.disabled =
+        false;
+
+}
+
+function disableEditor() {
+
+    fileName.disabled =
+        true;
+
+    textEditor.disabled =
+        true;
+
+    downloadBtn.disabled =
+        true;
+
+    clearBtn.disabled =
+        true;
+
+    deleteBtn.disabled =
+        true;
+
+}
+
+function showNoFile() {
+
+    activeFileId =
+        null;
+
+    fileName.value =
+        "No file selected";
+
+    textEditor.value =
+        "";
+
+    disableEditor();
+
+    updateStatistics();
+
+}
+
+function updateFileContent() {
+
+    if (!activeFileId) {
+
+        return;
+
     }
 
-    .nav-btn {
-        height: 37px;
+    const file =
+        files.find(
+            item =>
+            item.id ===
+            activeFileId
+        );
 
-        padding: 0 12px;
+    if (!file) {
+
+        return;
+
     }
 
-    .nav-btn span {
-        display: none;
+    file.content =
+        textEditor.value;
+
+    file.updatedAt =
+        new Date()
+        .toISOString();
+
+    saveAll();
+
+    updateStatistics();
+
+}
+
+function renameFile() {
+
+    if (!activeFileId) {
+
+        return;
+
     }
 
-    .sidebar-header {
-        padding:
-            14px
-            12px
-            10px;
+    const file =
+        files.find(
+            item =>
+            item.id ===
+            activeFileId
+        );
+
+    if (!file) {
+
+        return;
+
     }
 
-    .search-box {
-        margin:
-            0
-            10px
-            9px;
+    let name =
+        fileName
+        .value
+        .trim();
+
+    if (!name) {
+
+        name =
+            "Untitled File";
+
+        fileName.value =
+            name;
+
     }
 
-    .action-btn {
-        width: 38px;
+    file.name =
+        name;
 
-        padding: 0;
+    file.updatedAt =
+        new Date()
+        .toISOString();
 
-        display: grid;
-        place-items: center;
+    saveAll();
+
+    renderCurrentView();
+
+}
+
+/* =================================
+   Statistics
+================================= */
+
+function updateStatistics() {
+
+    const content =
+        textEditor
+        ?.value
+        || "";
+
+    const lines =
+        content === ""
+        ? 1
+        : content
+        .split("\n")
+        .length;
+
+    const clean =
+        content.trim();
+
+    const words =
+        clean === ""
+        ? 0
+        : clean
+        .split(/\s+/)
+        .length;
+
+    lineCount.textContent =
+        lines;
+
+    wordCount.textContent =
+        words;
+
+    characterCount.textContent =
+        content.length;
+
+}
+
+/* =================================
+   Render Files
+================================= */
+
+function renderFiles() {
+
+    if (!fileList) {
+
+        return;
+
     }
 
-    .action-btn span {
-        display: none;
+    const search =
+        searchFiles
+        ?.value
+        .trim()
+        .toLowerCase()
+        || "";
+
+    const result =
+        files.filter(
+            file =>
+            file.name
+            .toLowerCase()
+            .includes(search)
+        );
+
+    fileCount.textContent =
+        `${files.length} ${
+            files.length === 1
+            ? "file"
+            : "files"
+        }`;
+
+    fileList.innerHTML =
+        "";
+
+    if (
+        result.length === 0
+    ) {
+
+        fileList.innerHTML = `
+
+            <div class="empty-files">
+
+                <i class="fa-regular fa-folder-open"></i>
+
+                <h3>
+                    ${
+                        files.length
+                        ? "No files found"
+                        : "No files yet"
+                    }
+                </h3>
+
+                <p>
+                    ${
+                        files.length
+                        ? "Try another search."
+                        : "Create your first file to start writing."
+                    }
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
     }
 
-    .stats {
-        width: 100%;
+    result.forEach(
+        file => {
 
-        justify-content: space-between;
+            const button =
+                document.createElement(
+                    "button"
+                );
 
-        gap: 5px;
+            button.type =
+                "button";
+
+            button.className =
+                "file-item";
+
+            if (
+                file.id ===
+                activeFileId
+            ) {
+
+                button.classList.add(
+                    "active"
+                );
+
+            }
+
+            button.innerHTML = `
+
+                <div class="file-item-icon">
+
+                    <i class="fa-regular fa-file-lines"></i>
+
+                </div>
+
+                <div class="file-item-info">
+
+                    <div class="file-item-name">
+
+                        ${escapeHtml(
+                            file.name
+                        )}
+
+                    </div>
+
+                    <div class="file-item-date">
+
+                        ${formatDate(
+                            file.updatedAt
+                        )}
+
+                    </div>
+
+                </div>
+
+            `;
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    openFile(
+                        file.id
+                    );
+
+                }
+            );
+
+            fileList.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+/* =================================
+   Notes
+================================= */
+
+function renderNotes() {
+
+    fileList.innerHTML =
+        "";
+
+    fileCount.textContent =
+        `${notes.length} notes`;
+
+    if (
+        notes.length === 0
+    ) {
+
+        fileList.innerHTML = `
+
+            <div class="empty-files">
+
+                <i class="fa-regular fa-note-sticky"></i>
+
+                <h3>
+                    No notes yet
+                </h3>
+
+                <p>
+                    Your private notes will appear here.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
     }
 
-    .stats span {
-        font-size: 8px;
+    notes.forEach(
+        note => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "file-item";
+
+            button.innerHTML = `
+
+                <div class="file-item-icon">
+
+                    <i class="fa-regular fa-note-sticky"></i>
+
+                </div>
+
+                <div class="file-item-info">
+
+                    <div class="file-item-name">
+
+                        ${escapeHtml(
+                            note.name
+                        )}
+
+                    </div>
+
+                    <div class="file-item-date">
+
+                        ${formatDate(
+                            note.updatedAt
+                        )}
+
+                    </div>
+
+                </div>
+
+            `;
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    textEditor.value =
+                        note.content;
+
+                    fileName.value =
+                        note.name;
+
+                    enableEditor();
+
+                    activeFileId =
+                        null;
+
+                    showAppMessage(
+                        "Note opened"
+                    );
+
+                }
+            );
+
+            fileList.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+/* =================================
+   Trash
+================================= */
+
+function renderTrash() {
+
+    fileList.innerHTML =
+        "";
+
+    fileCount.textContent =
+        `${trash.length} items`;
+
+    if (
+        trash.length === 0
+    ) {
+
+        fileList.innerHTML = `
+
+            <div class="empty-files">
+
+                <i class="fa-solid fa-trash"></i>
+
+                <h3>
+                    Trash is empty
+                </h3>
+
+                <p>
+                    Deleted files will appear here.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
     }
 
-    .toast-container {
-        left: 10px;
-        right: 10px;
+    trash.forEach(
+        item => {
 
-        bottom: 10px;
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "file-item";
+
+            button.innerHTML = `
+
+                <div class="file-item-icon">
+
+                    <i class="fa-solid fa-trash"></i>
+
+                </div>
+
+                <div class="file-item-info">
+
+                    <div class="file-item-name">
+
+                        ${escapeHtml(
+                            item.name
+                        )}
+
+                    </div>
+
+                    <div class="file-item-date">
+
+                        Deleted:
+                        ${formatDate(
+                            item.deletedAt
+                        )}
+
+                    </div>
+
+                </div>
+
+            `;
+
+            button.addEventListener(
+                "click",
+                async () => {
+
+                    const restore =
+                        await customConfirm(
+                            "Restore file?",
+                            `Restore "${item.name}"?`
+                        );
+
+                    if (!restore) {
+
+                        return;
+
+                    }
+
+                    delete item.deletedAt;
+
+                    files.unshift(
+                        item
+                    );
+
+                    trash =
+                        trash.filter(
+                            old =>
+                            old.id !==
+                            item.id
+                        );
+
+                    saveAll();
+
+                    renderTrash();
+
+                    showAppMessage(
+                        "File restored"
+                    );
+
+                }
+            );
+
+            fileList.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+/* =================================
+   Current View
+================================= */
+
+function renderCurrentView() {
+
+    if (
+        currentView ===
+        "notes"
+    ) {
+
+        renderNotes();
+
+        return;
+
     }
 
-    .toast {
-        min-width: 0;
+    if (
+        currentView ===
+        "trash"
+    ) {
+
+        renderTrash();
+
+        return;
+
     }
+
+    renderFiles();
+
+}
+
+/* =================================
+   Clear
+================================= */
+
+async function clearContent() {
+
+    if (!activeFileId) {
+
+        return;
+
+    }
+
+    const allowed =
+        await customConfirm(
+            "Clear file?",
+            "All text inside this file will be removed."
+        );
+
+    if (!allowed) {
+
+        return;
+
+    }
+
+    textEditor.value =
+        "";
+
+    updateFileContent();
+
+    showAppMessage(
+        "File cleared"
+    );
+
+}
+
+/* =================================
+   Delete
+================================= */
+
+async function deleteFile() {
+
+    if (!activeFileId) {
+
+        return;
+
+    }
+
+    const file =
+        files.find(
+            item =>
+            item.id ===
+            activeFileId
+        );
+
+    if (!file) {
+
+        return;
+
+    }
+
+    const allowed =
+        await customConfirm(
+            "Move to trash?",
+            `"${file.name}" can be restored later.`
+        );
+
+    if (!allowed) {
+
+        return;
+
+    }
+
+    files =
+        files.filter(
+            item =>
+            item.id !==
+            activeFileId
+        );
+
+    trash.unshift({
+        ...file,
+        deletedAt:
+            new Date()
+            .toISOString()
+    });
+
+    activeFileId =
+        null;
+
+    saveAll();
+
+    showNoFile();
+
+    renderCurrentView();
+
+    showAppMessage(
+        "Moved to trash"
+    );
+
+}
+
+/* =================================
+   Download
+================================= */
+
+function downloadFile() {
+
+    if (!activeFileId) {
+
+        return;
+
+    }
+
+    const file =
+        files.find(
+            item =>
+            item.id ===
+            activeFileId
+        );
+
+    if (!file) {
+
+        return;
+
+    }
+
+    const blob =
+        new Blob(
+            [file.content],
+            {
+                type:
+                "text/plain;charset=utf-8"
+            }
+        );
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+    link.href =
+        url;
+
+    link.download =
+        file.name;
+
+    document.body.appendChild(
+        link
+    );
+
+    link.click();
+
+    link.remove();
+
+    URL.revokeObjectURL(
+        url
+    );
+
+    showAppMessage(
+        "Download started"
+    );
+
+}
+
+/* =================================
+   Navigation
+================================= */
+
+function setupNavigation() {
+
+    const navButtons =
+        document.querySelectorAll(
+            "[data-view]"
+        );
+
+    navButtons.forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    currentView =
+                        button.dataset.view;
+
+                    navButtons.forEach(
+                        item =>
+                        item.classList.remove(
+                            "active"
+                        )
+                    );
+
+                    button.classList.add(
+                        "active"
+                    );
+
+                    if (
+                        currentView ===
+                        "files"
+                    ) {
+
+                        renderFiles();
+
+                    }
+
+                    if (
+                        currentView ===
+                        "notes"
+                    ) {
+
+                        renderNotes();
+
+                    }
+
+                    if (
+                        currentView ===
+                        "trash"
+                    ) {
+
+                        renderTrash();
+
+                    }
+
+                    if (
+                        currentView ===
+                        "shared"
+                    ) {
+
+                        fileList.innerHTML = `
+
+                            <div class="empty-files">
+
+                                <i class="fa-solid fa-users"></i>
+
+                                <h3>
+                                    Shared With Me
+                                </h3>
+
+                                <p>
+                                    Shared files will appear here after MongoDB is connected.
+                                </p>
+
+                            </div>
+
+                        `;
+
+                    }
+
+                    if (
+                        currentView ===
+                        "published"
+                    ) {
+
+                        fileList.innerHTML = `
+
+                            <div class="empty-files">
+
+                                <i class="fa-solid fa-earth-americas"></i>
+
+                                <h3>
+                                    Explore
+                                </h3>
+
+                                <p>
+                                    Published files will appear here after MongoDB is connected.
+                                </p>
+
+                            </div>
+
+                        `;
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+/* =================================
+   Events
+================================= */
+
+newFileBtn
+?.addEventListener(
+    "click",
+    openModal
+);
+
+createFileBtn
+?.addEventListener(
+    "click",
+    openModal
+);
+
+closeModalBtn
+?.addEventListener(
+    "click",
+    closeModal
+);
+
+cancelFileBtn
+?.addEventListener(
+    "click",
+    closeModal
+);
+
+confirmCreateBtn
+?.addEventListener(
+    "click",
+    createFile
+);
+
+newFileName
+?.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key ===
+            "Enter"
+        ) {
+
+            createFile();
+
+        }
+
+    }
+);
+
+newFileModal
+?.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            newFileModal
+        ) {
+
+            closeModal();
+
+        }
+
+    }
+);
+
+textEditor
+?.addEventListener(
+    "input",
+    updateFileContent
+);
+
+fileName
+?.addEventListener(
+    "input",
+    renameFile
+);
+
+fileName
+?.addEventListener(
+    "blur",
+    renameFile
+);
+
+searchFiles
+?.addEventListener(
+    "input",
+    renderCurrentView
+);
+
+clearBtn
+?.addEventListener(
+    "click",
+    clearContent
+);
+
+deleteBtn
+?.addEventListener(
+    "click",
+    deleteFile
+);
+
+downloadBtn
+?.addEventListener(
+    "click",
+    downloadFile
+);
+
+saveProfileBtn
+?.addEventListener(
+    "click",
+    createProfile
+);
+
+displayNameInput
+?.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key ===
+            "Enter"
+        ) {
+
+            createProfile();
+
+        }
+
+    }
+);
+
+/* =================================
+   Start
+================================= */
+
+loadData();
+
+setupNavigation();
+
+renderFiles();
+
+if (
+    files.length > 0
+) {
+
+    openFile(
+        files[0].id
+    );
+
+} else {
+
+    showNoFile();
+
+}
+
+if (!userProfile) {
+
+    openProfileModal();
+
 }
