@@ -1521,3 +1521,106 @@ max-width: 450px
 }
 
 }
+
+/* =================================
+   FileForge Profile
+================================= */
+
+.profile-modal-box {
+    max-width: 430px;
+
+    text-align: center;
+
+    padding-top: 28px;
+}
+
+
+.profile-welcome-icon {
+    width: 68px;
+    height: 68px;
+
+    display: grid;
+    place-items: center;
+
+    margin:
+        0
+        auto
+        18px;
+
+    color: white;
+
+    font-size: 27px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary-light),
+            var(--primary)
+        );
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 12px 35px
+        rgba(109, 93, 252, 0.3);
+}
+
+
+.profile-modal-box h2 {
+    font-size: 21px;
+}
+
+
+.profile-modal-box > p {
+    color:
+        var(--text-soft);
+
+    font-size: 12px;
+
+    margin-top: 8px;
+}
+
+
+.profile-modal-box .modal-content {
+    text-align: left;
+
+    padding:
+        22px
+        26px
+        12px;
+}
+
+
+.profile-modal-box small {
+    display: block;
+
+    color:
+        var(--text-dark);
+
+    font-size: 10px;
+
+    line-height: 1.5;
+
+    margin-top: 9px;
+}
+
+
+.profile-modal-box .modal-actions {
+    justify-content: center;
+
+    border-top: none;
+
+    padding:
+        12px
+        26px
+        25px;
+}
+
+
+.profile-modal-box .create-btn {
+    width: 100%;
+
+    justify-content: center;
+
+    height: 45px;
+}
