@@ -36,6 +36,31 @@ const clearBtn = document.getElementById("clearBtn");
 const deleteBtn = document.getElementById("deleteBtn");
 
 /* =================================
+   User Profile
+================================= */
+
+const profileModal =
+    document.getElementById(
+        "profileModal"
+    );
+
+const displayNameInput =
+    document.getElementById(
+        "displayNameInput"
+    );
+
+const saveProfileBtn =
+    document.getElementById(
+        "saveProfileBtn"
+    );
+
+const PROFILE_KEY =
+    "fileforge_profile_v1";
+
+let userProfile =
+    null;
+
+/* =================================
 Storage
 ================================= */
 
@@ -869,6 +894,156 @@ newFileName.value =
 }
 
 /* =================================
+   Profile System
+================================= */
+
+function createDeviceId() {
+
+    const randomPart =
+        Math.random()
+        .toString(36)
+        .slice(2, 8)
+        .toUpperCase();
+
+
+    const timePart =
+        Date.now()
+        .toString(36)
+        .slice(-6)
+        .toUpperCase();
+
+
+    return `FF-${randomPart}-${timePart}`;
+
+}
+
+
+function loadProfile() {
+
+    try {
+
+        const savedProfile =
+            localStorage.getItem(
+                PROFILE_KEY
+            );
+
+
+        if (savedProfile) {
+
+            userProfile =
+                JSON.parse(
+                    savedProfile
+                );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Could not load profile:",
+            error
+        );
+
+    }
+
+}
+
+
+function saveProfile() {
+
+    localStorage.setItem(
+        PROFILE_KEY,
+        JSON.stringify(
+            userProfile
+        )
+    );
+
+}
+
+
+function openProfileModal() {
+
+    profileModal
+    .classList
+    .add("show");
+
+
+    profileModal
+    .setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    setTimeout(() => {
+
+        displayNameInput.focus();
+
+    }, 150);
+
+}
+
+
+function closeProfileModal() {
+
+    profileModal
+    .classList
+    .remove("show");
+
+
+    profileModal
+    .setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+}
+
+
+function createProfile() {
+
+    let displayName =
+        displayNameInput
+        .value
+        .trim();
+
+
+    if (
+        displayName === ""
+    ) {
+
+        displayName =
+            "FileForge User";
+
+    }
+
+
+    userProfile = {
+
+        displayName:
+            displayName,
+
+        deviceId:
+            createDeviceId(),
+
+        createdAt:
+            new Date()
+            .toISOString(),
+
+        nameChangedAt:
+            new Date()
+            .toISOString()
+
+    };
+
+
+    saveProfile();
+
+    closeProfileModal();
+
+}
+
+/* =================================
 Events
 ================================= */
 
@@ -966,9 +1141,33 @@ downloadBtn.addEventListener(
 downloadFile
 );
 
+saveProfileBtn.addEventListener(
+    "click",
+    createProfile
+);
+
+
+displayNameInput.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key ===
+            "Enter"
+        ) {
+
+            createProfile();
+
+        }
+
+    }
+);
+
 /* =================================
-Start App
+   Start App
 ================================= */
+
+loadProfile();
 
 loadFiles();
 
@@ -976,15 +1175,21 @@ renderFiles();
 
 if (files.length > 0) {
 
-activeFileId =
-    files[0].id;
+    activeFileId =
+        files[0].id;
 
-enableEditor();
+    enableEditor();
 
-openActiveFile();
+    openActiveFile();
 
 } else {
 
-showNoFile();
+    showNoFile();
+
+}
+
+if (!userProfile) {
+
+    openProfileModal();
 
 }
