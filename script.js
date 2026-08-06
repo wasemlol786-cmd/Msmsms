@@ -1,4 +1,4 @@
-// Database Structure Initialization (Local Storage Persistence)
+// Database Structure nitialization (Local Storage Persistence)
 let state = JSON.parse(localStorage.getItem('fm_state')) || {
     currentFolderId: 'root',
     folders: [
