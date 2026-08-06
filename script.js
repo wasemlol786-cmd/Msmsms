@@ -9,10 +9,6 @@ let state = JSON.parse(localStorage.getItem('fm_state')) || {
 };
 
 let activeFileId = null;
-let contextMenuOpen = null;
-
-// Initialize Lucide Icons
-lucide.createIcons();
 
 // Save state helper
 function saveState() {
@@ -38,6 +34,7 @@ function getFileTypeDetails(fileName) {
 // Render Core UI components
 function renderWorkspace() {
     const grid = document.getElementById('file-grid');
+    if (!grid) return;
     grid.innerHTML = '';
 
     // Render Folders
@@ -93,13 +90,14 @@ function renderWorkspace() {
         grid.appendChild(card);
     });
 
-    lucide.createIcons();
+    if (window.lucide) lucide.createIcons();
     attachContextMenuListeners();
 }
 
 // Breadcrumbs Navigation Generator
 function renderBreadcrumbs() {
     const breadcrumbs = document.getElementById('breadcrumbs');
+    if (!breadcrumbs) return;
     breadcrumbs.innerHTML = '';
     
     let chain = [];
@@ -132,12 +130,15 @@ function renderBreadcrumbs() {
 const editorArea = document.getElementById('file-editor-textarea');
 const lineNumbers = document.getElementById('line-numbers');
 
-editorArea.addEventListener('input', updateLineNumbers);
-editorArea.addEventListener('scroll', () => {
-    lineNumbers.scrollTop = editorArea.scrollTop;
-});
+if (editorArea && lineNumbers) {
+    editorArea.addEventListener('input', updateLineNumbers);
+    editorArea.addEventListener('scroll', () => {
+        lineNumbers.scrollTop = editorArea.scrollTop;
+    });
+}
 
 function updateLineNumbers() {
+    if (!editorArea || !lineNumbers) return;
     const lines = editorArea.value.split('\n').length;
     lineNumbers.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join('<br>');
 }
@@ -145,6 +146,7 @@ function updateLineNumbers() {
 function openEditor(fileId) {
     activeFileId = fileId;
     const file = state.files.find(f => f.id === fileId);
+    if (!file) return;
     
     document.getElementById('editor-file-name').value = file.name;
     editorArea.value = file.content || '';
@@ -193,18 +195,20 @@ function openZipViewer(file) {
     const zipContentDiv = document.getElementById('zip-contents');
     zipContentDiv.innerHTML = 'Loading archive content...';
 
-    JSZip.loadAsync(file.rawBase64 || file.content).then(zip => {
-        zipContentDiv.innerHTML = '';
-        zip.forEach((relativePath, zipEntry) => {
-            const item = document.createElement('div');
-            item.className = 'zip-item';
-            item.innerHTML = `<i data-lucide="${zipEntry.dir ? 'folder' : 'file'}"></i> <span>${relativePath}</span>`;
-            zipContentDiv.appendChild(item);
+    if (window.JSZip) {
+        JSZip.loadAsync(file.rawBase64 || file.content).then(zip => {
+            zipContentDiv.innerHTML = '';
+            zip.forEach((relativePath, zipEntry) => {
+                const item = document.createElement('div');
+                item.className = 'zip-item';
+                item.innerHTML = `<i data-lucide="${zipEntry.dir ? 'folder' : 'file'}"></i> <span>${relativePath}</span>`;
+                zipContentDiv.appendChild(item);
+            });
+            if (window.lucide) lucide.createIcons();
+        }).catch(() => {
+            zipContentDiv.innerHTML = 'Unable to preview ZIP file contents (Invalid or raw format).';
         });
-        lucide.createIcons();
-    }).catch(() => {
-        zipContentDiv.innerHTML = 'Unable to preview ZIP file contents (Invalid or raw format).';
-    });
+    }
 }
 
 document.getElementById('btn-close-zip').onclick = () => {
@@ -268,11 +272,12 @@ function attachContextMenuListeners() {
             menu.className = 'menu-dropdown';
             menu.innerHTML = `
                 <button class="menu-item" id="opt-rename"><i data-lucide="edit-3"></i> Rename</button>
+                <button class="menu-item" id="opt-move"><i data-lucide="folder-output"></i> Move</button>
                 <button class="menu-item" id="opt-delete" style="color:var(--danger)"><i data-lucide="trash-2"></i> Delete</button>
             `;
 
             btn.parentElement.appendChild(menu);
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
 
             document.getElementById('opt-rename').onclick = () => {
                 promptModal('Rename', 'Enter new name:', (newName) => {
@@ -281,6 +286,31 @@ function attachContextMenuListeners() {
                         else state.files.find(f => f.id === id).name = newName;
                         saveState();
                         renderWorkspace();
+                    }
+                });
+            };
+
+            document.getElementById('opt-move').onclick = () => {
+                const folderList = state.folders.map(f => f.name).join(', ');
+                promptModal('Move Item', `Available Folders: [ ${folderList} ]\nType target folder name (or "Root"):`, (targetName) => {
+                    if (targetName) {
+                        let targetFolder = state.folders.find(f => f.name.toLowerCase() === targetName.trim().toLowerCase());
+                        if (targetName.trim().toLowerCase() === 'root') {
+                            targetFolder = { id: 'root' };
+                        }
+                        
+                        if (targetFolder) {
+                            if (type === 'file') {
+                                state.files.find(f => f.id === id).folderId = targetFolder.id;
+                            } else if (type === 'folder' && id !== targetFolder.id) {
+                                state.folders.find(f => f.id === id).parentId = targetFolder.id;
+                            }
+                            saveState();
+                            renderWorkspace();
+                            showModal('Moved', 'Item moved successfully!', false);
+                        } else {
+                            showModal('Error', 'Folder not found!', false);
+                        }
                     }
                 });
             };
@@ -357,6 +387,7 @@ document.getElementById('btn-notes').onclick = () => {
 // Notes System
 function renderNotes() {
     const grid = document.getElementById('notes-grid');
+    if (!grid) return;
     grid.innerHTML = '';
     state.notes.forEach(note => {
         const card = document.createElement('div');
@@ -377,7 +408,7 @@ function renderNotes() {
         };
         grid.appendChild(card);
     });
-    lucide.createIcons();
+    if (window.lucide) lucide.createIcons();
 }
 
 document.getElementById('btn-add-note').onclick = () => {
@@ -386,6 +417,9 @@ document.getElementById('btn-add-note').onclick = () => {
     renderNotes();
 };
 
-// Initial App Startup
-renderWorkspace();
-renderBreadcrumbs();
+// Safe Initial Startup
+window.addEventListener('DOMContentLoaded', () => {
+    renderWorkspace();
+    renderBreadcrumbs();
+    if (window.lucide) lucide.createIcons();
+});
