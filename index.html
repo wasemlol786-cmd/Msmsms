@@ -1,0 +1,381 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8"><meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>FileForge</title>
+
+<!-- Website Icons -->
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+>
+
+<!-- Main CSS File -->
+<link rel="stylesheet" href="style.css">
+
+</head><body><!-- Main App -->
+<main class="app">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fa-solid fa-file-lines"></i>
+            </div>
+
+            <div>
+                <h1>FileForge</h1>
+                <p>Your personal file workspace</p>
+            </div>
+        </div>
+
+        <button
+            class="new-file-btn"
+            id="newFileBtn"
+            type="button"
+        >
+            <i class="fa-solid fa-plus"></i>
+            <span>New File</span>
+        </button>
+
+    </header>
+
+
+    <!-- Workspace -->
+    <section class="workspace">
+
+        <!-- Files Sidebar -->
+        <aside class="sidebar">
+
+            <div class="sidebar-header">
+
+                <div>
+                    <h2>My Files</h2>
+                    <span id="fileCount">0 files</span>
+                </div>
+
+                <button
+                    class="icon-btn"
+                    id="createFileBtn"
+                    type="button"
+                    title="Create File"
+                    aria-label="Create File"
+                >
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                </button>
+
+            </div>
+
+
+            <!-- Search -->
+            <div class="search-box">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="search"
+                    id="searchFiles"
+                    placeholder="Search files..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- Files Will Appear Here -->
+            <div
+                class="file-list"
+                id="fileList"
+            >
+
+                <!-- Empty State -->
+                <div
+                    class="empty-files"
+                    id="emptyFiles"
+                >
+
+                    <i class="fa-regular fa-folder-open"></i>
+
+                    <h3>No files yet</h3>
+
+                    <p>
+                        Create your first file to start writing.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- Editor -->
+        <section class="editor-section">
+
+            <!-- Editor Header -->
+            <div class="editor-header">
+
+                <div class="file-title-area">
+
+                    <i class="fa-regular fa-file-lines"></i>
+
+                    <input
+                        type="text"
+                        id="fileName"
+                        value="Untitled File"
+                        placeholder="File name..."
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <div class="editor-actions">
+
+                    <span
+                        class="save-status"
+                        id="saveStatus"
+                    >
+                        <i class="fa-solid fa-cloud"></i>
+                        Ready
+                    </span>
+
+
+                    <button
+                        class="action-btn"
+                        id="downloadBtn"
+                        type="button"
+                        title="Download File"
+                    >
+                        <i class="fa-solid fa-download"></i>
+                        <span>Download</span>
+                    </button>
+
+
+                    <button
+                        class="action-btn"
+                        id="clearBtn"
+                        type="button"
+                        title="Clear Content"
+                    >
+                        <i class="fa-solid fa-eraser"></i>
+                        <span>Clear</span>
+                    </button>
+
+
+                    <button
+                        class="action-btn delete-btn"
+                        id="deleteBtn"
+                        type="button"
+                        title="Delete File"
+                    >
+                        <i class="fa-solid fa-trash"></i>
+                        <span>Delete</span>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Text Editor -->
+            <div class="editor-container">
+
+                <textarea
+                    id="textEditor"
+                    placeholder="Start writing here..."
+                    spellcheck="false"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
+                ></textarea>
+
+            </div>
+
+
+            <!-- Editor Footer -->
+            <footer class="editor-footer">
+
+                <div class="stats">
+
+                    <span>
+                        <i class="fa-solid fa-align-left"></i>
+                        Lines:
+                        <strong id="lineCount">1</strong>
+                    </span>
+
+                    <span>
+                        <i class="fa-solid fa-font"></i>
+                        Words:
+                        <strong id="wordCount">0</strong>
+                    </span>
+
+                    <span>
+                        <i class="fa-solid fa-keyboard"></i>
+                        Characters:
+                        <strong id="characterCount">0</strong>
+                    </span>
+
+                </div>
+
+
+                <div class="save-info">
+
+                    <i class="fa-solid fa-shield-halved"></i>
+
+                    <span>
+                        Saved locally on this device
+                    </span>
+
+                </div>
+
+            </footer>
+
+        </section>
+
+    </section>
+
+</main>
+
+
+<!-- New File Popup -->
+<div
+    class="modal"
+    id="newFileModal"
+    aria-hidden="true"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <div>
+                <h2>Create New File</h2>
+
+                <p>
+                    Choose a name for your file.
+                </p>
+            </div>
+
+            <button
+                class="close-modal"
+                id="closeModalBtn"
+                type="button"
+                aria-label="Close"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <div class="modal-content">
+
+            <label for="newFileName">
+                File Name
+            </label>
+
+            <input
+                type="text"
+                id="newFileName"
+                placeholder="Example: notes.txt"
+                maxlength="100"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <div class="modal-actions">
+
+            <button
+                class="cancel-btn"
+                id="cancelFileBtn"
+                type="button"
+            >
+                Cancel
+            </button>
+
+            <button
+                class="create-btn"
+                id="confirmCreateBtn"
+                type="button"
+            >
+                <i class="fa-solid fa-plus"></i>
+                Create File
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+    <!-- Welcome / Profile Modal -->
+<div
+    class="modal"
+    id="profileModal"
+    aria-hidden="true"
+>
+
+    <div class="modal-box profile-modal-box">
+
+        <div class="profile-welcome-icon">
+            <i class="fa-solid fa-file-lines"></i>
+        </div>
+
+        <h2>Welcome to FileForge</h2>
+
+        <p>
+            Choose a display name for your workspace.
+        </p>
+
+        <div class="modal-content">
+
+            <label for="displayNameInput">
+                Display Name
+            </label>
+
+            <input
+                type="text"
+                id="displayNameInput"
+                placeholder="Example: Mohamed"
+                maxlength="30"
+                autocomplete="off"
+            >
+
+            <small>
+                You can change your name once every 7 days.
+            </small>
+
+        </div>
+
+        <div class="modal-actions">
+
+            <button
+                class="create-btn"
+                id="saveProfileBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+                Continue
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Main JavaScript File -->
+<script src="script.js"></script>
+
+</body>
+</html>
