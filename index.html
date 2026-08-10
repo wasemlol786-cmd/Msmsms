@@ -165,6 +165,30 @@ h1{font-size:29px;line-height:1;margin:0 0 8px;letter-spacing:-.035em}
   .editor-bar{height:auto;min-height:62px;flex-wrap:wrap}.editor-title{order:3;flex-basis:100%}
 }
 </style>
+
+<style id="mobile-fix">
+@media (max-width: 700px){
+  *{box-sizing:border-box}
+  html,body{width:100%;min-width:0;overflow-x:hidden}
+  body{font-size:14px}
+  .app,.shell,.layout,.main,.content,.workspace,.container{max-width:100%!important;width:100%!important}
+  .sidebar{position:fixed!important;left:-290px!important;top:0!important;bottom:0!important;width:280px!important;z-index:1000!important;transition:left .25s ease}
+  .sidebar.open{left:0!important}
+  .topbar,.header{padding:12px 14px!important;gap:8px!important}
+  .main{margin-left:0!important;padding:12px!important}
+  .toolbar{flex-wrap:wrap!important;gap:7px!important}
+  button,.btn{min-height:42px}
+  .file-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .file-card,.folder-card,.item-card{min-width:0!important;width:100%!important;padding:12px!important}
+  .file-card .name,.folder-card .name,.item-card .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .editor,.editor-wrap,.code-editor{width:100%!important;min-width:0!important}
+  textarea,.editor textarea{font-size:14px!important;line-height:1.55!important}
+  .modal,.dialog{width:calc(100vw - 24px)!important;max-width:none!important;margin:12px!important}
+  .breadcrumb{overflow-x:auto;white-space:nowrap;max-width:100%}
+  .notes-grid{grid-template-columns:1fr!important}
+  .empty{padding:35px 15px!important}
+}
+</style>
 </head>
 <body>
 <div class="app">
@@ -1535,6 +1559,191 @@ async function boot() {
 }
 
 boot();
+</script>
+
+<script id="open-on-card-click">
+document.addEventListener('click', function(e){
+  const interactive = e.target.closest('button,a,input,textarea,select,[role="button"],.menu,.context-menu');
+  if(interactive) return;
+  const card = e.target.closest('[data-file-id],[data-folder-id],.file-card,.folder-card,.item-card');
+  if(!card) return;
+  const id = card.dataset.fileId || card.dataset.folderId;
+  if(id){
+    card.dispatchEvent(new MouseEvent('dblclick',{bubbles:true}));
+  }
+});
+</script>
+
+<style id="fm-final-fixes">
+/* Final mobile + editor polish */
+@media(max-width:700px){
+  body{min-width:0!important}
+  .file-grid{grid-template-columns:1fr 1fr!important}
+  .file-card,.folder-card,.item-card{min-height:110px!important}
+  .topbar{position:sticky!important;top:0!important;z-index:50}
+}
+.fm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.58);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px}
+.fm-overlay.show{display:flex}
+.fm-panel{width:min(900px,100%);max-height:90vh;overflow:auto;background:#11141b;border:1px solid rgba(255,255,255,.1);border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.5);color:#eef2f7}
+.fm-panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;background:#11141b;z-index:2}
+.fm-panel-body{padding:16px}
+.fm-input,.fm-textarea{width:100%;background:#0b0e13;color:#eef2f7;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:11px 12px;outline:none}
+.fm-textarea{min-height:260px;resize:vertical;line-height:1.6}
+.fm-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.fm-btn{border:1px solid rgba(255,255,255,.12);background:#1a1f29;color:#fff;border-radius:10px;padding:10px 13px;cursor:pointer}
+.fm-btn.primary{background:#fff;color:#111}
+.fm-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.fm-list-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#0d1016}
+.fm-list-item .meta{min-width:0}.fm-list-item .meta b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fm-list-item .meta span{font-size:12px;opacity:.55}
+.fm-note-layout{display:grid;grid-template-columns:240px 1fr;gap:14px}
+.fm-note-list{border-right:1px solid rgba(255,255,255,.08);padding-right:14px}
+.fm-note-item{padding:10px;border-radius:10px;cursor:pointer;margin-bottom:6px}.fm-note-item.active,.fm-note-item:hover{background:#1a1f29}
+@media(max-width:700px){.fm-note-layout{grid-template-columns:1fr}.fm-note-list{border-right:0;border-bottom:1px solid rgba(255,255,255,.08);padding:0 0 10px;max-height:180px;overflow:auto}}
+</style>
+
+<div class="fm-overlay" id="fmZipOverlay">
+ <div class="fm-panel">
+  <div class="fm-panel-head"><strong id="fmZipTitle">ZIP Explorer</strong><button class="fm-btn" id="fmZipClose">Close</button></div>
+  <div class="fm-panel-body">
+   <div class="fm-row"><button class="fm-btn" id="fmZipExtract">Extract selected</button><button class="fm-btn" id="fmZipExtractAll">Extract all</button></div>
+   <div class="fm-list" id="fmZipList"></div>
+  </div>
+ </div>
+</div>
+
+<div class="fm-overlay" id="fmNotesOverlay">
+ <div class="fm-panel">
+  <div class="fm-panel-head"><strong>Notes</strong><button class="fm-btn" id="fmNotesClose">Close</button></div>
+  <div class="fm-panel-body">
+   <div class="fm-row" style="margin-bottom:12px"><button class="fm-btn primary" id="fmNewNote">New note</button></div>
+   <div class="fm-note-layout">
+    <div class="fm-note-list" id="fmNoteList"></div>
+    <div>
+     <input class="fm-input" id="fmNoteName" placeholder="Note name">
+     <input class="fm-input" id="fmNoteDesc" placeholder="Description" style="margin-top:8px">
+     <textarea class="fm-textarea" id="fmNoteContent" placeholder="Write your note..." style="margin-top:8px"></textarea>
+     <div class="fm-row" style="margin-top:10px">
+      <button class="fm-btn primary" id="fmSaveNote">Save</button>
+      <button class="fm-btn" id="fmDownloadNote">Download</button>
+      <button class="fm-btn" id="fmDeleteNote">Delete</button>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+
+<div style="position:fixed;right:16px;bottom:16px;z-index:9998"><button class="fm-btn primary" onclick="openFileManagerNotes()">Notes</button></div>
+<script id="fm-final-functionality">
+(function(){
+ const KEY='file-manager-notes-v2';
+ let notes=JSON.parse(localStorage.getItem(KEY)||'[]');
+ let activeNote=null, zipFiles=[], zipSelected=null, zipCurrentFile=null;
+
+ const $=id=>document.getElementById(id);
+ const saveNotes=()=>localStorage.setItem(KEY,JSON.stringify(notes));
+ function renderNotes(){
+   const list=$('fmNoteList'); if(!list)return;
+   list.innerHTML='';
+   notes.forEach(n=>{
+     const el=document.createElement('div'); el.className='fm-note-item'+(n.id===activeNote?' active':'');
+     el.innerHTML='<b>'+esc(n.name||'Untitled')+'</b><div style="opacity:.5;font-size:11px">'+new Date(n.updated||Date.now()).toLocaleString()+'</div>';
+     el.onclick=()=>{activeNote=n.id; loadNote()};
+     list.appendChild(el);
+   });
+   if(!notes.length) list.innerHTML='<div style="opacity:.5;padding:10px">No notes yet.</div>';
+ }
+ function loadNote(){
+   const n=notes.find(x=>x.id===activeNote);
+   if(!n){$('fmNoteName').value='';$('fmNoteDesc').value='';$('fmNoteContent').value='';}
+   else{$('fmNoteName').value=n.name||'';$('fmNoteDesc').value=n.desc||'';$('fmNoteContent').value=n.content||'';}
+   renderNotes();
+ }
+ function esc(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+ $('fmNewNote').onclick=()=>{activeNote='n_'+Date.now();notes.unshift({id:activeNote,name:'Untitled Note',desc:'',content:'',updated:Date.now()});saveNotes();loadNote()};
+ $('fmSaveNote').onclick=()=>{
+   if(!activeNote)return $('fmNewNote').click();
+   const n=notes.find(x=>x.id===activeNote);
+   if(n){n.name=$('fmNoteName').value||'Untitled Note';n.desc=$('fmNoteDesc').value;n.content=$('fmNoteContent').value;n.updated=Date.now();saveNotes();renderNotes()}
+ };
+ $('fmDeleteNote').onclick=()=>{
+   if(!activeNote)return;
+   if(!confirm('Delete this note? This action cannot be undone.'))return;
+   notes=notes.filter(n=>n.id!==activeNote);activeNote=null;saveNotes();loadNote();
+ };
+ $('fmDownloadNote').onclick=()=>{
+   const name=($('fmNoteName').value||'note').replace(/[\\/:*?"<>|]/g,'_');
+   const text=$('fmNoteContent').value;
+   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));a.download=name+'.txt';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
+ };
+ $('fmNotesClose').onclick=()=>$('fmNotesOverlay').classList.remove('show');
+
+ // Expose a simple global hook so the existing UI can open Notes.
+ window.openFileManagerNotes=function(){$('fmNotesOverlay').classList.add('show');renderNotes();if(activeNote===null&&notes.length)activeNote=notes[0].id;loadNote()};
+
+ // ZIP explorer uses the browser's native DecompressionStream where available.
+ // It reads ZIP central directory entries and supports stored/deflate entries.
+ function u16(a,o){return a[o]|a[o+1]<<8}
+ function u32(a,o){return (a[o]|a[o+1]<<8|a[o+2]<<16|a[o+3]<<24)>>>0}
+ function readZipEntries(buf){
+   const a=new Uint8Array(buf), dv=new DataView(buf), out=[];
+   let eocd=-1;
+   for(let i=a.length-22;i>=Math.max(0,a.length-65557);i--) if(u32(a,i)===0x06054b50){eocd=i;break}
+   if(eocd<0) throw Error('Invalid ZIP');
+   const cdSize=u32(a,eocd+12), cdOff=u32(a,eocd+16); let p=cdOff, end=cdOff+cdSize;
+   while(p<end && u32(a,p)===0x02014b50){
+     const method=u16(a,p+10), comp=u32(a,p+20), uncomp=u32(a,p+24), nlen=u16(a,p+28), elen=u16(a,p+30), clen=u16(a,p+32), off=u32(a,p+42);
+     const name=new TextDecoder().decode(a.slice(p+46,p+46+nlen));
+     out.push({name,method,comp,uncomp,off,dir:name.endsWith('/')});
+     p+=46+nlen+elen+clen;
+   }
+   return {a,entries:out};
+ }
+ async function zipEntryData(z,e){
+   const a=z.a, p=e.off, n=u16(a,p+26), x=u16(a,p+28), start=p+30+n+x;
+   const raw=a.slice(start,start+e.comp);
+   if(e.method===0)return raw;
+   if(e.method===8){
+     if(typeof DecompressionStream==='undefined')throw Error('This browser does not support ZIP deflate extraction.');
+     const ds=new DecompressionStream('deflate-raw');
+     return new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(ds)).arrayBuffer());
+   }
+   throw Error('Unsupported ZIP compression method.');
+ }
+ window.openZipExplorer=async function(file){
+   try{
+     const buf=await file.arrayBuffer(), z=readZipEntries(buf);zipCurrentFile=file;zipFiles=z.entries;zipSelected=null;
+     $('fmZipTitle').textContent='ZIP Explorer — '+file.name;
+     const list=$('fmZipList');list.innerHTML='';
+     z.entries.forEach((e,i)=>{
+       const row=document.createElement('div');row.className='fm-list-item';
+       row.innerHTML='<div class="meta"><b>'+esc(e.name)+'</b><span>'+(e.dir?'Folder':(Math.round(e.uncomp/1024)+' KB'))+'</span></div><button class="fm-btn">'+(e.dir?'Folder':'Select')+'</button>';
+       row.onclick=()=>{zipSelected=i;document.querySelectorAll('#fmZipList .fm-list-item').forEach(x=>x.style.outline='none');row.style.outline='2px solid rgba(255,255,255,.25)'};
+       list.appendChild(row);
+     });
+     $('fmZipOverlay').classList.add('show');
+   }catch(err){alert('Could not open ZIP: '+err.message)}
+ };
+ $('fmZipClose').onclick=()=>$('fmZipOverlay').classList.remove('show');
+ async function extractEntries(entries){
+   if(!zipCurrentFile)return;
+   const z=readZipEntries(await zipCurrentFile.arrayBuffer());
+   for(const e of entries){
+     if(e.dir)continue;
+     const data=await zipEntryData(z,e);
+     const blob=new Blob([data],{type:'application/octet-stream'});
+     const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+     a.download=e.name.split('/').pop()||'extracted-file';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
+   }
+ }
+ $('fmZipExtract').onclick=async()=>{
+   if(zipSelected===null)return alert('Select a file first.');
+   try{await extractEntries([zipFiles[zipSelected]])}catch(e){alert('Extraction failed: '+e.message)}
+ };
+ $('fmZipExtractAll').onclick=async()=>{
+   try{await extractEntries(zipFiles)}catch(e){alert('Extraction failed: '+e.message)}
+ };
+})();
 </script>
 </body>
 </html>
