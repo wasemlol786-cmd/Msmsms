@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ranked — Leaderboard</title>
+<meta name="description" content="A polished animated top 100 leaderboard.">
+<style>
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#080a0f;color:#f7f8fb;min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:-20%;z-index:-2;background:radial-gradient(circle at 15% 10%,#26334c55,transparent 32%),radial-gradient(circle at 90% 20%,#50302744,transparent 30%),radial-gradient(circle at 50% 100%,#17233a55,transparent 35%);animation:bg 12s ease-in-out infinite alternate}
+body:after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(120deg,transparent 0 45%,#ffffff03 50%,transparent 55%);animation:sheen 8s linear infinite}
+@keyframes bg{to{transform:scale(1.08) translate(2%,1%)}}@keyframes sheen{to{transform:translateX(20%)}}@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}@keyframes glow{50%{box-shadow:0 0 28px #ffffff16}}
+button,input{font:inherit}button{cursor:pointer}.wrap{width:min(1050px,calc(100% - 28px));margin:auto}.topbar{height:78px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:sticky;top:0;z-index:10;background:#080a0fcc;backdrop-filter:blur(18px);border-bottom:1px solid #ffffff0d}
+.brand{font-weight:800;letter-spacing:-.03em;font-size:21px}.brand span{color:#8e98aa}.actions{display:flex;gap:10px}.iconbtn,.primary{border:1px solid #ffffff14;background:#ffffff08;color:#fff;border-radius:13px;padding:11px 14px;transition:.22s;display:inline-flex;align-items:center;gap:9px}.iconbtn:hover,.primary:hover{transform:translateY(-2px);background:#ffffff11;border-color:#ffffff25}.primary{background:#fff;color:#080a0f;font-weight:750;border-color:#fff}.hero{text-align:center;padding:58px 0 30px;animation:up .65s ease both}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:#8d96a7}.hero h1{font-size:clamp(36px,7vw,64px);line-height:1;margin:10px 0 12px;letter-spacing:-.055em}.hero p{color:#9299a8;margin:0}.board{padding:14px 0 70px}.list{display:grid;gap:9px}.row{position:relative;display:grid;grid-template-columns:62px 48px minmax(0,1fr) auto;align-items:center;gap:14px;padding:13px 16px;border:1px solid #ffffff0d;background:linear-gradient(120deg,#ffffff08,#ffffff03);border-radius:18px;transition:.25s;animation:up .5s ease both}.row:hover{transform:translateX(4px);border-color:#ffffff22;background:#ffffff0b}.rank{font-weight:850;font-size:19px;color:#fff}.rank.gold{color:#f3c94b}.rank.silver{color:#d8dee8}.rank.bronze{color:#c99461}.avatar{width:48px;height:48px;border-radius:14px;object-fit:cover;display:grid;place-items:center;font-weight:850;font-size:15px;color:#111;background:linear-gradient(135deg,#f3a64b,#ffd66a);overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}.person{min-width:0}.name{font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub{font-size:12px;color:#7f8796;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.medal{width:29px;height:29px;display:grid;place-items:center;border-radius:50%;font-weight:900;font-size:11px}.goldbg{background:#f3c94b22;color:#f3c94b}.silverb{background:#d8dee822;color:#d8dee8}.bronzeb{background:#c9946122;color:#c99461}.empty{padding:55px;text-align:center;color:#747d8d;border:1px dashed #ffffff16;border-radius:20px}.footer{padding:20px 0 42px;text-align:center;color:#737b8b;font-size:12px}.footer strong{color:#dfe3eb}.modalback{position:fixed;inset:0;background:#000a;backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:18px;z-index:30}.modalback.open{display:flex}.modal{width:min(570px,100%);background:#10131a;border:1px solid #ffffff16;border-radius:24px;padding:24px;box-shadow:0 30px 90px #0009;animation:pop .25s ease}.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.modal h2{margin:0;font-size:21px}.x{background:none;border:0;color:#8e97a8;font-size:22px}.form{display:grid;gap:14px}.field label{display:block;font-size:12px;color:#929aaa;margin:0 0 7px}.field input{width:100%;background:#080a0f;border:1px solid #ffffff12;color:#fff;padding:12px 13px;border-radius:12px;outline:0;transition:.2s}.field input:focus{border-color:#ffffff3b;box-shadow:0 0 0 4px #ffffff06}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modalactions{display:flex;justify-content:flex-end;gap:9px;margin-top:4px}.danger{color:#ff8585!important}.preview{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid #ffffff0d;border-radius:14px}.preview .avatar{width:42px;height:42px}.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#f6f7f9;color:#0a0b0e;padding:11px 15px;border-radius:12px;font-size:13px;font-weight:700;z-index:50;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}@media(max-width:600px){.topbar{height:68px}.hero{padding:42px 0 25px}.row{grid-template-columns:39px 44px minmax(0,1fr) auto;gap:10px;padding:11px}.avatar{width:44px;height:44px;border-radius:12px}.rank{font-size:16px}.medal{width:25px;height:25px}.twocol{grid-template-columns:1fr}.actions .primary span{display:none}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;width:100%">
+    <div class="brand">Ranked<span> / 100</span></div>
+    <div class="actions">
+      <button class="iconbtn" id="langBtn" title="Language"><span>文</span><span>Language</span></button>
+      <button class="primary" id="addBtn"><span>＋</span><span>Add Person</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<section class="hero"><div class="eyebrow">Top 100</div><h1>Leaderboard</h1><p>One hundred places. One clear ranking.</p></section>
+<section class="board"><div id="list" class="list"></div></section>
+</main>
+
+<footer class="footer">Designed by <strong>Waseem</strong> · © <span id="year"></span> Waseem. All rights reserved.</footer>
+
+<div class="modalback" id="backdrop">
+  <div class="modal">
+    <div class="modalhead"><h2 id="modalTitle">Add person</h2><button class="x" id="closeBtn" aria-label="Close">×</button></div>
+    <form class="form" id="form">
+      <div class="field"><label>Photo URL (optional)</label><input id="photo" type="url" placeholder="https://..."></div>
+      <div class="twocol">
+        <div class="field"><label>Name (optional)</label><input id="name" maxlength="40" placeholder="Alex Carter"></div>
+        <div class="field"><label>Username (optional)</label><input id="username" maxlength="40" placeholder="@alex"></div>
+      </div>
+      <div class="twocol">
+        <div class="field"><label>ID (optional)</label><input id="uid" maxlength="50" placeholder="123456"></div>
+        <div class="field"><label>Rank</label><input id="rankInput" type="number" min="1" max="100" value="1" required></div>
+      </div>
+      <div class="preview"><div class="avatar" id="previewAvatar">PE</div><div><div class="name" id="previewName">Preview Person</div><div class="sub" id="previewSub">@preview</div></div></div>
+      <div class="modalactions"><button type="button" class="iconbtn" id="cancelBtn">Cancel</button><button class="primary" type="submit" id="saveBtn">Save</button></div>
+    </form>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY="ranked_leaderboard_v1";
+let people=JSON.parse(localStorage.getItem(KEY)||"[]"), editing=null;
+const $=id=>document.getElementById(id);
+$("year").textContent=new Date().getFullYear();
+
+function initials(p){let s=(p.name||"").trim();if(!s)return "♙";let a=s.split(/\s+/).slice(0,2).map(x=>x[0].toUpperCase());return a.join("")}
+function label(p){return p.name||p.username||"Unknown person"}
+function sub(p){return p.username||(p.id?`ID: ${p.id}`:"")}
+function save(){localStorage.setItem(KEY,JSON.stringify(people))}
+function render(){
+ people.sort((a,b)=>a.rank-b.rank);
+ const list=$("list");list.innerHTML="";
+ if(!people.length){list.innerHTML='<div class="empty">No people yet. Add the first person to build the leaderboard.</div>';return}
+ people.slice(0,100).forEach((p,i)=>{
+   const rank=i+1;
+   const row=document.createElement("div");row.className="row";row.style.animationDelay=(i*.018)+"s";
+   const medal=rank<=3?`<div class="medal ${rank===1?"goldbg":rank===2?"silverb":"bronzeb"}">${rank===1?"1":rank===2?"2":"3"}</div>`:"";
+   row.innerHTML=`<div class="rank ${rank===1?"gold":rank===2?"silver":rank===3?"bronze":""}">${rank}</div>
+   <div class="avatar">${p.photo?`<img src="${esc(p.photo)}" onerror="this.parentElement.innerHTML='${esc(initials(p))}'">`:esc(initials(p))}</div>
+   <div class="person"><div class="name">${esc(label(p))}</div><div class="sub">${esc(sub(p))}</div></div>${medal}`;
+   row.onclick=()=>openEdit(p.id);
+   list.appendChild(row);
+ });
+}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function openAdd(){editing=null; $("modalTitle").textContent="Add person";$("saveBtn").textContent="Save";$("form").reset();$("rankInput").value=Math.min(people.length+1,100);preview();$("backdrop").classList.add("open")}
+function openEdit(id){let p=people.find(x=>x.id===id);if(!p)return;editing=id;$("modalTitle").textContent="Edit person";$("saveBtn").textContent="Update";$("photo").value=p.photo||"";$("name").value=p.name||"";$("username").value=p.username||"";$("uid").value=p.uid||"";$("rankInput").value=p.rank;preview();$("backdrop").classList.add("open")}
+function close(){ $("backdrop").classList.remove("open");editing=null
+function preview(){let p={name:$("name").value,username:$("username").value,id:$("uid").value,photo:$("photo").value};$("previewName").textContent=label(p);$("previewSub").textContent=sub(p)||"Preview";$("previewAvatar").innerHTML=p.photo?`<img src="${esc(p.photo)}" onerror="this.parentElement.textContent='${esc(initials(p))}'">`:esc(initials(p))}
+function toast(t){$("toast").textContent=t;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),1800)}
+$("addBtn").onclick=openAdd;$("closeBtn").onclick=close;$("cancelBtn").onclick=close;$("backdrop").onclick=e=>{if(e.target===$("backdrop"))close()};
+["name","username","uid","photo"].forEach(id=>$(id).addEventListener("input",preview));
+
+$("form").onsubmit=e=>{
+ e.preventDefault();
+ const requested=Math.max(1,Math.min(100,Number($("rankInput").value)||1));
+ const obj={id:editing||crypto.randomUUID(),photo:$("photo").value.trim(),name:$("name").value.trim(),username:$("username").value.trim(),uid:$("uid").value.trim(),rank:requested};
+ if(!obj.name&&!obj.username){toast("Add a name or username");return}
+ if(editing){const old=people.find(p=>p.id===editing);Object.assign(old,obj)}
+ else people.push(obj);
+ people.sort((a,b)=>a.rank-b.rank);
+ // Normalize ranks: inserting at rank X pushes everyone at/after X down by one.
+ if(!editing){
+   let target=people.indexOf(obj);
+   people.forEach((p,i)=>p.rank=i+1);
+   // keep requested placement after sorting by the requested rank
+   people.sort((a,b)=>a.rank-b.rank);
+ }
+ save();render();close();toast(editing?"Person updated":"Person added");
+};
+$("list").addEventListener("contextmenu",e=>e.preventDefault());
+
+$("langBtn").onclick=()=>toast("Google Translate can translate this page from your browser.");
+render();
+</script>
+</body>
+</html>
