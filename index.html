@@ -1,324 +1,689 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0d12">
+<title>File Manager</title>
+<style>
+:root{
+  --bg:#080a0f;--surface:#0e1219;--surface-2:#131923;--surface-3:#181f2b;
+  --line:#242d3a;--text:#f4f7fb;--muted:#8d98aa;--accent:#7c5cff;
+  --accent-2:#a48cff;--danger:#f05272;--success:#43d19e;
+  --radius:16px;--shadow:0 24px 70px rgba(0,0,0,.42);
+}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0}
+body{
+  background:
+    radial-gradient(circle at 12% -10%,rgba(124,92,255,.20),transparent 34%),
+    radial-gradient(circle at 90% 100%,rgba(55,130,255,.08),transparent 28%),var(--bg);
+  color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  overflow:hidden;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.app{height:100%;display:flex}
+.sidebar{
+  width:250px;flex:0 0 250px;border-right:1px solid var(--line);background:rgba(10,13,18,.82);
+  backdrop-filter:blur(20px);padding:18px 13px;display:flex;flex-direction:column;gap:7px;z-index:20
+}
+.brand{display:flex;align-items:center;gap:11px;padding:11px 12px 25px;font-weight:800;font-size:18px;letter-spacing:-.02em}
+.brand-mark{width:32px;height:32px;border:1px solid #3a3266;border-radius:10px;display:grid;place-items:center;color:#b8aaff;background:#17132a}
+.nav{
+  width:100%;display:flex;align-items:center;gap:12px;border:1px solid transparent;background:transparent;
+  color:var(--muted);padding:11px 12px;border-radius:11px;text-align:left;transition:.2s
+}
+.nav:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.nav.active{background:linear-gradient(135deg,rgba(124,92,255,.18),rgba(124,92,255,.06));border-color:#30275a;color:#fff}
+.sidebar-bottom{margin-top:auto}
+.main{min-width:0;flex:1;display:flex;flex-direction:column}
+.topbar{
+  height:72px;flex:0 0 72px;border-bottom:1px solid var(--line);background:rgba(8,10,15,.68);
+  backdrop-filter:blur(18px);display:flex;align-items:center;gap:12px;padding:0 22px;position:relative;z-index:10
+}
+.breadcrumbs{display:flex;align-items:center;gap:7px;white-space:nowrap;overflow:auto;flex:1;color:var(--muted);min-width:0}
+.crumb{border:0;background:none;color:inherit;padding:5px 4px;border-radius:7px}
+.crumb:hover{color:#fff;background:rgba(255,255,255,.04)}
+.crumb.current{color:#fff;font-weight:700}
+.search{
+  width:230px;flex:0 0 230px;background:var(--surface);border:1px solid var(--line);color:#fff;
+  outline:none;border-radius:11px;padding:10px 12px;transition:.2s
+}
+.search:focus{border-color:#50427f;box-shadow:0 0 0 3px rgba(124,92,255,.1)}
+.page{flex:1;overflow:auto;padding:25px}
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:22px}
+h1{font-size:29px;line-height:1;margin:0 0 8px;letter-spacing:-.035em}
+.subtitle{color:var(--muted);font-size:13px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);
+  background:var(--surface-2);color:#e9edf4;padding:10px 13px;border-radius:11px;transition:.18s
+}
+.btn:hover{transform:translateY(-1px);border-color:#3d4859;background:var(--surface-3)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#896cff;border-color:#896cff}
+.btn.danger{background:rgba(240,82,114,.09);border-color:rgba(240,82,114,.28);color:#ff9eb2}
+.btn.ghost{background:transparent}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:14px}
+.item-card{
+  position:relative;min-height:170px;border:1px solid var(--line);border-radius:17px;
+  background:linear-gradient(145deg,rgba(20,26,36,.98),rgba(13,17,24,.98));
+  padding:18px;transition:.22s;animation:rise .3s ease both;overflow:hidden
+}
+.item-card:hover{transform:translateY(-4px);border-color:#3a4555;box-shadow:0 15px 35px rgba(0,0,0,.18)}
+.item-card.selected{border-color:#6652bb;box-shadow:0 0 0 2px rgba(124,92,255,.12)}
+.item-icon{
+  width:48px;height:48px;border-radius:13px;background:#191f2a;border:1px solid #2b3442;
+  display:grid;place-items:center;font-size:11px;font-weight:800;letter-spacing:-.02em;color:#b8c1cf;margin-bottom:25px
+}
+.item-icon.folder{color:#c9bbff;background:#211c34;border-color:#3a3260}
+.item-icon.js{color:#ffe76a;background:#27261c}.item-icon.py{color:#70c8ff;background:#17242c}
+.item-icon.html{color:#ff8d74;background:#2a1d1a}.item-icon.css{color:#71a8ff;background:#182031}
+.item-icon.json{color:#b8c1cf}.item-icon.zip{color:#d8b4ff;background:#241b2e}
+.item-name{font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-meta{color:var(--muted);font-size:12px;margin-top:6px}
+.more{
+  position:absolute;right:10px;top:10px;border:0;background:transparent;color:#8d98aa;width:34px;height:34px;
+  border-radius:9px;display:grid;place-items:center
+}
+.more:hover{background:rgba(255,255,255,.06);color:#fff}
+.empty{
+  border:1px dashed #2c3542;border-radius:16px;min-height:190px;display:grid;place-items:center;
+  color:var(--muted);text-align:center;padding:30px
+}
+.menu{
+  position:fixed;z-index:100;min-width:205px;padding:6px;border:1px solid #343e4d;background:#151b24;
+  border-radius:13px;box-shadow:var(--shadow);animation:pop .14s ease;display:none
+}
+.menu button{
+  width:100%;display:flex;align-items:center;gap:10px;border:0;background:transparent;color:#dce2eb;
+  padding:10px;border-radius:9px;text-align:left
+}
+.menu button:hover{background:rgba(255,255,255,.06);color:#fff}
+.menu button.danger{color:#ff9eb2}
+.menu-sep{height:1px;background:var(--line);margin:5px 3px}
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.68);backdrop-filter:blur(9px);display:none;
+  align-items:center;justify-content:center;z-index:200;padding:20px
+}
+.modal-backdrop.show{display:flex;animation:fade .15s ease}
+.modal{
+  width:min(540px,100%);background:#151a23;border:1px solid #323c4a;border-radius:19px;
+  box-shadow:var(--shadow);padding:22px;animation:modalIn .18s ease
+}
+.modal h2{margin:0 0 7px;font-size:20px}.modal p{color:var(--muted);line-height:1.55;margin:0 0 15px}
+.field{margin:13px 0}.field label{display:block;color:#9ca6b5;font-size:12px;margin:0 0 7px}
+.field input,.field textarea,.field select{
+  width:100%;border:1px solid var(--line);outline:none;background:#0d1118;color:#fff;border-radius:11px;padding:11px 12px
+}
+.field textarea{min-height:150px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{border-color:#55478b}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.editor{
+  position:fixed;inset:0;background:#080a0e;z-index:150;display:none;flex-direction:column
+}
+.editor.show{display:flex;animation:fade .15s ease}
+.editor-bar{height:65px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;padding:10px 14px}
+.editor-title{flex:1;min-width:0}.editor-title input{width:100%;background:transparent;border:0;outline:0;color:#fff;font-weight:750;font-size:15px}
+.editor-body{display:flex;flex:1;min-height:0}
+.line-numbers{
+  width:58px;flex:0 0 58px;background:#0c1016;color:#566171;text-align:right;padding:17px 10px;
+  white-space:pre;overflow:hidden;line-height:1.55;font:14px ui-monospace,SFMono-Regular,Menlo,monospace
+}
+.code{
+  flex:1;min-width:0;resize:none;border:0;outline:0;background:#090c11;color:#eef2f7;padding:17px;
+  line-height:1.55;font:14px ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre;tab-size:2
+}
+.notes-layout{display:grid;grid-template-columns:285px minmax(0,1fr);gap:14px;min-height:calc(100vh - 185px)}
+.notes-list,.note-editor{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.notes-list{overflow:auto}.note-row{padding:14px;border-bottom:1px solid var(--line);cursor:pointer;transition:.15s}
+.note-row:hover,.note-row.active{background:var(--surface-2)}.note-row b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-row small{display:block;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-editor{display:flex;flex-direction:column;padding:17px}.note-editor textarea{flex:1;min-height:280px;resize:none;margin-top:10px;line-height:1.6}
+.trash-card{border-color:#352633}
+.toast{
+  position:fixed;right:18px;bottom:18px;z-index:300;background:#171d27;border:1px solid #344050;
+  border-radius:12px;padding:12px 15px;box-shadow:var(--shadow);opacity:0;transform:translateY(15px);pointer-events:none;transition:.22s
+}
+.toast.show{opacity:1;transform:none}
+.progress{position:fixed;left:0;right:0;bottom:0;height:3px;background:transparent;z-index:400}
+.progress i{display:block;width:0;height:100%;background:var(--accent);transition:.15s}
+.hidden{display:none!important}
+@keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.97) translateY(-3px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes modalIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+@media(max-width:800px){
+  .sidebar{width:70px;flex-basis:70px;padding:12px 8px}.brand-text,.nav-text{display:none}.brand{justify-content:center;padding:10px 4px 22px}
+  .nav{justify-content:center;padding:12px 8px}.topbar{padding:0 13px}.search{width:150px;flex-basis:150px}.page{padding:18px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}.notes-layout{grid-template-columns:1fr;grid-template-rows:180px minmax(400px,1fr)}
+}
+@media(max-width:520px){
+  .topbar{height:62px;flex-basis:62px}.search{width:120px;flex-basis:120px}.hero{align-items:flex-start;flex-direction:column}
+  h1{font-size:25px}.grid{grid-template-columns:1fr 1fr;gap:9px}.item-card{min-height:145px;padding:14px}.item-icon{margin-bottom:20px}
+  .editor-bar{height:auto;min-height:62px;flex-wrap:wrap}.editor-title{order:3;flex-basis:100%}
+}
+</style>
 
-<html lang="en">  
-<head>  
-<meta charset="utf-8">  
-<meta name="viewport" content="width=device-width,initial-scale=1">  
-<title>Ranked — Leaderboard</title>  
-<meta name="description" content="A polished animated top 10 leaderboard.">  
-<style>  
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#080a0f;color:#f7f8fb;min-height:100vh;overflow-x:hidden}  
-body:before{content:"";position:fixed;inset:-20%;z-index:-2;background:radial-gradient(circle at 15% 10%,#26334c55,transparent 32%),radial-gradient(circle at 90% 20%,#50302744,transparent 30%),radial-gradient(circle at 50% 100%,#17233a55,transparent 35%);animation:bg 12s ease-in-out infinite alternate}  
-body:after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(120deg,transparent 0 45%,#ffffff03 50%,transparent 55%);animation:sheen 8s linear infinite}  
-@keyframes bg{to{transform:scale(1.08) translate(2%,1%)}}@keyframes sheen{to{transform:translateX(20%)}}@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}@keyframes glow{50%{box-shadow:0 0 28px #ffffff16}}  
-button,input{font:inherit}button{cursor:pointer}.wrap{width:min(1050px,calc(100% - 28px));margin:auto}.topbar{height:78px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:sticky;top:0;z-index:10;background:#080a0fcc;backdrop-filter:blur(18px);border-bottom:1px solid #ffffff0d}  
-.brand{font-weight:800;letter-spacing:-.03em;font-size:21px}.brand span{color:#8e98aa}.actions{display:flex;gap:10px}.iconbtn,.primary{border:1px solid #ffffff14;background:#ffffff08;color:#fff;border-radius:13px;padding:11px 14px;transition:.22s;display:inline-flex;align-items:center;gap:9px}.iconbtn:hover,.primary:hover{transform:translateY(-2px);background:#ffffff11;border-color:#ffffff25}.primary{background:#fff;color:#080a0f;font-weight:750;border-color:#fff}.hero{text-align:center;padding:58px 0 30px;animation:up .65s ease both}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:#8d96a7}.hero h1{font-size:clamp(36px,7vw,64px);line-height:1;margin:10px 0 12px;letter-spacing:-.055em}.hero p{color:#9299a8;margin:0}.board{padding:14px 0 70px}.list{display:grid;gap:9px}.row{position:relative;display:grid;grid-template-columns:62px 48px minmax(0,1fr) auto;align-items:center;gap:14px;padding:13px 16px;border:1px solid #ffffff0d;background:linear-gradient(120deg,#ffffff08,#ffffff03);border-radius:18px;transition:.25s;animation:up .5s ease both}.row:hover{transform:translateX(4px);border-color:#ffffff22;background:#ffffff0b}.rank{font-weight:850;font-size:19px;color:#fff;position:relative;display:inline-flex;flex-direction:column;align-items:center;justify-content:center}.rank.gold{color:#f3c94b}.rank.silver{color:#e2e8f0;text-shadow:0 0 10px rgba(226,232,240,0.4)}.rank.bronze{color:#c99461}.avatar{width:48px;height:48px;border-radius:14px;object-fit:cover;display:grid;place-items:center;font-weight:850;font-size:15px;color:#111;background:linear-gradient(135deg,#f3a64b,#ffd66a);overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}.person{min-width:0}.name{font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub{font-size:12px;color:#7f8796;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.medal{width:29px;height:29px;display:grid;place-items:center;border-radius:50%;font-weight:900;font-size:11px}.goldbg{background:#f3c94b22;color:#f3c94b}.silverb{background:#d8dee822;color:#d8dee8}.bronzeb{background:#c9946122;color:#c99461}.empty{padding:55px;text-align:center;color:#747d8d;border:1px dashed #ffffff16;border-radius:20px}.footer{padding:20px 0 42px;text-align:center;color:#737b8b;font-size:12px}.footer strong{color:#dfe3eb}.modalback{position:fixed;inset:0;background:#000a;backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:18px;z-index:30}.modalback.open{display:flex}.modal{width:min(570px,100%);background:#10131a;border:1px solid #ffffff16;border-radius:24px;padding:24px;box-shadow:0 30px 90px #0009;animation:pop .25s ease}.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.modal h2{margin:0;font-size:21px}.x{background:none;border:0;color:#8e97a8;font-size:22px}.form{display:grid;gap:14px}.field label{display:block;font-size:12px;color:#929aaa;margin:0 0 7px}.field input{width:100%;background:#080a0f;border:1px solid #ffffff12;color:#fff;padding:12px 13px;border-radius:12px;outline:0;transition:.2s}.field input:focus{border-color:#ffffff3b;box-shadow:0 0 0 4px #ffffff06}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modalactions{display:flex;justify-content:flex-end;gap:9px;margin-top:4px}.danger{color:#ff8585!important}.preview{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid #ffffff0d;border-radius:14px}.preview .avatar{width:42px;height:42px}.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#f6f7f9;color:#0a0b0e;padding:11px 15px;border-radius:12px;font-size:13px;font-weight:700;z-index:50;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}@media(max-width:600px){.topbar{height:68px}.hero{padding:42px 0 25px}.row{grid-template-columns:39px 44px minmax(0,1fr) auto;gap:10px;padding:11px}.avatar{width:44px;height:44px;border-radius:12px}.rank{font-size:16px}.medal{width:25px;height:25px}.twocol{grid-template-columns:1fr}.actions .primary span:first-child{display:none}}  
+<style id="mobile-fix">
+@media (max-width: 700px){
+  *{box-sizing:border-box}
+  html,body{width:100%;min-width:0;overflow-x:hidden}
+  body{font-size:14px}
+  .app,.shell,.layout,.main,.content,.workspace,.container{max-width:100%!important;width:100%!important}
+  .sidebar{position:fixed!important;left:-290px!important;top:0!important;bottom:0!important;width:280px!important;z-index:1000!important;transition:left .25s ease}
+  .sidebar.open{left:0!important}
+  .topbar,.header{padding:12px 14px!important;gap:8px!important}
+  .main{margin-left:0!important;padding:12px!important}
+  .toolbar{flex-wrap:wrap!important;gap:7px!important}
+  button,.btn{min-height:42px}
+  .file-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .file-card,.folder-card,.item-card{min-width:0!important;width:100%!important;padding:12px!important}
+  .file-card .name,.folder-card .name,.item-card .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .editor,.editor-wrap,.code-editor{width:100%!important;min-width:0!important}
+  textarea,.editor textarea{font-size:14px!important;line-height:1.55!important}
+  .modal,.dialog{width:calc(100vw - 24px)!important;max-width:none!important;margin:12px!important}
+  .breadcrumb{overflow-x:auto;white-space:nowrap;max-width:100%}
+  .notes-grid{grid-template-columns:1fr!important}
+  .empty{padding:35px 15px!important}
+}
+</style>
 
-@keyframes topGlow {
-  0%, 100% { box-shadow: 0 0 12px rgba(255, 255, 255, 0.05); }
-  50% { box-shadow: 0 0 22px rgba(255, 255, 255, 0.2); }
+<style id="fm-polish-v4">
+#editorStyle{display:none!important}
+.fm-pathbar{display:flex;align-items:center;gap:7px;min-height:38px;padding:7px 13px;border-bottom:1px solid var(--line);background:rgba(10,13,19,.94);overflow-x:auto;white-space:nowrap}
+.fm-pathbar .crumb{flex:0 0 auto}
+.fm-pathbar .path-sep{color:#566171}
+.style-option[data-style="handwritten"]{font-family:"Comic Sans MS","Segoe Print",cursive}
+.style-option[data-style="gothic"]{font-family:"Old English Text MT",Georgia,serif}
+.style-option[data-style="classic"]{font-family:Palatino,Georgia,serif}
+.style-option[data-style="mono"],.style-option[data-style="terminal"],.style-option[data-style="typewriter"]{font-family:monospace}
+@media(max-width:700px){
+ .fm-pathbar{margin:0 10px;border:1px solid var(--line);border-radius:11px;height:40px;min-height:40px}
+ .page{padding-top:12px!important}
+ .topbar{height:96px!important;min-height:96px!important;grid-template-rows:34px 42px!important}
+ .notes-layout{display:flex!important;flex-direction:column!important;min-height:0!important}
+ .notes-list{max-height:150px;min-height:80px}
+ .note-editor{min-height:520px}
+ .note-editor textarea{min-height:260px!important;background:#0d1118!important;color:#f4f7fb!important;border:1px solid var(--line)!important;border-radius:12px!important;padding:13px!important}
+ .note-editor .modal-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+ .note-editor .modal-actions .btn{min-width:0;padding:10px 7px}
+ .style-menu{z-index:2000!important}
 }
-.row.top-1 {
-  border-color: #f3c94b55;
-  background: linear-gradient(120deg, #f3c94b15, #ffffff03);
-  animation: up .5s ease both, topGlow 3s infinite ease-in-out;
-}
-.row.top-2 {
-  border-color: #e2e8f055;
-  background: linear-gradient(120deg, #e2e8f015, #ffffff03);
-  animation: up .5s ease both, topGlow 3s infinite ease-in-out;
-}
-.row.top-3 {
-  border-color: #c9946155;
-  background: linear-gradient(120deg, #c9946115, #ffffff03);
-  animation: up .5s ease both, topGlow 3s infinite ease-in-out;
-}
+@media(min-width:701px){.fm-pathbar{margin:0 25px;border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px}}
+</style>
+</head>
 
-.crown-icon {
-  width: 20px;
-  height: 20px;
-  fill: #f3c94b;
-  position: absolute;
-  top: -14px;
-  filter: drop-shadow(0 0 6px rgba(243, 201, 75, 0.6));
-}
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24"><path d="M4 7.5h6l1.7 2H20v9H4z"/><path d="M4 7.5V5.5h6l1.5 2"/></svg>
+      </div>
+      <span class="brand-text">File Manager</span>
+    </div>
+    <button class="nav active" data-view="files"><svg viewBox="0 0 24 24"><path d="M4 7.5h6l1.7 2H20v9H4z"/><path d="M4 7.5V5.5h6l1.5 2"/></svg><span class="nav-text">My Files</span></button>
+    <button class="nav" data-view="notes"><svg viewBox="0 0 24 24"><path d="M6 4h12v16H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span class="nav-text">Notes</span></button>
+    <button class="nav" data-view="trash"><svg viewBox="0 0 24 24"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg><span class="nav-text">Trash</span></button>
+    <div class="sidebar-bottom">
+      <button class="nav" id="importFilesBtn"><svg viewBox="0 0 24 24"><path d="M12 4v11M8 11l4 4 4-4"/><path d="M5 19h14"/></svg><span class="nav-text">Import Files</span></button>
+      <button class="nav" id="importFolderBtn"><svg viewBox="0 0 24 24"><path d="M4 7.5h6l1.7 2H20v9H4z"/><path d="M12 12v5M9.5 14.5h5"/></svg><span class="nav-text">Import Folder</span></button>
+      <input id="filePicker" type="file" multiple hidden>
+      <input id="folderPicker" type="file" webkitdirectory directory multiple hidden>
+    </div>
+  </aside>
 
-.welcome-screen {
-  position: fixed;
-  inset: 0;
-  background: #080a0fe6;
-  backdrop-filter: blur(20px);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 20px;
-  transition: opacity 0.5s ease, visibility 0.5s ease;
-}
-.welcome-screen.hidden {
-  opacity: 0;
-  visibility: hidden;
-}
-.welcome-card {
-  background: #10131a;
-  border: 1px solid #ffffff1a;
-  padding: 40px 30px;
-  border-radius: 28px;
-  max-width: 460px;
-  width: 100%;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-  animation: pop .4s ease;
-}
-.welcome-card h2 {
-  font-size: 28px;
-  margin: 0 0 10px;
-  letter-spacing: -.03em;
-}
-.welcome-card p {
-  color: #8e98aa;
-  margin: 0 0 24px;
-  font-size: 15px;
-  line-height: 1.5;
-}
-</style>  
-</head>  
-<body>  
+  <main class="main">
+    <header class="topbar">
+      <div class="breadcrumbs" id="breadcrumbs"></div>
+      <input class="search" id="search" autocomplete="off" placeholder="Search files...">
+    </header>
+    <section class="page" id="page"></section>
+  </main>
+</div>
 
-<div class="welcome-screen" id="welcomeScreen">
-  <div class="welcome-card">
-    <h2>Welcome to Ranked</h2>
-    <p>Explore the Top 10 Leaderboard. Track live rankings and manage entries smoothly.</p>
-    <button class="primary" id="enterBtn" style="width:100%;justify-content:center;padding:14px;">View Leaderboard</button>
+<div class="menu" id="contextMenu"></div>
+<div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+<div class="progress"><i id="progressBar"></i></div>
+
+<div class="editor" id="editor">
+  <div class="editor-bar">
+    <button class="btn ghost" id="editorClose"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>Close</button>
+    <div class="editor-title"><input id="editorName" aria-label="File name"></div>
+    <select class="btn" id="editorStyle">
+      <option value="normal">Normal</option>
+      <option value="serif">Serif</option>
+      <option value="wide">Wide</option>
+      <option value="mono">Monospace</option>
+    </select>
+    <button class="btn primary" id="editorSave"><svg viewBox="0 0 24 24"><path d="M5 4h12l2 2v14H5z"/><path d="M8 4v6h8V4M8 20v-6h8v6"/></svg>Save</button>
+  </div>
+  <div class="editor-body">
+    <div class="line-numbers" id="lineNumbers">1</div>
+    <textarea class="code" id="code" spellcheck="false"></textarea>
   </div>
 </div>
 
-<header class="topbar">  
-  <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;width:100%">  
-    <div class="brand">Ranked<span> / 10</span></div>  
-    <div class="actions">  
-      <button class="iconbtn" id="langBtn" title="Language"><span>文</span><span>Language</span></button>  
-      <button class="primary" id="addBtn"><span>＋</span><span>Add Person</span></button>  
-    </div>  
-  </div>  
-</header>  <main class="wrap">  
-<section class="hero"><div class="eyebrow">Top 10</div><h1>Leaderboard</h1><p>Ten places. One clear ranking.</p></section>  
-<section class="board"><div id="list" class="list"></div></section>  
-</main>  <footer class="footer">Designed by <strong>Waseem</strong> · © <span id="year"></span> Waseem. All rights reserved.</footer>  <div class="modalback" id="backdrop">  
-  <div class="modal">  
-    <div class="modalhead"><h2 id="modalTitle">Add person</h2><button class="x" id="closeBtn" aria-label="Close">×</button></div>  
-    <form class="form" id="form">  
-      <div class="field"><label>Photo URL (optional)</label><input id="photo" type="url" placeholder="https://..."></div>  
-      <div class="twocol">  
-        <div class="field"><label>Name (optional)</label><input id="name" maxlength="40" placeholder="Alex Carter"></div>  
-        <div class="field"><label>Username (optional)</label><input id="username" maxlength="40" placeholder="@alex"></div>  
-      </div>  
-      <div class="twocol">  
-        <div class="field"><label>ID (optional)</label><input id="uid" maxlength="50" placeholder="123456"></div>  
-        <div class="field"><label>Rank</label><input id="rankInput" type="number" min="1" max="10" value="1" required></div>  
-      </div>  
-      <div class="preview"><div class="avatar" id="previewAvatar">PE</div><div><div class="name" id="previewName">Preview Person</div><div class="sub" id="previewSub">@preview</div></div></div>  
-      <div class="modalactions"><button type="button" class="iconbtn danger" id="deleteBtn" style="display:none">Delete</button><button type="button" class="iconbtn" id="cancelBtn">Cancel</button><button class="primary" type="submit" id="saveBtn">Save</button></div>  
-    </form>  
-  </div>  
-</div>  
-<div class="toast" id="toast"></div>  <script>  
-const KEY="ranked_leaderboard_v2";  
-let people=JSON.parse(localStorage.getItem(KEY)||"[]"),editing=null;  
-const $=id=>document.getElementById(id);  
-$("year").textContent=new Date().getFullYear();  
-  
-$("enterBtn").onclick=()=>{
-  $("welcomeScreen").classList.add("hidden");
+<script>
+const DB_NAME = "FM_SINGLE_FILE_DB";
+const DB_VERSION = 2;
+
+let db = null;
+let view = "files";
+let currentFolder = null;
+let editorId = null;
+let currentNote = null;
+
+const $ = (q) => document.querySelector(q);
+const page = $("#page");
+const search = $("#search");
+const breadcrumbs = $("#breadcrumbs");
+const modalBackdrop = $("#modalBackdrop");
+const contextMenu = $("#contextMenu");
+
+const ICONS = {
+  folder: `<svg viewBox="0 0 24 24"><path d="M3.5 7.5h6l1.7 2H20v9h-16.5z"/><path d="M3.5 7.5V5.5h6l1.5 2"/></svg>`,
+  file: `<svg viewBox="0 0 24 24"><path d="M6 3.5h8l4 4V20.5H6z"/><path d="M14 3.5v5h4M9 13h6M9 16h6"/></svg>`,
+  more: `<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>`,
+  download: `<svg viewBox="0 0 24 24"><path d="M12 4v11M8 11l4 4 4-4"/><path d="M5 20h14"/></svg>`,
+  edit: `<svg viewBox="0 0 24 24"><path d="M4 17.5V20h2.5L18 8.5 15.5 6z"/><path d="M14.5 7l2.5 2.5"/></svg>`,
+  move: `<svg viewBox="0 0 24 24"><path d="M4 7h9M13 7l-3-3M13 7l-3 3M20 17h-9M11 17l3-3M11 17l3 3"/></svg>`,
+  trash: `<svg viewBox="0 0 24 24"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg>`,
+  zip: `<svg viewBox="0 0 24 24"><path d="M5 4h10l4 4v12H5z"/><path d="M15 4v5h4M12 7v2M10.5 11h3M12 14v6"/></svg>`,
+  extract: `<svg viewBox="0 0 24 24"><path d="M12 4v11M8 11l4 4 4-4"/><path d="M5 20h14"/></svg>`,
+  open: `<svg viewBox="0 0 24 24"><path d="M4 7.5h6l1.7 2H20v9H4z"/><path d="M4 7.5V5.5h6l1.5 2"/></svg>`,
+  restore: `<svg viewBox="0 0 24 24"><path d="M5 8a8 8 0 1 1 1 9"/><path d="M5 4v4h4"/></svg>`
 };
 
-function makeId(){return "p_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)}  
-function initials(p){  
-  const s=(p.name||"").trim();  
-  if(!s)return "P";  
-  return s.split(/\s+/).slice(0,2).map(x=>x[0].toUpperCase()).join("");  
-}  
-function label(p){return p.name||p.username||"Unknown person"}  
-function sub(p){return p.username||(p.uid?`ID: ${p.uid}`:"")}  
-function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}  
-function save(){localStorage.setItem(KEY,JSON.stringify(people))}  
-  
-function normalize(){  
-  people.sort((a,b)=>Number(a.rank)-Number(b.rank));  
-  people.forEach((p,i)=>p.rank=i+1);  
-}  
-  
-function render(){  
-  normalize();  
-  save();  
-  const list=$("list");  
-  list.innerHTML="";  
-  if(!people.length){  
-    list.innerHTML='<div class="empty">No people yet. Add the first person to build the leaderboard.</div>';  
-    return;  
-  }  
-  people.slice(0,10).forEach((p,i)=>{  
-    const rank=i+1;  
-    const row=document.createElement("div");  
-    row.className="row" + (rank===1?" top-1":rank===2?" top-2":rank===3?" top-3":"");  
-    row.style.animationDelay=(i*.018)+"s";  
-    const medal=rank<=3  
-      ? `<div class="medal ${rank===1?"goldbg":rank===2?"silverb":"bronzeb"}">${rank}</div>`  
-      : "";  
-    
-    const crownSvg = rank===1 ? `<svg class="crown-icon" viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>` : "";
+function uid() {
+  if (crypto.randomUUID) return crypto.randomUUID();
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
 
-    row.innerHTML=`  
-      <div class="rank ${rank===1?"gold":rank===2?"silver":rank===3?"bronze":""}">
-        ${crownSvg}
-        <span>${rank}</span>
-      </div>  
-      <div class="avatar">${  
-        p.photo  
-        ? `<img src="${esc(p.photo)}" alt="" onerror="this.parentElement.innerHTML='${esc(initials(p))}'">`  
-        : esc(initials(p))  
-      }</div>  
-      <div class="person">  
-        <div class="name">${esc(label(p))}</div>  
-        <div class="sub">${esc(sub(p))}</div>  
-      </div>  
-      ${medal}`;  
-    row.onclick=()=>openEdit(p.id);  
-    list.appendChild(row);  
-  });  
-}  
-  
-function openAdd(){  
-  editing=null;  
-  $("modalTitle").textContent="Add person";  
-  $("saveBtn").textContent="Save";  
-  $("deleteBtn").style.display="none";  
-  $("form").reset();  
-  $("rankInput").value=Math.min(people.length+1,10);  
-  preview();  
-  $("backdrop").classList.add("open");  
-}  
-  
-function openEdit(id){  
-  const p=people.find(x=>x.id===id);  
-  if(!p)return;  
-  editing=id;  
-  $("modalTitle").textContent="Edit person";  
-  $("saveBtn").textContent="Update";  
-  $("deleteBtn").style.display="inline-flex";  
-  $("photo").value=p.photo||"";  
-  $("name").value=p.name||"";  
-  $("username").value=p.username||"";  
-  $("uid").value=p.uid||"";  
-  $("rankInput").value=p.rank;  
-  preview();  
-  $("backdrop").classList.add("open");  
-}  
-  
-function closeModal(){  
-  $("backdrop").classList.remove("open");  
-  editing=null;  
-}  
-  
-function preview(){  
-  const p={  
-    name:$("name").value,  
-    username:$("username").value,  
-    uid:$("uid").value,  
-    photo:$("photo").value  
-  };  
-  $("previewName").textContent=label(p);  
-  $("previewSub").textContent=sub(p)||"Preview";  
-  $("previewAvatar").innerHTML=p.photo  
-    ? `<img src="${esc(p.photo)}" alt="" onerror="this.parentElement.textContent='${esc(initials(p))}'">`  
-    : esc(initials(p));  
-}  
-  
-function toast(t){  
-  $("toast").textContent=t;  
-  $("toast").classList.add("show");  
-  setTimeout(()=>$("toast").classList.remove("show"),1800);  
-}  
-  
-$("addBtn").onclick=openAdd;  
-$("closeBtn").onclick=closeModal;  
-$("cancelBtn").onclick=closeModal;  
-$("backdrop").onclick=e=>{if(e.target===$("backdrop"))closeModal()};  
-["name","username","uid","photo"].forEach(id=>$(id).addEventListener("input",preview));  
-  
-$("form").onsubmit=e=>{  
-  e.preventDefault();  
-  
-  const name=$("name").value.trim();  
-  const username=$("username").value.trim();  
-  if(!name&&!username){  
-    toast("Add a name or username");  
-    return;  
-  }  
-  
-  let requested=Math.max(1,Math.min(10,Number($("rankInput").value)||1));  
-  
-  if(editing){  
-    const p=people.find(x=>x.id===editing);  
-    if(!p)return;  
-  
-    const oldRank=p.rank;  
-    Object.assign(p,{  
-      photo:$("photo").value.trim(),  
-      name,  
-      username,  
-      uid:$("uid").value.trim(),  
-      rank:requested  
-    });  
-  
-    people.sort((a,b)=>Number(a.rank)-Number(b.rank));  
-  
-    const others=people.filter(x=>x.id!==editing);  
-    const target=Math.min(requested-1,others.length);  
-    others.splice(target,0,p);  
-    people=others.map((x,i)=>({...x,rank:i+1}));  
-  
-    save();  
-    render();  
-    closeModal();  
-    toast("Person updated");  
-  }else{  
-    const p={  
-      id:makeId(),  
-      photo:$("photo").value.trim(),  
-      name,  
-      username,  
-      uid:$("uid").value.trim(),  
-      rank:requested  
-    };  
-  
-    people.sort((a,b)=>Number(a.rank)-Number(b.rank));  
-    const target=Math.min(requested-1,people.length);  
-    people.splice(target,0,p);  
-    people=people.map((x,i)=>({...x,rank:i+1}));  
-  
-    save();  
-    render();  
-    closeModal();  
-    toast("Person added");  
-  }  
-};  
-  
-$("deleteBtn").onclick=()=>{  
-  if(!editing)return;  
-  if(!confirm("Delete this person from the leaderboard?"))return;  
-  people=people.filter(p=>p.id!==editing);  
-  normalize();  
-  save();  
-  render();  
-  closeModal();  
-  toast("Person deleted");  
-};  
-  
-$("langBtn").onclick=()=>{  
-  toast("Use your browser menu → Translate to change the page language.");  
-};  
-  
-render();  
-</script>  </body>  
+function req(request) {
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function store(name, mode = "readonly") {
+  return db.transaction(name, mode).objectStore(name);
+}
+
+function dbGet(name, id) { return req(store(name).get(id)); }
+function dbAll(name) { return req(store(name).getAll()); }
+function dbPut(name, value) { return req(store(name, "readwrite").put(value)); }
+function dbDelete(name, id) { return req(store(name, "readwrite").delete(id)); }
+
+function openDatabase() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = () => {
+      const d = request.result;
+      if (!d.objectStoreNames.contains("items")) d.createObjectStore("items", {keyPath:"id"});
+      if (!d.objectStoreNames.contains("notes")) d.createObjectStore("notes", {keyPath:"id"});
+      if (!d.objectStoreNames.contains("trash")) d.createObjectStore("trash", {keyPath:"id"});
+    };
+    request.onsuccess = () => { db = request.result; resolve(); };
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function showToast(message) {
+  const toast = $("#toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => toast.classList.remove("show"), 2300);
+}
+
+function setProgress(value) {
+  $("#progressBar").style.width = Math.max(0, Math.min(100, value)) + "%";
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[char]));
+}
+
+function getExtension(name) {
+  const parts = String(name).split(".");
+  return parts.length > 1 ? parts.pop().toLowerCase() : "";
+}
+
+function extensionClass(name) {
+  const e = getExtension(name);
+  return ["js","ts","jsx","tsx"].includes(e) ? "js" :
+    ["py"].includes(e) ? "py" :
+    ["html","htm"].includes(e) ? "html" :
+    ["css","scss","sass"].includes(e) ? "css" :
+    ["json"].includes(e) ? "json" :
+    ["zip"].includes(e) ? "zip" : "";
+}
+
+function fileBadge(name, type) {
+  if (type === "folder") return `<div class="item-icon folder">${ICONS.folder}</div>`;
+  const e = getExtension(name);
+  const cls = extensionClass(name);
+  const label = e ? e.toUpperCase().slice(0, 5) : "";
+  return `<div class="item-icon ${cls}">${label || ICONS.file}</div>`;
+}
+
+function formatSize(bytes) {
+  if (!bytes) return "Empty";
+  const units = ["B","KB","MB","GB"];
+  let n = bytes, i = 0;
+  while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+  return `${n.toFixed(i ? 1 : 0)} ${units[i]}`;
+}
+
+async function children(parentId, source = "items") {
+  const all = await dbAll(source);
+  return all.filter(item => (item.parent || null) === (parentId || null));
+}
+
+async function findChild(parent, name) {
+  const items = await children(parent);
+  return items.find(x => x.name === name);
+}
+
+async function makeFolder(name, parent, options = {}) {
+  const existing = await findChild(parent, name);
+  if (existing && existing.type === "folder") return existing.id;
+  const folder = {
+    id: uid(), name, type: "folder", parent: parent || null,
+    createdAt: Date.now(), modifiedAt: Date.now(),
+    originalParent: parent || null, ...options
+  };
+  await dbPut("items", folder);
+  return folder.id;
+}
+
+function closeModal() { modalBackdrop.classList.remove("show"); }
+function openModal(title, body, actions) {
+  $("#modal").innerHTML = `<h2>${title}</h2>${body}<div class="modal-actions">${actions}</div>`;
+  modalBackdrop.classList.add("show");
+}
+
+function askText(title, label, value, callback) {
+  openModal(
+    title,
+    `<div class="field"><label>${label}</label><input id="modalText" value="${escapeHTML(value)}"></div>`,
+    `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" id="modalConfirm">Continue</button>`
+  );
+  const input = $("#modalText");
+  $("#modalConfirm").onclick = () => {
+    const v = input.value.trim();
+    if (!v) return;
+    closeModal();
+    callback(v);
+  };
+  setTimeout(() => input.focus(), 30);
+}
+
+function confirmBox(title, message, callback, danger = true) {
+  openModal(
+    title,
+    `<p>${escapeHTML(message)}</p>`,
+    `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn ${danger ? "danger" : "primary"}" id="confirmButton">Confirm</button>`
+  );
+  $("#confirmButton").onclick = () => { closeModal(); callback(); };
+}
+
+function setActiveNav(viewName) {
+  document.querySelectorAll(".nav[data-view]").forEach(button => {
+    button.classList.toggle("active", button.dataset.view === viewName);
+  });
+}
+
+function navigate(viewName) {
+  view = viewName;
+  currentFolder = viewName === "files" ? currentFolder : null;
+  setActiveNav(viewName);
+  if (viewName === "files") renderFiles();
+  if (viewName === "notes") renderNotes();
+  if (viewName === "trash") renderTrash();
+}
+
+document.querySelectorAll(".nav[data-view]").forEach(button => {
+  button.addEventListener("click", () => navigate(button.dataset.view));
+});
+
+async function buildBreadcrumbs(folderId) {
+  const pieces = [];
+  let current = folderId ? await dbGet("items", folderId) : null;
+  while (current) {
+    pieces.unshift(current);
+    current = current.parent ? await dbGet("items", current.parent) : null;
+  }
+  breadcrumbs.innerHTML = `
+    <button class="crumb ${pieces.length ? "" : "current"}" onclick="goHome()">Home</button>
+    ${pieces.map((item, index) => `
+      <span>/</span>
+      <button class="crumb ${index === pieces.length - 1 ? "current" : ""}" onclick="openFolder('${item.id}')">
+        ${escapeHTML(item.name)}
+      </button>
+    `).join("")}
+  `;
+}
+
+function goHome() { currentFolder = null; renderFiles(); }
+async function openFolder(id) { currentFolder = id; renderFiles(); }
+
+async function renderFiles() {
+  view = "files";
+  setActiveNav("files");
+  search.placeholder = "Search files...";
+  await buildBreadcrumbs(currentFolder);
+
+  page.innerHTML = `
+    <div class="hero">
+      <div>
+        <h1>${currentFolder ? "Folder" : "My Files"}</h1>
+        <div class="subtitle">${currentFolder ? "Browse and manage files." : "Your workspace."}</div>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button class="btn primary" onclick="createFile()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New File</button>
+      <button class="btn" onclick="createFolder()">${ICONS.folder} New Folder</button>
+      <button class="btn" onclick="document.getElementById('filePicker').click()"><svg viewBox="0 0 24 24"><path d="M12 4v11M8 11l4 4 4-4"/><path d="M5 20h14"/></svg>Import</button>
+    </div>
+    <div class="grid" id="fileGrid"></div>
+  `;
+  await drawFileGrid();
+}
+
+async function drawFileGrid() {
+  const grid = $("#fileGrid");
+  if (!grid) return;
+  let items = await children(currentFolder);
+  const query = search.value.trim().toLowerCase();
+  if (query) items = items.filter(item => item.name.toLowerCase().includes(query));
+
+  items.sort((a,b) => a.type !== b.type ? (a.type === "folder" ? -1 : 1) : a.name.localeCompare(b.name));
+
+  if (!items.length) {
+    grid.innerHTML = `<div class="empty"><div><div style="font-size:18px;color:#dce2eb;font-weight:700;">Nothing here yet</div></div></div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map((item, index) => `
+    <article class="item-card" style="animation-delay:${Math.min(index * 25, 250)}ms" onclick="openItem('${item.id}')">
+      <button class="more" aria-label="More actions" onclick="event.stopPropagation();openItemMenu(event,'${item.id}')">${ICONS.more}</button>
+      ${fileBadge(item.name, item.type)}
+      <div class="item-name">${escapeHTML(item.name)}</div>
+      <div class="item-meta">${item.type === "folder" ? "Folder" : `${formatSize(item.size || new Blob([item.content || ""]).size)}`}</div>
+    </article>
+  `).join("");
+}
+
+async function openItem(id) {
+  const item = await dbGet("items", id);
+  if (!item) return;
+  if (item.type === "folder") { await openFolder(item.id); return; }
+  openEditor(item);
+}
+
+function createFile() {
+  askText("Create File", "File name", "untitled.txt", async name => {
+    const item = {
+      id: uid(), name, type: "file", parent: currentFolder || null,
+      content: "", size: 0, style: "normal", createdAt: Date.now(), modifiedAt: Date.now()
+    };
+    await dbPut("items", item);
+    await renderFiles();
+    openEditor(item);
+  });
+}
+
+function createFolder() {
+  askText("Create Folder", "Folder name", "New Folder", async name => {
+    await makeFolder(name, currentFolder);
+    await renderFiles();
+    showToast("Folder created");
+  });
+}
+
+function menuButton(label, icon, action, danger = false) {
+  const button = document.createElement("button");
+  button.innerHTML = `${icon}${escapeHTML(label)}`;
+  if (danger) button.classList.add("danger");
+  button.onclick = () => { closeMenu(); action(); };
+  contextMenu.appendChild(button);
+}
+
+function openItemMenu(event, id) {
+  dbGet("items", id).then(x => {
+    contextMenu.innerHTML = "";
+    menuButton("Open", ICONS.open, () => openItem(id));
+    menuButton("Rename", ICONS.edit, () => renameItem(id));
+    menuButton("Delete", ICONS.trash, () => sendToTrash(id), true);
+    positionMenu(event);
+  });
+}
+
+function positionMenu(event) {
+  contextMenu.style.display = "block";
+  contextMenu.style.left = Math.min(event.clientX, innerWidth - 220) + "px";
+  contextMenu.style.top = Math.min(event.clientY, innerHeight - 200) + "px";
+}
+
+function closeMenu() { contextMenu.style.display = "none"; }
+
+document.addEventListener("click", event => {
+  if (!event.target.closest("#contextMenu") && !event.target.closest(".more")) closeMenu();
+});
+
+async function renameItem(id) {
+  const item = await dbGet("items", id);
+  askText("Rename", "New name", item.name, async name => {
+    item.name = name;
+    item.modifiedAt = Date.now();
+    await dbPut("items", item);
+    renderFiles();
+    showToast("Renamed");
+  });
+}
+
+async function sendToTrash(id) {
+  const item = await dbGet("items", id);
+  if (!item) return;
+  confirmBox("Move to Trash?", `"${item.name}" will be moved to Trash.`, async () => {
+    item.deletedAt = Date.now();
+    await dbPut("trash", item);
+    await dbDelete("items", id);
+    renderFiles();
+    showToast("Moved to Trash");
+  });
+}
+
+async function renderTrash() {
+  view = "trash";
+  setActiveNav("trash");
+  page.innerHTML = `<h1>Trash</h1><div class="grid" id="trashGrid"></div>`;
+  const items = await dbAll("trash");
+  const grid = $("#trashGrid");
+  if (!items.length) { grid.innerHTML = `<div class="empty">Trash is empty</div>`; return; }
+  grid.innerHTML = items.map(item => `
+    <article class="item-card">
+      <div class="item-name">${escapeHTML(item.name)}</div>
+      <button class="btn danger" onclick="permanentlyDelete('${item.id}')">Delete Permanently</button>
+    </article>
+  `).join("");
+}
+
+async function permanentlyDelete(id) {
+  await dbDelete("trash", id);
+  renderTrash();
+  showToast("Deleted forever");
+}
+
+function openEditor(item) {
+  editorId = item.id;
+  $("#editorName").value = item.name;
+  $("#code").value = item.content || "";
+  $("#editor").classList.add("show");
+  updateLineNumbers();
+}
+
+function closeEditor() { $("#editor").classList.remove("show"); editorId = null; }
+function updateLineNumbers() {
+  const lines = $("#code").value.split("\n").length;
+  $("#lineNumbers").textContent = Array.from({length: lines}, (_, i) => i + 1).join("\n");
+}
+
+$("#editorClose").onclick = closeEditor;
+$("#code").addEventListener("input", updateLineNumbers);
+
+$("#editorSave").onclick = async () => {
+  if (!editorId) return;
+  const item = await dbGet("items", editorId);
+  if (!item) return;
+  item.name = $("#editorName").value.trim() || item.name;
+  item.content = $("#code").value;
+  item.modifiedAt = Date.now();
+  await dbPut("items", item);
+  closeEditor();
+  renderFiles();
+  showToast("Saved");
+};
+
+async function renderNotes() {
+  view = "notes";
+  setActiveNav("notes");
+  page.innerHTML = `<h1>Notes</h1><p>Work on your personal quick notes below.</p>`;
+}
+
+async function boot() {
+  try {
+    await openDatabase();
+    await renderFiles();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Global delegated double click listener properly ended and sanitized
+document.addEventListener('click', function(e) {
+  const card = e.target.closest('.item-card');
+  if (card && !e.target.closest('button, input, select, textarea')) {
+    const moreBtn = card.querySelector('.more');
+    if (moreBtn) {
+      const onclickAttr = moreBtn.getAttribute('onclick');
+      if (onclickAttr) {
+        const match = onclickAttr.match(/'([^']+)'/);
+        if (match && match[1]) openItem(match[1]);
+      }
+    }
+  }
+});
+
+boot();
+</script>
+</body>
 </html>
