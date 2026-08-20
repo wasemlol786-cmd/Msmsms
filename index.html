@@ -37,7 +37,7 @@ svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke
 }
 .nav:hover{background:rgba(255,255,255,.04);color:var(--text)}
 .nav.active{background:linear-gradient(135deg,rgba(124,92,255,.18),rgba(124,92,255,.06));border-color:#30275a;color:#fff}
-.sidebar-bottom{margin-top:auto}
+.sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;gap:6px}
 .main{min-width:0;flex:1;display:flex;flex-direction:column}
 .topbar{
   height:72px;flex:0 0 72px;border-bottom:1px solid var(--line);background:rgba(8,10,15,.68);
@@ -70,10 +70,9 @@ h1{font-size:29px;line-height:1;margin:0 0 8px;letter-spacing:-.035em}
 .item-card{
   position:relative;min-height:170px;border:1px solid var(--line);border-radius:17px;
   background:linear-gradient(145deg,rgba(20,26,36,.98),rgba(13,17,24,.98));
-  padding:18px;transition:.22s;animation:rise .3s ease both;overflow:hidden
+  padding:18px;transition:.22s;animation:rise .3s ease both;overflow:hidden;cursor:pointer
 }
 .item-card:hover{transform:translateY(-4px);border-color:#3a4555;box-shadow:0 15px 35px rgba(0,0,0,.18)}
-.item-card.selected{border-color:#6652bb;box-shadow:0 0 0 2px rgba(124,92,255,.12)}
 .item-icon{
   width:48px;height:48px;border-radius:13px;background:#191f2a;border:1px solid #2b3442;
   display:grid;place-items:center;font-size:11px;font-weight:800;letter-spacing:-.02em;color:#b8c1cf;margin-bottom:25px
@@ -91,7 +90,7 @@ h1{font-size:29px;line-height:1;margin:0 0 8px;letter-spacing:-.035em}
 .more:hover{background:rgba(255,255,255,.06);color:#fff}
 .empty{
   border:1px dashed #2c3542;border-radius:16px;min-height:190px;display:grid;place-items:center;
-  color:var(--muted);text-align:center;padding:30px
+  color:var(--muted);text-align:center;padding:30px;width:100%
 }
 .menu{
   position:fixed;z-index:100;min-width:205px;padding:6px;border:1px solid #343e4d;background:#151b24;
@@ -103,7 +102,6 @@ h1{font-size:29px;line-height:1;margin:0 0 8px;letter-spacing:-.035em}
 }
 .menu button:hover{background:rgba(255,255,255,.06);color:#fff}
 .menu button.danger{color:#ff9eb2}
-.menu-sep{height:1px;background:var(--line);margin:5px 3px}
 .modal-backdrop{
   position:fixed;inset:0;background:rgba(0,0,0,.68);backdrop-filter:blur(9px);display:none;
   align-items:center;justify-content:center;z-index:200;padding:20px
@@ -141,7 +139,6 @@ h1{font-size:29px;line-height:1;margin:0 0 8px;letter-spacing:-.035em}
 .note-row:hover,.note-row.active{background:var(--surface-2)}.note-row b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .note-row small{display:block;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .note-editor{display:flex;flex-direction:column;padding:17px}.note-editor textarea{flex:1;min-height:280px;resize:none;margin-top:10px;line-height:1.6}
-.trash-card{border-color:#352633}
 .toast{
   position:fixed;right:18px;bottom:18px;z-index:300;background:#171d27;border:1px solid #344050;
   border-radius:12px;padding:12px 15px;box-shadow:var(--shadow);opacity:0;transform:translateY(15px);pointer-events:none;transition:.22s
@@ -149,70 +146,32 @@ h1{font-size:29px;line-height:1;margin:0 0 8px;letter-spacing:-.035em}
 .toast.show{opacity:1;transform:none}
 .progress{position:fixed;left:0;right:0;bottom:0;height:3px;background:transparent;z-index:400}
 .progress i{display:block;width:0;height:100%;background:var(--accent);transition:.15s}
-.hidden{display:none!important}
+
+/* Font Customization Styles */
+.style-handwritten { font-family: "Comic Sans MS", "Segoe Print", cursive !important; }
+.style-gothic { font-family: "Old English Text MT", Georgia, serif !important; }
+.style-classic { font-family: Palatino, Georgia, serif !important; }
+.style-mono { font-family: monospace !important; }
+.style-terminal { font-family: "Courier New", monospace !important; background:#000 !important; color:#0f0 !important; }
+.style-typewriter { font-family: "Courier", monospace !important; }
+
 @keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 @keyframes pop{from{opacity:0;transform:scale(.97) translateY(-3px)}to{opacity:1;transform:none}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @keyframes modalIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
-@media(max-width:800px){
-  .sidebar{width:70px;flex-basis:70px;padding:12px 8px}.brand-text,.nav-text{display:none}.brand{justify-content:center;padding:10px 4px 22px}
-  .nav{justify-content:center;padding:12px 8px}.topbar{padding:0 13px}.search{width:150px;flex-basis:150px}.page{padding:18px}
-  .grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}.notes-layout{grid-template-columns:1fr;grid-template-rows:180px minmax(400px,1fr)}
-}
-@media(max-width:520px){
-  .topbar{height:62px;flex-basis:62px}.search{width:120px;flex-basis:120px}.hero{align-items:flex-start;flex-direction:column}
-  h1{font-size:25px}.grid{grid-template-columns:1fr 1fr;gap:9px}.item-card{min-height:145px;padding:14px}.item-icon{margin-bottom:20px}
-  .editor-bar{height:auto;min-height:62px;flex-wrap:wrap}.editor-title{order:3;flex-basis:100%}
-}
-</style>
 
-<style id="mobile-fix">
-@media (max-width: 700px){
-  *{box-sizing:border-box}
-  html,body{width:100%;min-width:0;overflow-x:hidden}
-  body{font-size:14px}
-  .app,.shell,.layout,.main,.content,.workspace,.container{max-width:100%!important;width:100%!important}
-  .sidebar{position:fixed!important;left:-290px!important;top:0!important;bottom:0!important;width:280px!important;z-index:1000!important;transition:left .25s ease}
-  .sidebar.open{left:0!important}
-  .topbar,.header{padding:12px 14px!important;gap:8px!important}
-  .main{margin-left:0!important;padding:12px!important}
-  .toolbar{flex-wrap:wrap!important;gap:7px!important}
-  button,.btn{min-height:42px}
-  .file-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
-  .file-card,.folder-card,.item-card{min-width:0!important;width:100%!important;padding:12px!important}
-  .file-card .name,.folder-card .name,.item-card .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .editor,.editor-wrap,.code-editor{width:100%!important;min-width:0!important}
-  textarea,.editor textarea{font-size:14px!important;line-height:1.55!important}
-  .modal,.dialog{width:calc(100vw - 24px)!important;max-width:none!important;margin:12px!important}
-  .breadcrumb{overflow-x:auto;white-space:nowrap;max-width:100%}
-  .notes-grid{grid-template-columns:1fr!important}
-  .empty{padding:35px 15px!important}
-}
-</style>
-
-<style id="fm-polish-v4">
-#editorStyle{display:none!important}
-.fm-pathbar{display:flex;align-items:center;gap:7px;min-height:38px;padding:7px 13px;border-bottom:1px solid var(--line);background:rgba(10,13,19,.94);overflow-x:auto;white-space:nowrap}
-.fm-pathbar .crumb{flex:0 0 auto}
-.fm-pathbar .path-sep{color:#566171}
-.style-option[data-style="handwritten"]{font-family:"Comic Sans MS","Segoe Print",cursive}
-.style-option[data-style="gothic"]{font-family:"Old English Text MT",Georgia,serif}
-.style-option[data-style="classic"]{font-family:Palatino,Georgia,serif}
-.style-option[data-style="mono"],.style-option[data-style="terminal"],.style-option[data-style="typewriter"]{font-family:monospace}
 @media(max-width:700px){
- .fm-pathbar{margin:0 10px;border:1px solid var(--line);border-radius:11px;height:40px;min-height:40px}
- .page{padding-top:12px!important}
- .topbar{height:96px!important;min-height:96px!important;grid-template-rows:34px 42px!important}
- .notes-layout{display:flex!important;flex-direction:column!important;min-height:0!important}
- .notes-list{max-height:150px;min-height:80px}
- .note-editor{min-height:520px}
- .note-editor textarea{min-height:260px!important;background:#0d1118!important;color:#f4f7fb!important;border:1px solid var(--line)!important;border-radius:12px!important;padding:13px!important}
- .note-editor .modal-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
- .note-editor .modal-actions .btn{min-width:0;padding:10px 7px}
- .style-menu{z-index:2000!important}
+  .app{flex-direction:column}
+  .sidebar{width:100%;flex:0 0 auto;flex-direction:row;align-items:center;justify-content:space-between;padding:10px 15px}
+  .sidebar-bottom{flex-direction:row;margin-top:0}
+  .brand-text,.nav-text{display:none}
+  .topbar{height:60px;padding:0 15px}
+  .page{padding:15px}
+  .notes-layout{grid-template-columns:1fr;grid-template-rows:180px 1fr}
 }
-@media(min-width:701px){.fm-pathbar{margin:0 25px;border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px}}
 </style>
+<!-- JSZip library for compression and decompression -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 
 <body>
@@ -227,6 +186,7 @@ h1{font-size:29px;line-height:1;margin:0 0 8px;letter-spacing:-.035em}
     <button class="nav active" data-view="files"><svg viewBox="0 0 24 24"><path d="M4 7.5h6l1.7 2H20v9H4z"/><path d="M4 7.5V5.5h6l1.5 2"/></svg><span class="nav-text">My Files</span></button>
     <button class="nav" data-view="notes"><svg viewBox="0 0 24 24"><path d="M6 4h12v16H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span class="nav-text">Notes</span></button>
     <button class="nav" data-view="trash"><svg viewBox="0 0 24 24"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg><span class="nav-text">Trash</span></button>
+    
     <div class="sidebar-bottom">
       <button class="nav" id="importFilesBtn"><svg viewBox="0 0 24 24"><path d="M12 4v11M8 11l4 4 4-4"/><path d="M5 19h14"/></svg><span class="nav-text">Import Files</span></button>
       <button class="nav" id="importFolderBtn"><svg viewBox="0 0 24 24"><path d="M4 7.5h6l1.7 2H20v9H4z"/><path d="M12 12v5M9.5 14.5h5"/></svg><span class="nav-text">Import Folder</span></button>
@@ -255,9 +215,12 @@ h1{font-size:29px;line-height:1;margin:0 0 8px;letter-spacing:-.035em}
     <div class="editor-title"><input id="editorName" aria-label="File name"></div>
     <select class="btn" id="editorStyle">
       <option value="normal">Normal</option>
-      <option value="serif">Serif</option>
-      <option value="wide">Wide</option>
+      <option value="handwritten">Handwritten</option>
+      <option value="gothic">Gothic</option>
+      <option value="classic">Classic</option>
       <option value="mono">Monospace</option>
+      <option value="terminal">Terminal</option>
+      <option value="typewriter">Typewriter</option>
     </select>
     <button class="btn primary" id="editorSave"><svg viewBox="0 0 24 24"><path d="M5 4h12l2 2v14H5z"/><path d="M8 4v6h8V4M8 20v-6h8v6"/></svg>Save</button>
   </div>
@@ -268,14 +231,14 @@ h1{font-size:29px;line-height:1;margin:0 0 8px;letter-spacing:-.035em}
 </div>
 
 <script>
-const DB_NAME = "FM_SINGLE_FILE_DB";
-const DB_VERSION = 2;
+const DB_NAME = "FM_FULL_SYSTEM_DB";
+const DB_VERSION = 1;
 
 let db = null;
 let view = "files";
 let currentFolder = null;
 let editorId = null;
-let currentNote = null;
+let activeNoteId = null;
 
 const $ = (q) => document.querySelector(q);
 const page = $("#page");
@@ -299,7 +262,6 @@ const ICONS = {
 };
 
 function uid() {
-  if (crypto.randomUUID) return crypto.randomUUID();
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
@@ -343,6 +305,7 @@ function showToast(message) {
 
 function setProgress(value) {
   $("#progressBar").style.width = Math.max(0, Math.min(100, value)) + "%";
+  if (value >= 100) setTimeout(() => $("#progressBar").style.width = "0%", 400);
 }
 
 function escapeHTML(value) {
@@ -361,9 +324,9 @@ function extensionClass(name) {
   return ["js","ts","jsx","tsx"].includes(e) ? "js" :
     ["py"].includes(e) ? "py" :
     ["html","htm"].includes(e) ? "html" :
-    ["css","scss","sass"].includes(e) ? "css" :
+    ["css","scss"].includes(e) ? "css" :
     ["json"].includes(e) ? "json" :
-    ["zip"].includes(e) ? "zip" : "";
+    ["zip","rar","tar","gz"].includes(e) ? "zip" : "";
 }
 
 function fileBadge(name, type) {
@@ -375,7 +338,7 @@ function fileBadge(name, type) {
 }
 
 function formatSize(bytes) {
-  if (!bytes) return "Empty";
+  if (!bytes) return "0 B";
   const units = ["B","KB","MB","GB"];
   let n = bytes, i = 0;
   while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
@@ -392,13 +355,12 @@ async function findChild(parent, name) {
   return items.find(x => x.name === name);
 }
 
-async function makeFolder(name, parent, options = {}) {
+async function makeFolder(name, parent) {
   const existing = await findChild(parent, name);
   if (existing && existing.type === "folder") return existing.id;
   const folder = {
     id: uid(), name, type: "folder", parent: parent || null,
-    createdAt: Date.now(), modifiedAt: Date.now(),
-    originalParent: parent || null, ...options
+    createdAt: Date.now(), modifiedAt: Date.now()
   };
   await dbPut("items", folder);
   return folder.id;
@@ -443,7 +405,6 @@ function setActiveNav(viewName) {
 
 function navigate(viewName) {
   view = viewName;
-  currentFolder = viewName === "files" ? currentFolder : null;
   setActiveNav(viewName);
   if (viewName === "files") renderFiles();
   if (viewName === "notes") renderNotes();
@@ -452,6 +413,12 @@ function navigate(viewName) {
 
 document.querySelectorAll(".nav[data-view]").forEach(button => {
   button.addEventListener("click", () => navigate(button.dataset.view));
+});
+
+search.addEventListener("input", () => {
+  if (view === "files") drawFileGrid();
+  if (view === "notes") drawNotesList();
+  if (view === "trash") drawTrashGrid();
 });
 
 async function buildBreadcrumbs(folderId) {
@@ -484,14 +451,14 @@ async function renderFiles() {
   page.innerHTML = `
     <div class="hero">
       <div>
-        <h1>${currentFolder ? "Folder" : "My Files"}</h1>
-        <div class="subtitle">${currentFolder ? "Browse and manage files." : "Your workspace."}</div>
+        <h1>${currentFolder ? "Folder View" : "My Files"}</h1>
+        <div class="subtitle">Manage files and folders efficiently.</div>
       </div>
     </div>
     <div class="toolbar">
       <button class="btn primary" onclick="createFile()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New File</button>
       <button class="btn" onclick="createFolder()">${ICONS.folder} New Folder</button>
-      <button class="btn" onclick="document.getElementById('filePicker').click()"><svg viewBox="0 0 24 24"><path d="M12 4v11M8 11l4 4 4-4"/><path d="M5 20h14"/></svg>Import</button>
+      <button class="btn" onclick="compressCurrentFolder()">${ICONS.zip} Compress Folder</button>
     </div>
     <div class="grid" id="fileGrid"></div>
   `;
@@ -508,7 +475,7 @@ async function drawFileGrid() {
   items.sort((a,b) => a.type !== b.type ? (a.type === "folder" ? -1 : 1) : a.name.localeCompare(b.name));
 
   if (!items.length) {
-    grid.innerHTML = `<div class="empty"><div><div style="font-size:18px;color:#dce2eb;font-weight:700;">Nothing here yet</div></div></div>`;
+    grid.innerHTML = `<div class="empty"><div><div style="font-size:18px;color:#dce2eb;font-weight:700;">No files here</div></div></div>`;
     return;
   }
 
@@ -557,14 +524,17 @@ function menuButton(label, icon, action, danger = false) {
   contextMenu.appendChild(button);
 }
 
-function openItemMenu(event, id) {
-  dbGet("items", id).then(x => {
-    contextMenu.innerHTML = "";
-    menuButton("Open", ICONS.open, () => openItem(id));
-    menuButton("Rename", ICONS.edit, () => renameItem(id));
-    menuButton("Delete", ICONS.trash, () => sendToTrash(id), true);
-    positionMenu(event);
-  });
+async function openItemMenu(event, id) {
+  const item = await dbGet("items", id);
+  if (!item) return;
+  contextMenu.innerHTML = "";
+  menuButton("Open", ICONS.open, () => openItem(id));
+  if (item.type === "file") menuButton("Download", ICONS.download, () => downloadFile(id));
+  if (getExtension(item.name) === "zip") menuButton("Extract ZIP", ICONS.extract, () => extractZip(id));
+  menuButton("Move", ICONS.move, () => moveItemDialog(id));
+  menuButton("Rename", ICONS.edit, () => renameItem(id));
+  menuButton("Delete", ICONS.trash, () => sendToTrash(id), true);
+  positionMenu(event);
 }
 
 function positionMenu(event) {
@@ -586,8 +556,33 @@ async function renameItem(id) {
     item.modifiedAt = Date.now();
     await dbPut("items", item);
     renderFiles();
-    showToast("Renamed");
+    showToast("Renamed successfully");
   });
+}
+
+async function moveItemDialog(id) {
+  const item = await dbGet("items", id);
+  const all = await dbAll("items");
+  const folders = all.filter(x => x.type === "folder" && x.id !== id);
+  
+  const options = `<option value="">/ (Root)</option>` + 
+    folders.map(f => `<option value="${f.id}" ${f.id === item.parent ? "selected" : ""}>/${escapeHTML(f.name)}</option>`).join("");
+
+  openModal(
+    "Move Item",
+    `<div class="field"><label>Select Destination Folder</label><select id="moveDest">${options}</select></div>`,
+    `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" id="confirmMove">Move</button>`
+  );
+
+  $("#confirmMove").onclick = async () => {
+    const dest = $("#moveDest").value || null;
+    item.parent = dest;
+    item.modifiedAt = Date.now();
+    await dbPut("items", item);
+    closeModal();
+    renderFiles();
+    showToast("Moved successfully");
+  };
 }
 
 async function sendToTrash(id) {
@@ -602,34 +597,123 @@ async function sendToTrash(id) {
   });
 }
 
-async function renderTrash() {
-  view = "trash";
-  setActiveNav("trash");
-  page.innerHTML = `<h1>Trash</h1><div class="grid" id="trashGrid"></div>`;
-  const items = await dbAll("trash");
-  const grid = $("#trashGrid");
-  if (!items.length) { grid.innerHTML = `<div class="empty">Trash is empty</div>`; return; }
-  grid.innerHTML = items.map(item => `
-    <article class="item-card">
-      <div class="item-name">${escapeHTML(item.name)}</div>
-      <button class="btn danger" onclick="permanentlyDelete('${item.id}')">Delete Permanently</button>
-    </article>
-  `).join("");
+async function downloadFile(id) {
+  const item = await dbGet("items", id);
+  if (!item) return;
+  const blob = new Blob([item.content || ""], {type: "text/plain;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = item.name;
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
-async function permanentlyDelete(id) {
-  await dbDelete("trash", id);
-  renderTrash();
-  showToast("Deleted forever");
+/* Import Files & Folders */
+$("#importFilesBtn").onclick = () => $("#filePicker").click();
+$("#importFolderBtn").onclick = () => $("#folderPicker").click();
+
+$("#filePicker").onchange = async (e) => {
+  const files = Array.from(e.target.files);
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    const text = await f.text();
+    await dbPut("items", {
+      id: uid(), name: f.name, type: "file", parent: currentFolder || null,
+      content: text, size: f.size, createdAt: Date.now(), modifiedAt: Date.now()
+    });
+    setProgress(((i + 1) / files.length) * 100);
+  }
+  renderFiles();
+  showToast("Files imported");
+};
+
+$("#folderPicker").onchange = async (e) => {
+  const files = Array.from(e.target.files);
+  const folderMap = {};
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    const parts = f.webkitRelativePath.split("/");
+    let parent = currentFolder;
+
+    for (let p = 0; p < parts.length - 1; p++) {
+      const pathKey = parts.slice(0, p + 1).join("/");
+      if (!folderMap[pathKey]) {
+        folderMap[pathKey] = await makeFolder(parts[p], parent);
+      }
+      parent = folderMap[pathKey];
+    }
+
+    const text = await f.text();
+    await dbPut("items", {
+      id: uid(), name: f.name, type: "file", parent: parent,
+      content: text, size: f.size, createdAt: Date.now(), modifiedAt: Date.now()
+    });
+    setProgress(((i + 1) / files.length) * 100);
+  }
+  renderFiles();
+  showToast("Folder structure imported");
+};
+
+/* ZIP Compression & Extraction */
+async function compressCurrentFolder() {
+  if (typeof JSZip === "undefined") { showToast("Zip library loading..."); return; }
+  const zip = new JSZip();
+  const items = await children(currentFolder);
+  if (!items.length) { showToast("Folder is empty"); return; }
+
+  for (const item of items) {
+    if (item.type === "file") zip.file(item.name, item.content || "");
+  }
+
+  const content = await zip.generateAsync({type: "blob"});
+  const reader = new FileReader();
+  reader.onload = async () => {
+    await dbPut("items", {
+      id: uid(), name: "archive.zip", type: "file", parent: currentFolder || null,
+      content: reader.result, size: content.size, createdAt: Date.now(), modifiedAt: Date.now()
+    });
+    renderFiles();
+    showToast("Compressed to archive.zip");
+  };
+  reader.readAsText(content);
 }
 
+async function extractZip(id) {
+  const item = await dbGet("items", id);
+  if (!item || typeof JSZip === "undefined") return;
+  const zip = await JSZip.loadAsync(item.content);
+  const targetFolder = await makeFolder(item.name.replace(".zip", ""), currentFolder);
+
+  for (const [filename, fileObj] of Object.entries(zip.files)) {
+    if (!fileObj.dir) {
+      const text = await fileObj.async("string");
+      await dbPut("items", {
+        id: uid(), name: filename.split("/").pop(), type: "file", parent: targetFolder,
+        content: text, size: text.length, createdAt: Date.now(), modifiedAt: Date.now()
+      });
+    }
+  }
+  renderFiles();
+  showToast("Extracted successfully");
+}
+
+/* Editor Implementation */
 function openEditor(item) {
   editorId = item.id;
   $("#editorName").value = item.name;
   $("#code").value = item.content || "";
+  $("#editorStyle").value = item.style || "normal";
+  applyCodeStyle(item.style || "normal");
   $("#editor").classList.add("show");
   updateLineNumbers();
 }
+
+function applyCodeStyle(styleClass) {
+  const code = $("#code");
+  code.className = "code " + (styleClass !== "normal" ? `style-${styleClass}` : "");
+}
+
+$("#editorStyle").addEventListener("change", (e) => applyCodeStyle(e.target.value));
 
 function closeEditor() { $("#editor").classList.remove("show"); editorId = null; }
 function updateLineNumbers() {
@@ -646,6 +730,7 @@ $("#editorSave").onclick = async () => {
   if (!item) return;
   item.name = $("#editorName").value.trim() || item.name;
   item.content = $("#code").value;
+  item.style = $("#editorStyle").value;
   item.modifiedAt = Date.now();
   await dbPut("items", item);
   closeEditor();
@@ -653,10 +738,179 @@ $("#editorSave").onclick = async () => {
   showToast("Saved");
 };
 
+/* Notes Section */
 async function renderNotes() {
   view = "notes";
   setActiveNav("notes");
-  page.innerHTML = `<h1>Notes</h1><p>Work on your personal quick notes below.</p>`;
+  search.placeholder = "Search notes...";
+  breadcrumbs.innerHTML = `<span class="crumb current">Notes</span>`;
+
+  page.innerHTML = `
+    <div class="hero">
+      <div>
+        <h1>Notes Studio</h1>
+        <div class="subtitle">Quick personal notebook.</div>
+      </div>
+      <button class="btn primary" onclick="createNewNote()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New Note</button>
+    </div>
+    <div class="notes-layout">
+      <div class="notes-list" id="notesList"></div>
+      <div class="note-editor" id="noteEditorArea">
+        <div class="empty">Select or create a note to start writing.</div>
+      </div>
+    </div>
+  `;
+  await drawNotesList();
+}
+
+async function drawNotesList() {
+  const container = $("#notesList");
+  if (!container) return;
+  let notes = await dbAll("notes");
+  const query = search.value.trim().toLowerCase();
+  if (query) notes = notes.filter(n => n.title.toLowerCase().includes(query) || n.content.toLowerCase().includes(query));
+
+  notes.sort((a,b) => b.modifiedAt - a.modifiedAt);
+
+  if (!notes.length) {
+    container.innerHTML = `<div class="empty" style="min-height:100px;border:0;">No notes</div>`;
+    return;
+  }
+
+  container.innerHTML = notes.map(n => `
+    <div class="note-row ${n.id === activeNoteId ? "active" : ""}" onclick="selectNote('${n.id}')">
+      <b>${escapeHTML(n.title || "Untitled Note")}</b>
+      <small>${escapeHTML(n.content.slice(0,40) || "Empty note...")}</small>
+    </div>
+  `).join("");
+}
+
+async function createNewNote() {
+  const note = {
+    id: uid(), title: "New Note", content: "", style: "normal", modifiedAt: Date.now()
+  };
+  await dbPut("notes", note);
+  activeNoteId = note.id;
+  await drawNotesList();
+  selectNote(note.id);
+}
+
+async function selectNote(id) {
+  activeNoteId = id;
+  const note = await dbGet("notes", id);
+  if (!note) return;
+  drawNotesList();
+
+  const area = $("#noteEditorArea");
+  area.innerHTML = `
+    <div class="field"><input id="noteTitle" value="${escapeHTML(note.title)}" placeholder="Note Title"></div>
+    <div class="field" style="margin:0;">
+      <select id="noteStyle" class="btn" style="width:auto;margin-bottom:10px;">
+        <option value="normal" ${note.style==='normal'?'selected':''}>Normal Font</option>
+        <option value="handwritten" ${note.style==='handwritten'?'selected':''}>Handwritten</option>
+        <option value="gothic" ${note.style==='gothic'?'selected':''}>Gothic</option>
+        <option value="classic" ${note.style==='classic'?'selected':''}>Classic</option>
+        <option value="mono" ${note.style==='mono'?'selected':''}>Monospace</option>
+      </select>
+    </div>
+    <textarea id="noteContent" class="${note.style !== 'normal' ? 'style-'+note.style : ''}" placeholder="Write your thoughts here...">${escapeHTML(note.content)}</textarea>
+    <div class="modal-actions">
+      <button class="btn danger" onclick="deleteNote('${note.id}')">${ICONS.trash} Delete</button>
+      <button class="btn primary" onclick="saveNote('${note.id}')">Save Changes</button>
+    </div>
+  `;
+
+  $("#noteStyle").onchange = (e) => {
+    $("#noteContent").className = e.target.value !== 'normal' ? 'style-' + e.target.value : '';
+  };
+}
+
+async function saveNote(id) {
+  const note = await dbGet("notes", id);
+  if (!note) return;
+  note.title = $("#noteTitle").value.trim() || "Untitled Note";
+  note.content = $("#noteContent").value;
+  note.style = $("#noteStyle").value;
+  note.modifiedAt = Date.now();
+  await dbPut("notes", note);
+  drawNotesList();
+  showToast("Note saved");
+}
+
+async function deleteNote(id) {
+  confirmBox("Delete Note?", "Are you sure you want to delete this note?", async () => {
+    await dbDelete("notes", id);
+    activeNoteId = null;
+    renderNotes();
+    showToast("Note deleted");
+  });
+}
+
+/* Trash Section */
+async function renderTrash() {
+  view = "trash";
+  setActiveNav("trash");
+  breadcrumbs.innerHTML = `<span class="crumb current">Trash</span>`;
+  page.innerHTML = `
+    <div class="hero">
+      <div>
+        <h1>Trash Bin</h1>
+        <div class="subtitle">Items stored here can be restored or deleted permanently.</div>
+      </div>
+      <button class="btn danger" onclick="emptyTrash()">Empty Trash</button>
+    </div>
+    <div class="grid" id="trashGrid"></div>
+  `;
+  await drawTrashGrid();
+}
+
+async function drawTrashGrid() {
+  const grid = $("#trashGrid");
+  if (!grid) return;
+  let items = await dbAll("trash");
+  const query = search.value.trim().toLowerCase();
+  if (query) items = items.filter(i => i.name.toLowerCase().includes(query));
+
+  if (!items.length) {
+    grid.innerHTML = `<div class="empty">Trash is empty</div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map(item => `
+    <article class="item-card">
+      ${fileBadge(item.name, item.type)}
+      <div class="item-name">${escapeHTML(item.name)}</div>
+      <div class="modal-actions" style="margin-top:15px;justify-content:flex-start;">
+        <button class="btn" onclick="restoreTrash('${item.id}')">${ICONS.restore} Restore</button>
+        <button class="btn danger" onclick="permanentlyDelete('${item.id}')">Delete</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+async function restoreTrash(id) {
+  const item = await dbGet("trash", id);
+  if (!item) return;
+  delete item.deletedAt;
+  await dbPut("items", item);
+  await dbDelete("trash", id);
+  renderTrash();
+  showToast("Item restored");
+}
+
+async function permanentlyDelete(id) {
+  await dbDelete("trash", id);
+  renderTrash();
+  showToast("Permanently deleted");
+}
+
+async function emptyTrash() {
+  confirmBox("Empty Trash?", "This action cannot be undone.", async () => {
+    const items = await dbAll("trash");
+    for (const item of items) await dbDelete("trash", item.id);
+    renderTrash();
+    showToast("Trash emptied");
+  });
 }
 
 async function boot() {
@@ -664,24 +918,9 @@ async function boot() {
     await openDatabase();
     await renderFiles();
   } catch (error) {
-    console.error(error);
+    console.error("Boot error:", error);
   }
 }
-
-// Global delegated double click listener properly ended and sanitized
-document.addEventListener('click', function(e) {
-  const card = e.target.closest('.item-card');
-  if (card && !e.target.closest('button, input, select, textarea')) {
-    const moreBtn = card.querySelector('.more');
-    if (moreBtn) {
-      const onclickAttr = moreBtn.getAttribute('onclick');
-      if (onclickAttr) {
-        const match = onclickAttr.match(/'([^']+)'/);
-        if (match && match[1]) openItem(match[1]);
-      }
-    }
-  }
-});
 
 boot();
 </script>
