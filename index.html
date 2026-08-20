@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -17,13 +17,12 @@
   --accent: #7c5cff;
   --accent-hover: #896cff;
   --danger: #f05272;
-  --success: #43d19e;
-  --radius: 14px;
+  --radius: 12px;
   --shadow: 0 20px 50px rgba(0,0,0,.5);
 }
 
-* { box-sizing: border-box; transition: background-color .2s ease, border-color .2s ease, transform .15s ease; }
-html, body { width: 100%; height: 100%; margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; overflow: hidden; }
+* { box-sizing: border-box; margin: 0; padding: 0; transition: background-color .2s ease, border-color .2s ease, transform .15s ease; }
+html, body { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; }
 
 /* Scrollbars */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -32,170 +31,166 @@ html, body { width: 100%; height: 100%; margin: 0; padding: 0; background: var(-
 
 button, input, textarea, select { font: inherit; color: inherit; }
 button { cursor: pointer; border: none; background: none; }
-svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
 .app { height: 100%; display: flex; position: relative; }
 
-/* Sidebar & Drawer */
+/* Sidebar & Mobile Drawer */
 .sidebar {
-  width: 260px; flex: 0 0 260px; border-left: 1px solid var(--line); background: rgba(14, 18, 25, 0.95);
-  backdrop-filter: blur(15px); padding: 18px 12px; display: flex; flex-direction: column; gap: 8px; z-index: 50;
+  width: 250px; flex: 0 0 250px; border-right: 1px solid var(--line); background: var(--surface);
+  padding: 16px 12px; display: flex; flex-direction: column; gap: 8px; z-index: 50;
 }
-.brand { display: flex; align-items: center; gap: 10px; padding: 10px; font-weight: 800; font-size: 17px; color: var(--text); }
-.brand-mark { width: 34px; height: 34px; border-radius: 10px; background: rgba(124, 92, 255, 0.15); border: 1px solid var(--accent); display: grid; place-items: center; color: var(--accent); }
+.brand { display: flex; align-items: center; gap: 10px; padding: 8px; font-weight: 700; font-size: 16px; }
+.brand-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(124, 92, 255, 0.15); border: 1px solid var(--accent); display: grid; place-items: center; color: var(--accent); }
+
 .nav-item {
-  display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 14px; border-radius: var(--radius);
-  color: var(--muted); font-size: 14px; font-weight: 500; text-align: right;
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border-radius: var(--radius);
+  color: var(--muted); font-size: 13.5px; font-weight: 500; text-align: left;
 }
 .nav-item:hover { background: var(--surface-2); color: var(--text); }
-.nav-item.active { background: var(--accent); color: #fff; font-weight: 600; box-shadow: 0 4px 20px rgba(124,92,255,0.3); }
+.nav-item.active { background: var(--accent); color: #fff; font-weight: 600; box-shadow: 0 4px 15px rgba(124,92,255,0.25); }
 .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); padding-top: 10px; }
 
 /* Main Area */
 .main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
 .topbar {
-  height: 65px; border-bottom: 1px solid var(--line); background: rgba(8, 10, 15, 0.8);
+  height: 60px; border-bottom: 1px solid var(--line); background: rgba(8, 10, 15, 0.8);
   backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 12px; z-index: 20;
 }
 .menu-btn { display: none; padding: 8px; border-radius: 8px; background: var(--surface-2); }
 .breadcrumbs { display: flex; align-items: center; gap: 6px; overflow-x: auto; flex: 1; color: var(--muted); font-size: 13px; }
-.crumb { color: var(--muted); padding: 4px 8px; border-radius: 6px; }
+.crumb { color: var(--muted); padding: 4px 6px; border-radius: 6px; cursor: pointer; }
 .crumb:hover { background: var(--surface-2); color: var(--text); }
-.crumb.active { color: var(--text); font-weight: 700; }
+.crumb.active { color: var(--text); font-weight: 600; }
 
 .search-input {
-  width: 200px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
-  padding: 8px 12px; font-size: 13px; outline: none;
+  width: 180px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 7px 12px; font-size: 13px; outline: none;
 }
 .search-input:focus { border-color: var(--accent); }
 
-.page { flex: 1; overflow-y: auto; padding: 20px; }
+.page { flex: 1; overflow-y: auto; padding: 16px; }
 
-/* Action Bar & Buttons */
-.action-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+/* Action Toolbar */
+.action-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
 .btn-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .btn {
-  display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px; border-radius: 10px;
+  display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 8px;
   background: var(--surface-2); border: 1px solid var(--line); font-size: 13px; font-weight: 500; color: var(--text);
 }
-.btn:hover { background: var(--surface-3); transform: translateY(-1px); }
+.btn:hover { background: var(--surface-3); }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
 .btn.primary:hover { background: var(--accent-hover); }
 .btn.danger { background: rgba(240, 82, 114, 0.15); border-color: var(--danger); color: var(--danger); }
 .btn.danger:hover { background: var(--danger); color: #fff; }
 
-/* Multi-Select Toolbar */
+/* Multi-Selection Bar */
 .selection-bar {
   display: none; align-items: center; justify-content: space-between; background: var(--accent);
-  color: #fff; padding: 10px 16px; border-radius: var(--radius); margin-bottom: 15px; animation: slideDown 0.2s ease;
+  color: #fff; padding: 10px 14px; border-radius: var(--radius); margin-bottom: 14px; animation: slideDown 0.2s ease;
 }
 .selection-bar.show { display: flex; }
 
 /* Grid Layout */
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
 .card {
   position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 14px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px;
-  user-select: none; animation: fadeIn 0.25s ease;
+  padding: 12px; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;
+  user-select: none; animation: fadeIn 0.2s ease;
 }
-.card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--shadow); }
+.card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
 .card.selected { border-color: var(--accent); background: rgba(124, 92, 255, 0.08); }
-.card-checkbox { position: absolute; top: 12px; right: 12px; width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; z-index: 2; }
-.card-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--surface-2); display: grid; place-items: center; margin-bottom: 10px; color: var(--accent); }
-.card-title { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-checkbox { position: absolute; top: 10px; right: 10px; width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; z-index: 2; }
+.card-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--surface-2); display: grid; place-items: center; margin-bottom: 8px; color: var(--accent); }
+.card-title { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .card-meta { font-size: 11px; color: var(--muted); margin-top: 4px; }
-.card-more { position: absolute; top: 10px; left: 10px; padding: 4px; border-radius: 6px; color: var(--muted); }
+.card-more { position: absolute; top: 8px; left: 8px; padding: 4px 8px; border-radius: 6px; color: var(--muted); }
 .card-more:hover { background: var(--surface-3); color: var(--text); }
 
 /* Context Menu */
 .context-menu {
-  position: fixed; background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px;
-  box-shadow: var(--shadow); padding: 6px; min-width: 180px; z-index: 200; display: none; animation: popIn 0.15s ease;
+  position: fixed; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: var(--shadow); padding: 4px; min-width: 170px; z-index: 200; display: none; animation: popIn 0.15s ease;
 }
 .context-menu button {
-  width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 12px; font-size: 13px;
-  border-radius: 8px; color: var(--text); text-align: right;
+  width: 100%; display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-size: 12.5px;
+  border-radius: 6px; color: var(--text); text-align: left;
 }
 .context-menu button:hover { background: var(--accent); color: #fff; }
-.context-menu button.danger-item:hover { background: var(--danger); }
 
 /* Modals */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
   display: none; align-items: center; justify-content: center; z-index: 300; padding: 15px; animation: fadeIn 0.15s ease;
 }
 .modal-overlay.show { display: flex; }
 .modal-box {
-  width: min(480px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
-  padding: 20px; box-shadow: var(--shadow); animation: scaleUp 0.18s ease;
+  width: min(440px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 18px; box-shadow: var(--shadow); animation: scaleUp 0.15s ease;
 }
-.modal-header { font-size: 17px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-.modal-body { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 18px; }
-.form-group { margin-bottom: 12px; }
-.form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
-.form-control { width: 100%; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px; color: #fff; outline: none; }
+.modal-header { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+.modal-body { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 16px; }
+.form-group { margin-bottom: 10px; }
+.form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.form-control { width: 100%; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; color: #fff; outline: none; }
 .form-control:focus { border-color: var(--accent); }
 
-/* Custom Code Editor Screen */
+/* Full Code Editor Screen */
 .editor-screen {
   position: fixed; inset: 0; background: var(--bg); z-index: 250; display: none; flex-direction: column; animation: fadeIn 0.2s ease;
 }
 .editor-screen.show { display: flex; }
-.editor-header { height: 60px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 10px; background: var(--surface); }
-.editor-container { flex: 1; display: flex; min-height: 0; position: relative; background: #090c11; }
+.editor-header { height: 55px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 0 14px; gap: 10px; background: var(--surface); }
+.editor-container { flex: 1; display: flex; min-height: 0; position: relative; background: #06080c; direction: ltr !important; }
 .line-numbers {
-  width: 50px; background: var(--surface); color: var(--muted); text-align: left; padding: 15px 8px;
-  font-family: monospace; font-size: 13px; line-height: 1.6; user-select: none; overflow: hidden; border-left: 1px solid var(--line);
+  width: 45px; background: var(--surface); color: var(--muted); text-align: right; padding: 12px 8px;
+  font-family: monospace; font-size: 13px; line-height: 1.5; user-select: none; overflow: hidden; border-right: 1px solid var(--line);
 }
 .code-area {
-  flex: 1; background: transparent !important; color: #eef2f7 !important; border: none; outline: none;
-  padding: 15px; font-family: monospace; font-size: 13px; line-height: 1.6; resize: none; white-space: pre; overflow: auto;
+  flex: 1; background: transparent !important; color: #f4f7fb !important; border: none; outline: none;
+  padding: 12px; font-family: monospace; font-size: 13px; line-height: 1.5; resize: none; white-space: pre; overflow: auto; text-align: left !important; direction: ltr !important;
 }
 
-/* Notes View Specifics */
-.notes-container { display: grid; grid-template-columns: 280px 1fr; gap: 16px; height: calc(100vh - 120px); }
-.notes-sidebar { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow-y: auto; padding: 10px; }
-.note-item { padding: 12px; border-radius: 10px; border: 1px solid transparent; margin-bottom: 6px; cursor: pointer; }
+/* Notes Section Styling */
+.notes-container { display: grid; grid-template-columns: 240px 1fr; gap: 14px; height: calc(100vh - 110px); }
+.notes-sidebar { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow-y: auto; padding: 8px; }
+.note-item { padding: 10px; border-radius: 8px; border: 1px solid transparent; margin-bottom: 4px; cursor: pointer; }
 .note-item:hover { background: var(--surface-2); }
 .note-item.active { background: var(--surface-3); border-color: var(--accent); }
-.note-item-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.note-item-title { font-weight: 600; font-size: 13px; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .note-item-snippet { font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.note-editor-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.note-editor-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 .note-textarea {
   flex: 1; background: var(--surface-2) !important; color: var(--text) !important; border: 1px solid var(--line);
-  border-radius: 10px; padding: 14px; resize: none; outline: none; font-size: 14px; line-height: 1.6;
+  border-radius: 8px; padding: 12px; resize: none; outline: none; font-size: 13.5px; line-height: 1.5;
 }
 
-/* Font Styles Customizations */
-.font-handwritten { font-family: 'Comic Sans MS', 'Chalkboard SE', cursive !important; }
-.font-gothic { font-family: 'Old English Text MT', 'Georgia', serif !important; }
-.font-classic { font-family: 'Times New Roman', Times, serif !important; }
-.font-mono { font-family: 'Courier New', Courier, monospace !important; }
+/* Font Variations */
+.font-handwritten { font-family: 'Comic Sans MS', cursive !important; }
+.font-gothic { font-family: 'Georgia', serif !important; }
+.font-classic { font-family: 'Times New Roman', serif !important; }
+.font-mono { font-family: 'Courier New', monospace !important; }
 .font-terminal { font-family: monospace !important; background: #000 !important; color: #00ff00 !important; }
 
-/* Toast Notifications */
+/* Toast Messages */
 .toast-msg {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
-  background: var(--surface-3); border: 1px solid var(--accent); color: #fff; padding: 10px 20px;
-  border-radius: 30px; font-size: 13px; box-shadow: var(--shadow); z-index: 400; opacity: 0; transition: all 0.25s ease;
+  background: var(--surface-3); border: 1px solid var(--accent); color: #fff; padding: 8px 18px;
+  border-radius: 20px; font-size: 12.5px; box-shadow: var(--shadow); z-index: 400; opacity: 0; transition: all 0.25s ease;
 }
 .toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-/* Keyframe Animations */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes scaleUp { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-/* Mobile Responsiveness */
 @media (max-width: 768px) {
-  .sidebar { position: fixed; right: -270px; top: 0; bottom: 0; transition: right 0.3s ease; box-shadow: var(--shadow); }
-  .sidebar.open { right: 0; }
+  .sidebar { position: fixed; left: -260px; top: 0; bottom: 0; transition: left 0.3s ease; box-shadow: var(--shadow); }
+  .sidebar.open { left: 0; }
   .menu-btn { display: block; }
-  .notes-container { grid-template-columns: 1fr; grid-template-rows: 180px 1fr; }
-  .search-input { width: 130px; }
-  .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .notes-container { grid-template-columns: 1fr; grid-template-rows: 150px 1fr; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -206,74 +201,73 @@ svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width:
   <!-- Sidebar Navigation -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="brand-mark"><svg viewBox="0 0 24 24"><path d="M4 7.5h6l1.7 2H20v9H4z"/><path d="M4 7.5V5.5h6l1.5 2"/></svg></div>
-      <span>إدارة الملفات Pro</span>
+      <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M4 7.5h6l1.7 2H20v9H4z"/><path d="M4 7.5V5.5h6l1.5 2"/></svg></div>
+      <span>File Manager Pro</span>
     </div>
-    <button class="nav-item active" data-view="files"><svg viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> ملفاتي</button>
-    <button class="nav-item" data-view="notes"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> المذكرات</button>
-    <button class="nav-item" data-view="trash"><svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> سلة المحذوفات</button>
+    <button class="nav-item active" data-view="files"><svg viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> My Files</button>
+    <button class="nav-item" data-view="notes"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Notes</button>
+    <button class="nav-item" data-view="trash"><svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> Trash Bin</button>
 
     <div class="sidebar-bottom">
-      <button class="nav-item" onclick="triggerImportFiles()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> استيراد ملفات</button>
-      <button class="nav-item" onclick="triggerImportFolder()"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><path d="M12 11v6M9 14h6"/></svg> استيراد مجلد</button>
+      <button class="nav-item" onclick="triggerImportFiles()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> Import Files</button>
+      <button class="nav-item" onclick="triggerImportFolder()"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><path d="M12 11v6M9 14h6"/></svg> Import Folder</button>
       <input type="file" id="filePicker" multiple hidden>
       <input type="file" id="folderPicker" webkitdirectory directory multiple hidden>
     </div>
   </aside>
 
-  <!-- Main View -->
+  <!-- Main Dashboard -->
   <main class="main">
     <header class="topbar">
       <button class="menu-btn" onclick="toggleSidebar()"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      <div class="breadcrumbs" id="breadcrumbs">/ الرئيسية</div>
-      <input type="text" class="search-input" id="searchInput" placeholder="بحث...">
+      <div class="breadcrumbs" id="breadcrumbs">Home</div>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search...">
     </header>
 
     <section class="page" id="pageContent"></section>
   </main>
 </div>
 
-<!-- Selection Action Bar -->
+<!-- Bulk Selection Toolbar -->
 <div class="selection-bar" id="selectionBar">
-  <span id="selectedCount">تم تحديد 0 عناصر</span>
+  <span id="selectedCount">0 Selected</span>
   <div class="btn-group">
-    <button class="btn" onclick="handleBulkDownload()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> تحميل</button>
-    <button class="btn" onclick="handleBulkZip()"><svg viewBox="0 0 24 24"><path d="M16 16v1a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h2m5.66 0H14a2 2 0 012 2v1"/></svg> ضغط ZIP</button>
-    <button class="btn" onclick="handleBulkMove()"><svg viewBox="0 0 24 24"><path d="M5 9l4 4 4-4M9 13V3"/></svg> نقل</button>
-    <button class="btn danger" onclick="handleBulkDelete()"><svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg> حذف</button>
+    <button class="btn" onclick="handleBulkDownload()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Download</button>
+    <button class="btn" onclick="handleBulkZip()"><svg viewBox="0 0 24 24"><path d="M16 16v1a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h2"/></svg> Compress ZIP</button>
+    <button class="btn danger" onclick="handleBulkDelete()"><svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg> Delete</button>
   </div>
 </div>
 
 <!-- Context Menu -->
 <div class="context-menu" id="contextMenu"></div>
 
-<!-- Custom Modal Dialog -->
+<!-- Custom Dialog Modal -->
 <div class="modal-overlay" id="customModal">
   <div class="modal-box">
-    <div class="modal-header" id="modalTitle">عنوان التنبيه</div>
-    <div class="modal-body" id="modalBody">محتوى التنبيه هنا...</div>
+    <div class="modal-header" id="modalTitle">Notice</div>
+    <div class="modal-body" id="modalBody">Message text...</div>
     <div class="btn-group" id="modalFooter" style="justify-content: flex-end;"></div>
   </div>
 </div>
 
-<!-- Editor Overlay -->
+<!-- Full Editor Screen -->
 <div class="editor-screen" id="editorScreen">
   <div class="editor-header">
     <div style="display:flex; align-items:center; gap:8px;">
-      <button class="btn" onclick="closeEditor()"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> رجوع</button>
-      <input type="text" id="editorFileName" class="form-control" style="width:180px; padding:5px 8px;">
+      <button class="btn" onclick="closeEditor()"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back</button>
+      <input type="text" id="editorFileName" class="form-control" style="width:160px; padding:4px 8px;">
     </div>
     <div class="btn-group">
       <select id="editorStyleSelect" class="btn" onchange="changeEditorStyle(this.value)">
-        <option value="normal">عادي</option>
-        <option value="handwritten">يدوي</option>
-        <option value="gothic">قوطي</option>
-        <option value="classic">كلاسيك</option>
+        <option value="normal">Normal</option>
+        <option value="handwritten">Handwritten</option>
+        <option value="gothic">Gothic</option>
+        <option value="classic">Classic</option>
         <option value="mono">Monospace</option>
         <option value="terminal">Terminal</option>
       </select>
-      <button class="btn danger" onclick="clearEditorContent()">مسح الكل</button>
-      <button class="btn primary" onclick="saveEditorContent()">حفظ</button>
+      <button class="btn danger" onclick="clearEditorContent()">Clear All</button>
+      <button class="btn primary" onclick="saveEditorContent()">Save</button>
     </div>
   </div>
   <div class="editor-container">
@@ -282,11 +276,9 @@ svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width:
   </div>
 </div>
 
-<!-- Toast Message -->
-<div class="toast-msg" id="toast">تم الإجراء بنجاح</div>
+<div class="toast-msg" id="toast">Action Completed</div>
 
 <script>
-// DB State & Architecture
 const DB_NAME = "FileManagerProDB";
 const DB_VERSION = 2;
 let db = null;
@@ -296,10 +288,9 @@ let currentFolderId = null;
 let currentNoteFolderId = null;
 let selectedItems = new Set();
 let activeEditorFile = null;
-let isDirty = false; // Tracks unsaved changes
-let historyStack = [];
+let isDirty = false;
 
-// Initialize IndexedDB
+// IndexedDB Bootstrapping
 function initDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
@@ -314,7 +305,6 @@ function initDB() {
   });
 }
 
-// DB Helpers
 const dbCall = (storeName, mode, cb) => new Promise((resolve, reject) => {
   const tx = db.transaction(storeName, mode);
   const store = tx.objectStore(storeName);
@@ -328,10 +318,9 @@ const getItem = (id, store="items") => dbCall(store, "readonly", s => s.get(id))
 const saveItem = (item, store="items") => dbCall(store, "readwrite", s => s.put(item));
 const removeItem = (id, store="items") => dbCall(store, "readwrite", s => s.delete(id));
 
-// Unique ID Generator
 const uid = () => Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 
-// Navigation & View Routing
+// Navigation
 function switchView(view) {
   currentView = view;
   selectedItems.clear();
@@ -350,11 +339,9 @@ document.querySelectorAll(".nav-item[data-view]").forEach(b => {
   b.addEventListener("click", () => switchView(b.dataset.view));
 });
 
-function toggleSidebar() {
-  document.getElementById("sidebar").classList.toggle("open");
-}
+function toggleSidebar() { document.getElementById("sidebar").classList.toggle("open"); }
 
-// Custom Modal System
+// Modal Helper System
 function showCustomModal(title, bodyHTML, buttons = []) {
   document.getElementById("modalTitle").textContent = title;
   document.getElementById("modalBody").innerHTML = bodyHTML;
@@ -372,14 +359,12 @@ function showCustomModal(title, bodyHTML, buttons = []) {
   document.getElementById("customModal").classList.add("show");
 }
 
-function closeCustomModal() {
-  document.getElementById("customModal").classList.remove("show");
-}
+function closeCustomModal() { document.getElementById("customModal").classList.remove("show"); }
 
 function customConfirm(title, message, onConfirm) {
   showCustomModal(title, message, [
-    { label: "إلغاء", class: "" },
-    { label: "تأكيد", class: "danger", onClick: onConfirm }
+    { label: "Cancel", class: "" },
+    { label: "Confirm", class: "danger", onClick: onConfirm }
   ]);
 }
 
@@ -390,8 +375,8 @@ function customPrompt(title, label, defaultValue, onSubmit) {
       <input type="text" id="promptInput" class="form-control" value="${defaultValue}">
     </div>`;
   showCustomModal(title, html, [
-    { label: "إلغاء", class: "" },
-    { label: "حفظ", class: "primary", onClick: () => {
+    { label: "Cancel", class: "" },
+    { label: "Save", class: "primary", onClick: () => {
       const val = document.getElementById("promptInput").value.trim();
       if(val) onSubmit(val);
     }}
@@ -406,7 +391,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove("show"), 2500);
 }
 
-// Multi-Selection System
+// Multi Selection Actions
 function toggleSelectItem(id) {
   if (selectedItems.has(id)) selectedItems.delete(id);
   else selectedItems.add(id);
@@ -418,27 +403,26 @@ function updateSelectionBar() {
   const bar = document.getElementById("selectionBar");
   if (selectedItems.size > 0) {
     bar.classList.add("show");
-    document.getElementById("selectedCount").textContent = `تم تحديد ${selectedItems.size} عنصر`;
+    document.getElementById("selectedCount").textContent = `${selectedItems.size} Items Selected`;
   } else {
     bar.classList.remove("show");
   }
 }
 
-// Files Management Rendering
+// Files Renderer
 async function renderFilesView() {
   const page = document.getElementById("pageContent");
   const items = await getItems("items");
   const currentItems = items.filter(i => (i.parent || null) === currentFolderId);
   
-  // Breadcrumbs
   await updateBreadcrumbs();
 
   page.innerHTML = `
     <div class="action-bar">
       <div class="btn-group">
-        <button class="btn primary" onclick="createFolder()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> مجلد جديد</button>
-        <button class="btn" onclick="createFile()"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/></svg> ملف جديد</button>
-        <button class="btn" onclick="compressCurrentFolder()"><svg viewBox="0 0 24 24"><path d="M16 16v1a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h2"/></svg> ضغط المجلد الحقيقي</button>
+        <button class="btn primary" onclick="createFolder()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> New Folder</button>
+        <button class="btn" onclick="createFile()"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/></svg> New File</button>
+        <button class="btn" onclick="compressCurrentFolder()"><svg viewBox="0 0 24 24"><path d="M16 16v1a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h2"/></svg> Compress Folder</button>
       </div>
     </div>
     <div class="grid" id="fileGrid"></div>
@@ -449,7 +433,7 @@ async function renderFilesView() {
   const filtered = currentItems.filter(i => i.name.toLowerCase().includes(query));
 
   if (filtered.length === 0) {
-    grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--muted);">المجلد فارغ</div>`;
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--muted);">Folder is empty</div>`;
     return;
   }
 
@@ -459,7 +443,7 @@ async function renderFilesView() {
       <button class="card-more" onclick="event.stopPropagation(); openContextMenu(event, '${item.id}')">⋮</button>
       <div class="card-icon">${getItemIcon(item)}</div>
       <div class="card-title">${escapeHTML(item.name)}</div>
-      <div class="card-meta">${item.type === 'folder' ? 'مجلد' : formatSize(item.size || 0)}</div>
+      <div class="card-meta">${item.type === 'folder' ? 'Folder' : formatSize(item.size || 0)}</div>
     </div>
   `).join("");
 }
@@ -472,7 +456,7 @@ function getItemIcon(item) {
 
 async function updateBreadcrumbs() {
   const container = document.getElementById("breadcrumbs");
-  let path = [{ id: null, name: "الرئيسية" }];
+  let path = [{ id: null, name: "Home" }];
   let curr = currentFolderId;
   while(curr) {
     const item = await getItem(curr, "items");
@@ -497,9 +481,9 @@ function handleCardClick(event, id, type) {
   } else {
     getItem(id, "items").then(item => {
       if (item.name.endsWith('.zip')) {
-        showCustomModal("تنبيه ملف مضغوط", "هذا الملف مضغوط بصيغة ZIP. يجب عليك فك الضغط لاستعراض الملفات بالداخل.", [
-          { label: "إلغاء", class: "" },
-          { label: "فك الضغط الآن", class: "primary", onClick: () => extractZip(id) }
+        showCustomModal("Compressed ZIP File", "This is a ZIP archive. You need to extract its content first.", [
+          { label: "Cancel", class: "" },
+          { label: "Extract ZIP Now", class: "primary", onClick: () => extractZip(id) }
         ]);
       } else {
         openEditor(item);
@@ -510,7 +494,7 @@ function handleCardClick(event, id, type) {
 
 // File Operations
 function createFile() {
-  customPrompt("إنشاء ملف جديد", "اسم الملف مع الامتداد", "untitled.txt", async (name) => {
+  customPrompt("Create New File", "Filename with extension", "untitled.txt", async (name) => {
     const item = {
       id: uid(), name, type: "file", parent: currentFolderId,
       content: "", size: 0, style: "normal", createdAt: Date.now()
@@ -522,24 +506,24 @@ function createFile() {
 }
 
 function createFolder() {
-  customPrompt("إنشاء مجلد جديد", "اسم المجلد", "مجلد جديد", async (name) => {
+  customPrompt("Create New Folder", "Folder Name", "New Folder", async (name) => {
     const item = {
       id: uid(), name, type: "folder", parent: currentFolderId, createdAt: Date.now()
     };
     await saveItem(item, "items");
     renderFilesView();
-    showToast("تم إنشاء المجلد");
+    showToast("Folder Created");
   });
 }
 
-// ZIP Compression & Extraction System
+// ZIP Compression & Unzipping
 async function compressCurrentFolder() {
-  if (typeof JSZip === "undefined") return showToast("جاري تحميل مكتبة الضغط...");
+  if (typeof JSZip === "undefined") return showToast("JSZip Library Loading...");
   const zip = new JSZip();
   const items = await getItems("items");
   const children = items.filter(i => (i.parent || null) === currentFolderId);
 
-  if (children.length === 0) return showToast("المجلد فارغ لا يمكن ضغطه");
+  if (children.length === 0) return showToast("Folder is empty");
 
   for (const item of children) {
     if (item.type === "file") zip.file(item.name, item.content || "");
@@ -552,7 +536,7 @@ async function compressCurrentFolder() {
   };
   await saveItem(zipItem, "items");
   renderFilesView();
-  showToast("تم ضغط المجلد بنجاح");
+  showToast("Folder Compressed to ZIP");
 }
 
 async function extractZip(id) {
@@ -561,8 +545,7 @@ async function extractZip(id) {
 
   try {
     const zip = await JSZip.loadAsync(item.content, { base64: true });
-    // Create actual extracted directory
-    const folderName = item.name.replace('.zip', '') + '_مستخرج';
+    const folderName = item.name.replace('.zip', '') + '_extracted';
     const folderId = uid();
     await saveItem({ id: folderId, name: folderName, type: "folder", parent: currentFolderId, createdAt: Date.now() }, "items");
 
@@ -576,13 +559,13 @@ async function extractZip(id) {
       }
     }
     renderFilesView();
-    showToast("تم فك الضغط داخل مجلد جديد بنجاح");
+    showToast("ZIP Extracted Successfully");
   } catch (err) {
-    showToast("حدث خطأ أثناء فك الضغط");
+    showToast("Error Extracing ZIP");
   }
 }
 
-// Import Handlers
+// Imports
 function triggerImportFiles() { document.getElementById("filePicker").click(); }
 function triggerImportFolder() { document.getElementById("folderPicker").click(); }
 
@@ -596,7 +579,7 @@ document.getElementById("filePicker").addEventListener("change", async (e) => {
     }, "items");
   }
   renderFilesView();
-  showToast("تم استيراد الملفات");
+  showToast("Files Imported");
 });
 
 document.getElementById("folderPicker").addEventListener("change", async (e) => {
@@ -624,23 +607,22 @@ document.getElementById("folderPicker").addEventListener("change", async (e) => 
     }, "items");
   }
   renderFilesView();
-  showToast("تم استيراد المجلد بالكامل");
+  showToast("Folder Imported Successfully");
 });
 
-// Item Context Menu & File Info Modal
+// Context Menu & File Info Modal
 function openContextMenu(e, id) {
   e.preventDefault();
   const menu = document.getElementById("contextMenu");
   menu.innerHTML = `
-    <button onclick="showInfoModal('${id}')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> معلومات التفاصيل</button>
-    <button onclick="renameItemDialog('${id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> إعادة تسمية</button>
-    <button onclick="moveItemDialog('${id}')"><svg viewBox="0 0 24 24"><path d="M5 9l4 4 4-4M9 13V3"/></svg> نقل</button>
-    <button class="danger-item" onclick="deleteItemSingle('${id}')"><svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg> حذف إلى السلة</button>
+    <button onclick="showInfoModal('${id}')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Detailed Info</button>
+    <button onclick="renameItemDialog('${id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Rename</button>
+    <button class="danger-item" onclick="deleteItemSingle('${id}')"><svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg> Move to Trash</button>
   `;
 
   menu.style.display = "block";
   menu.style.top = Math.min(e.clientY, window.innerHeight - 150) + "px";
-  menu.style.left = Math.min(e.clientX, window.innerWidth - 200) + "px";
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 180) + "px";
 }
 
 document.addEventListener("click", () => document.getElementById("contextMenu").style.display = "none");
@@ -656,41 +638,41 @@ async function showInfoModal(id) {
     const subFiles = all.filter(i => i.parent === id && i.type !== "folder").length;
     const subFolders = all.filter(i => i.parent === id && i.type === "folder").length;
     details = `
-      <b>نوع العنصر:</b> مجلد<br>
-      <b>الاسم:</b> ${escapeHTML(item.name)}<br>
-      <b>يحتوي على:</b> ${subFiles} ملفات، و ${subFolders} مجلدات فرعية.
+      <b>Type:</b> Folder<br>
+      <b>Name:</b> ${escapeHTML(item.name)}<br>
+      <b>Contains:</b> ${subFiles} files, ${subFolders} folders
     `;
   } else {
     const text = item.content || "";
     const lines = text.split("\n").length;
     const chars = text.length;
     details = `
-      <b>نوع العنصر:</b> ملف<br>
-      <b>الاسم:</b> ${escapeHTML(item.name || item.title)}<br>
-      <b>عدد الحروف:</b> ${chars} حرف<br>
-      <b>عدد الأسطر:</b> ${lines} سطر<br>
-      <b>الحجم:</b> ${formatSize(chars)}
+      <b>Type:</b> File<br>
+      <b>Name:</b> ${escapeHTML(item.name || item.title)}<br>
+      <b>Characters:</b> ${chars}<br>
+      <b>Lines:</b> ${lines}<br>
+      <b>Size:</b> ${formatSize(chars)}
     `;
   }
 
-  showCustomModal("معلومات تفصيلية", details, [{ label: "حسناً", class: "primary" }]);
+  showCustomModal("Item Details", details, [{ label: "Close", class: "primary" }]);
 }
 
 function renameItemDialog(id) {
   const store = currentView === "notes" ? "notes" : "items";
   getItem(id, store).then(item => {
-    customPrompt("إعادة التسمية", "الاسم الجديد", item.name || item.title, async (newName) => {
+    customPrompt("Rename Item", "New Name", item.name || item.title, async (newName) => {
       if(item.name) item.name = newName;
       if(item.title) item.title = newName;
       await saveItem(item, store);
       refreshCurrentView();
-      showToast("تمت إعادة التسمية");
+      showToast("Renamed Successfully");
     });
   });
 }
 
 function deleteItemSingle(id) {
-  customConfirm("تأكيد الحذف", "هل أنت تأكد من نقل هذا العنصر إلى سلة المحذوفات؟", async () => {
+  customConfirm("Confirm Delete", "Are you sure you want to move this item to Trash?", async () => {
     const store = currentView === "notes" ? "notes" : "items";
     const item = await getItem(id, store);
     if(item) {
@@ -699,72 +681,68 @@ function deleteItemSingle(id) {
       await saveItem(item, "trash");
       await removeItem(id, store);
       refreshCurrentView();
-      showToast("تم النقل للسلة");
+      showToast("Moved to Trash");
     }
   });
 }
 
-// Bulk Actions
-async function handleBulkDelete() {
-  customConfirm("حذف العناصر المحددة", "هل تريد نقل جميع العناصر المحددة للسلة؟", async () => {
-    const store = currentView === "notes" ? "notes" : "items";
-    for(let id of selectedItems) {
-      const item = await getItem(id, store);
-      if(item) {
-        item.deletedAt = Date.now();
-        item.originalStore = store;
-        await saveItem(item, "trash");
-        await removeItem(id, store);
-      }
-    }
-    selectedItems.clear();
-    updateSelectionBar();
-    refreshCurrentView();
-    showToast("تم حذف العناصر المحددة");
-  });
-}
-
-// Notes Section & Editor
+// Notes System & Folders
 async function renderNotesView() {
   const page = document.getElementById("pageContent");
   const notes = await getItems("notes");
+  const currentNotes = notes.filter(n => (n.parent || null) === currentNoteFolderId);
 
   page.innerHTML = `
     <div class="action-bar">
       <div class="btn-group">
-        <button class="btn primary" onclick="createNote()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> ملاحظة جديدة</button>
-        <button class="btn" onclick="createNoteFolder()"><svg viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> مجلد ملاحظات</button>
+        <button class="btn primary" onclick="createNote()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> New Note</button>
+        <button class="btn" onclick="createNoteFolder()"><svg viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> New Note Folder</button>
       </div>
     </div>
     <div class="notes-container">
       <div class="notes-sidebar" id="notesList"></div>
       <div class="note-editor-panel" id="notePanel">
-        <div style="text-align:center; color: var(--muted); padding-top: 50px;">اختر ملاحظة للتعديل عليها</div>
+        <div style="text-align:center; color: var(--muted); padding-top: 50px;">Select a note to edit</div>
       </div>
     </div>
   `;
 
-  renderNotesList(notes);
+  renderNotesList(currentNotes);
 }
 
 function renderNotesList(notes) {
   const list = document.getElementById("notesList");
   if (notes.length === 0) {
-    list.innerHTML = `<div style="text-align:center; color: var(--muted); padding: 20px;">لا توجد ملاحظات</div>`;
+    list.innerHTML = `<div style="text-align:center; color: var(--muted); padding: 20px;">No Notes Found</div>`;
     return;
   }
 
   list.innerHTML = notes.map(n => `
-    <div class="note-item" onclick="openNoteEditor('${n.id}')">
-      <div class="note-item-title">${escapeHTML(n.title || "بدون عنوان")}</div>
-      <div class="note-item-snippet">${escapeHTML(n.content || "ملاحظة فارغة...")}</div>
+    <div class="note-item" onclick="${n.type === 'folder' ? `openNoteFolder('${n.id}')` : `openNoteEditor('${n.id}')`}">
+      <div class="note-item-title">${n.type === 'folder' ? '📁 ' : ''}${escapeHTML(n.title || n.name || "Untitled")}</div>
+      <div class="note-item-snippet">${n.type === 'folder' ? 'Folder' : escapeHTML(n.content || "Empty...")}</div>
     </div>
   `).join("");
 }
 
+function createNoteFolder() {
+  customPrompt("Create Note Folder", "Folder Name", "Notes Folder", async (name) => {
+    const item = { id: uid(), name, title: name, type: "folder", parent: currentNoteFolderId, createdAt: Date.now() };
+    await saveItem(item, "notes");
+    renderNotesView();
+    showToast("Note Folder Created");
+  });
+}
+
+function openNoteFolder(id) {
+  currentNoteFolderId = id;
+  renderNotesView();
+}
+
 async function createNote() {
   const note = {
-    id: uid(), title: "ملاحظة جديدة", content: "", fontStyle: "normal", createdAt: Date.now()
+    id: uid(), title: "New Note", type: "note", parent: currentNoteFolderId,
+    content: "", fontStyle: "normal", createdAt: Date.now()
   };
   await saveItem(note, "notes");
   renderNotesView();
@@ -773,32 +751,31 @@ async function createNote() {
 
 async function openNoteEditor(id) {
   const note = await getItem(id, "notes");
-  if (!note) return;
+  if (!note || note.type === "folder") return;
 
   const panel = document.getElementById("notePanel");
   panel.innerHTML = `
     <div style="display:flex; gap:10px; align-items:center;">
-      <input type="text" id="noteTitleInput" class="form-control" value="${escapeHTML(note.title)}" placeholder="عنوان الملاحظة">
+      <input type="text" id="noteTitleInput" class="form-control" value="${escapeHTML(note.title)}" placeholder="Note Title">
       <select id="noteFontSelect" class="btn" onchange="applyNoteFont(this.value)">
-        <option value="normal" ${note.fontStyle==='normal'?'selected':''}>عادي</option>
-        <option value="handwritten" ${note.fontStyle==='handwritten'?'selected':''}>يدوي</option>
-        <option value="gothic" ${note.fontStyle==='gothic'?'selected':''}>قوطي</option>
-        <option value="classic" ${note.fontStyle==='classic'?'selected':''}>كلاسيك</option>
+        <option value="normal" ${note.fontStyle==='normal'?'selected':''}>Normal</option>
+        <option value="handwritten" ${note.fontStyle==='handwritten'?'selected':''}>Handwritten</option>
+        <option value="gothic" ${note.fontStyle==='gothic'?'selected':''}>Gothic</option>
+        <option value="classic" ${note.fontStyle==='classic'?'selected':''}>Classic</option>
         <option value="mono" ${note.fontStyle==='mono'?'selected':''}>Monospace</option>
       </select>
     </div>
-    <textarea id="noteBody" class="note-textarea font-${note.fontStyle || 'normal'}" placeholder="اكتب مذكراتك هنا...">${escapeHTML(note.content)}</textarea>
+    <textarea id="noteBody" class="note-textarea font-${note.fontStyle || 'normal'}" placeholder="Type your notes here...">${escapeHTML(note.content)}</textarea>
     <div class="btn-group" style="justify-content: flex-end;">
-      <button class="btn danger" onclick="clearNoteContent()">مسح الكل</button>
-      <button class="btn danger" onclick="deleteItemSingle('${note.id}')">حذف</button>
-      <button class="btn primary" onclick="saveActiveNote('${note.id}')">حفظ الملاحظة</button>
+      <button class="btn danger" onclick="clearNoteContent()">Clear Text</button>
+      <button class="btn danger" onclick="deleteItemSingle('${note.id}')">Delete</button>
+      <button class="btn primary" onclick="saveActiveNote('${note.id}')">Save Note</button>
     </div>
   `;
 }
 
 function applyNoteFont(font) {
-  const area = document.getElementById("noteBody");
-  area.className = `note-textarea font-${font}`;
+  document.getElementById("noteBody").className = `note-textarea font-${font}`;
 }
 
 function clearNoteContent() {
@@ -813,10 +790,10 @@ async function saveActiveNote(id) {
   note.fontStyle = document.getElementById("noteFontSelect").value;
   await saveItem(note, "notes");
   renderNotesView();
-  showToast("تم حفظ الملاحظة بالخط المحدد لها");
+  showToast("Note Saved");
 }
 
-// Code Editor Window Code & Synchronized Line Numbers
+// Text & Code Editor Screen
 function openEditor(file) {
   activeEditorFile = file;
   isDirty = false;
@@ -827,13 +804,12 @@ function openEditor(file) {
   document.getElementById("editorScreen").classList.add("show");
   updateLineNumbers();
 
-  // Push State for Mobile Back Button Handle
   history.pushState({ inEditor: true }, "");
 }
 
 function closeEditor() {
   if (isDirty) {
-    customConfirm("تغييرات غير محفوظة", "هل تريد الخروج بدون حفظ التغييرات؟", () => {
+    customConfirm("Unsaved Changes", "Are you sure you want to exit without saving?", () => {
       document.getElementById("editorScreen").classList.remove("show");
       activeEditorFile = null;
     });
@@ -844,8 +820,7 @@ function closeEditor() {
 }
 
 function changeEditorStyle(style) {
-  const codeArea = document.getElementById("codeArea");
-  codeArea.className = `code-area font-${style}`;
+  document.getElementById("codeArea").className = `code-area font-${style}`;
 }
 
 function clearEditorContent() {
@@ -863,8 +838,7 @@ function updateLineNumbers() {
 
 function syncScroll() {
   const codeArea = document.getElementById("codeArea");
-  const lineNumbers = document.getElementById("lineNumbers");
-  lineNumbers.scrollTop = codeArea.scrollTop;
+  document.getElementById("lineNumbers").scrollTop = codeArea.scrollTop;
 }
 
 async function saveEditorContent() {
@@ -876,11 +850,11 @@ async function saveEditorContent() {
 
   await saveItem(activeEditorFile, "items");
   isDirty = false;
-  showToast("تم حفظ الملف بنجاح");
+  showToast("File Saved Successfully");
   renderFilesView();
 }
 
-// Trash Bin Management
+// Trash Bin
 async function renderTrashView() {
   const page = document.getElementById("pageContent");
   const trashItems = await getItems("trash");
@@ -888,8 +862,8 @@ async function renderTrashView() {
   page.innerHTML = `
     <div class="action-bar">
       <div class="btn-group">
-        <button class="btn primary" onclick="restoreAllTrash()">استعادة الكل</button>
-        <button class="btn danger" onclick="emptyTrashAll()">حذف الكل نهائياً</button>
+        <button class="btn primary" onclick="restoreAllTrash()">Restore All</button>
+        <button class="btn danger" onclick="emptyTrashAll()">Empty Trash</button>
       </div>
     </div>
     <div class="grid" id="trashGrid"></div>
@@ -897,7 +871,7 @@ async function renderTrashView() {
 
   const grid = document.getElementById("trashGrid");
   if (trashItems.length === 0) {
-    grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--muted);">سلة المحذوفات فارغة</div>`;
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--muted);">Trash Bin is empty</div>`;
     return;
   }
 
@@ -906,8 +880,8 @@ async function renderTrashView() {
       <div class="card-icon">${getItemIcon(item)}</div>
       <div class="card-title">${escapeHTML(item.name || item.title)}</div>
       <div class="btn-group" style="margin-top:10px;">
-        <button class="btn" onclick="restoreTrashItem('${item.id}')">استعادة</button>
-        <button class="btn danger" onclick="deleteTrashPermanent('${item.id}')">حذف نهائي</button>
+        <button class="btn" onclick="restoreTrashItem('${item.id}')">Restore</button>
+        <button class="btn danger" onclick="deleteTrashPermanent('${item.id}')">Delete Permanently</button>
       </div>
     </div>
   `).join("");
@@ -922,15 +896,15 @@ async function restoreTrashItem(id) {
     await saveItem(item, targetStore);
     await removeItem(id, "trash");
     renderTrashView();
-    showToast("تم استعادة العنصر بنجاح");
+    showToast("Item Restored");
   }
 }
 
 async function deleteTrashPermanent(id) {
-  customConfirm("حذف نهائي", "هل أنت أصلًا متاكد من حذف العنصر نهائيًا؟ لا يمكن تراجعه.", async () => {
+  customConfirm("Permanent Delete", "Are you sure you want to delete this permanently?", async () => {
     await removeItem(id, "trash");
     renderTrashView();
-    showToast("تم الحذف النهائي");
+    showToast("Deleted Permanently");
   });
 }
 
@@ -944,19 +918,38 @@ async function restoreAllTrash() {
     await removeItem(item.id, "trash");
   }
   renderTrashView();
-  showToast("تم استعادة جميع العناصر");
+  showToast("All Restored");
 }
 
 async function emptyTrashAll() {
-  customConfirm("تفريغ السلة", "هل تريد تفريغ سلة المحذوفات بالكامل؟", async () => {
+  customConfirm("Empty Trash", "Are you sure you want to empty the trash completely?", async () => {
     const items = await getItems("trash");
     for(let item of items) await removeItem(item.id, "trash");
     renderTrashView();
-    showToast("تم تفريغ السلة بالكامل");
+    showToast("Trash Emptied");
   });
 }
 
-// Helpers & Event Listeners
+// Bulk Helpers
+async function handleBulkDelete() {
+  customConfirm("Delete Selected", "Move selected items to Trash?", async () => {
+    const store = currentView === "notes" ? "notes" : "items";
+    for(let id of selectedItems) {
+      const item = await getItem(id, store);
+      if(item) {
+        item.deletedAt = Date.now();
+        item.originalStore = store;
+        await saveItem(item, "trash");
+        await removeItem(id, store);
+      }
+    }
+    selectedItems.clear();
+    updateSelectionBar();
+    refreshCurrentView();
+    showToast("Selected Items Deleted");
+  });
+}
+
 function refreshCurrentView() {
   if (currentView === "files") renderFilesView();
   else if (currentView === "notes") renderNotesView();
@@ -974,14 +967,14 @@ function escapeHTML(str) {
   return String(str || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 }
 
-// Mobile Back Button Event Handler
+// Mobile Back Listener
 window.addEventListener("popstate", (e) => {
   if (document.getElementById("editorScreen").classList.contains("show")) {
     closeEditor();
   }
 });
 
-// Boot App
+// App Start
 initDB().then(() => {
   switchView("files");
 });
