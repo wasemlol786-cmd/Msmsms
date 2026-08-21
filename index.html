@@ -1,983 +1,430 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0a0d12">
-<title>Pro File & Note Manager</title>
-<style>
-:root {
-  --bg: #080a0f;
-  --surface: #0e1219;
-  --surface-2: #131923;
-  --surface-3: #181f2b;
-  --line: #242d3a;
-  --text: #f4f7fb;
-  --muted: #8d98aa;
-  --accent: #7c5cff;
-  --accent-hover: #896cff;
-  --danger: #f05272;
-  --radius: 12px;
-  --shadow: 0 20px 50px rgba(0,0,0,.5);
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; transition: background-color .2s ease, border-color .2s ease, transform .15s ease; }
-html, body { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; }
-
-/* Scrollbars */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-thumb { background: var(--line); border-radius: 10px; }
-::-webkit-scrollbar-track { background: transparent; }
-
-button, input, textarea, select { font: inherit; color: inherit; }
-button { cursor: pointer; border: none; background: none; }
-svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-
-.app { height: 100%; display: flex; position: relative; }
-
-/* Sidebar & Mobile Drawer */
-.sidebar {
-  width: 250px; flex: 0 0 250px; border-right: 1px solid var(--line); background: var(--surface);
-  padding: 16px 12px; display: flex; flex-direction: column; gap: 8px; z-index: 50;
-}
-.brand { display: flex; align-items: center; gap: 10px; padding: 8px; font-weight: 700; font-size: 16px; }
-.brand-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(124, 92, 255, 0.15); border: 1px solid var(--accent); display: grid; place-items: center; color: var(--accent); }
-
-.nav-item {
-  display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border-radius: var(--radius);
-  color: var(--muted); font-size: 13.5px; font-weight: 500; text-align: left;
-}
-.nav-item:hover { background: var(--surface-2); color: var(--text); }
-.nav-item.active { background: var(--accent); color: #fff; font-weight: 600; box-shadow: 0 4px 15px rgba(124,92,255,0.25); }
-.sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); padding-top: 10px; }
-
-/* Main Area */
-.main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
-.topbar {
-  height: 60px; border-bottom: 1px solid var(--line); background: rgba(8, 10, 15, 0.8);
-  backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 12px; z-index: 20;
-}
-.menu-btn { display: none; padding: 8px; border-radius: 8px; background: var(--surface-2); }
-.breadcrumbs { display: flex; align-items: center; gap: 6px; overflow-x: auto; flex: 1; color: var(--muted); font-size: 13px; }
-.crumb { color: var(--muted); padding: 4px 6px; border-radius: 6px; cursor: pointer; }
-.crumb:hover { background: var(--surface-2); color: var(--text); }
-.crumb.active { color: var(--text); font-weight: 600; }
-
-.search-input {
-  width: 180px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
-  padding: 7px 12px; font-size: 13px; outline: none;
-}
-.search-input:focus { border-color: var(--accent); }
-
-.page { flex: 1; overflow-y: auto; padding: 16px; }
-
-/* Action Toolbar */
-.action-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
-.btn-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.btn {
-  display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 8px;
-  background: var(--surface-2); border: 1px solid var(--line); font-size: 13px; font-weight: 500; color: var(--text);
-}
-.btn:hover { background: var(--surface-3); }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.btn.primary:hover { background: var(--accent-hover); }
-.btn.danger { background: rgba(240, 82, 114, 0.15); border-color: var(--danger); color: var(--danger); }
-.btn.danger:hover { background: var(--danger); color: #fff; }
-
-/* Multi-Selection Bar */
-.selection-bar {
-  display: none; align-items: center; justify-content: space-between; background: var(--accent);
-  color: #fff; padding: 10px 14px; border-radius: var(--radius); margin-bottom: 14px; animation: slideDown 0.2s ease;
-}
-.selection-bar.show { display: flex; }
-
-/* Grid Layout */
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-.card {
-  position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 12px; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;
-  user-select: none; animation: fadeIn 0.2s ease;
-}
-.card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
-.card.selected { border-color: var(--accent); background: rgba(124, 92, 255, 0.08); }
-.card-checkbox { position: absolute; top: 10px; right: 10px; width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; z-index: 2; }
-.card-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--surface-2); display: grid; place-items: center; margin-bottom: 8px; color: var(--accent); }
-.card-title { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card-meta { font-size: 11px; color: var(--muted); margin-top: 4px; }
-.card-more { position: absolute; top: 8px; left: 8px; padding: 4px 8px; border-radius: 6px; color: var(--muted); }
-.card-more:hover { background: var(--surface-3); color: var(--text); }
-
-/* Context Menu */
-.context-menu {
-  position: fixed; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
-  box-shadow: var(--shadow); padding: 4px; min-width: 170px; z-index: 200; display: none; animation: popIn 0.15s ease;
-}
-.context-menu button {
-  width: 100%; display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-size: 12.5px;
-  border-radius: 6px; color: var(--text); text-align: left;
-}
-.context-menu button:hover { background: var(--accent); color: #fff; }
-
-/* Modals */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
-  display: none; align-items: center; justify-content: center; z-index: 300; padding: 15px; animation: fadeIn 0.15s ease;
-}
-.modal-overlay.show { display: flex; }
-.modal-box {
-  width: min(440px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
-  padding: 18px; box-shadow: var(--shadow); animation: scaleUp 0.15s ease;
-}
-.modal-header { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
-.modal-body { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 16px; }
-.form-group { margin-bottom: 10px; }
-.form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-.form-control { width: 100%; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; color: #fff; outline: none; }
-.form-control:focus { border-color: var(--accent); }
-
-/* Full Code Editor Screen */
-.editor-screen {
-  position: fixed; inset: 0; background: var(--bg); z-index: 250; display: none; flex-direction: column; animation: fadeIn 0.2s ease;
-}
-.editor-screen.show { display: flex; }
-.editor-header { height: 55px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 0 14px; gap: 10px; background: var(--surface); }
-.editor-container { flex: 1; display: flex; min-height: 0; position: relative; background: #06080c; direction: ltr !important; }
-.line-numbers {
-  width: 45px; background: var(--surface); color: var(--muted); text-align: right; padding: 12px 8px;
-  font-family: monospace; font-size: 13px; line-height: 1.5; user-select: none; overflow: hidden; border-right: 1px solid var(--line);
-}
-.code-area {
-  flex: 1; background: transparent !important; color: #f4f7fb !important; border: none; outline: none;
-  padding: 12px; font-family: monospace; font-size: 13px; line-height: 1.5; resize: none; white-space: pre; overflow: auto; text-align: left !important; direction: ltr !important;
-}
-
-/* Notes Section Styling */
-.notes-container { display: grid; grid-template-columns: 240px 1fr; gap: 14px; height: calc(100vh - 110px); }
-.notes-sidebar { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow-y: auto; padding: 8px; }
-.note-item { padding: 10px; border-radius: 8px; border: 1px solid transparent; margin-bottom: 4px; cursor: pointer; }
-.note-item:hover { background: var(--surface-2); }
-.note-item.active { background: var(--surface-3); border-color: var(--accent); }
-.note-item-title { font-weight: 600; font-size: 13px; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.note-item-snippet { font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-.note-editor-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-.note-textarea {
-  flex: 1; background: var(--surface-2) !important; color: var(--text) !important; border: 1px solid var(--line);
-  border-radius: 8px; padding: 12px; resize: none; outline: none; font-size: 13.5px; line-height: 1.5;
-}
-
-/* Font Variations */
-.font-handwritten { font-family: 'Comic Sans MS', cursive !important; }
-.font-gothic { font-family: 'Georgia', serif !important; }
-.font-classic { font-family: 'Times New Roman', serif !important; }
-.font-mono { font-family: 'Courier New', monospace !important; }
-.font-terminal { font-family: monospace !important; background: #000 !important; color: #00ff00 !important; }
-
-/* Toast Messages */
-.toast-msg {
-  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
-  background: var(--surface-3); border: 1px solid var(--accent); color: #fff; padding: 8px 18px;
-  border-radius: 20px; font-size: 12.5px; box-shadow: var(--shadow); z-index: 400; opacity: 0; transition: all 0.25s ease;
-}
-.toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-@keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-@media (max-width: 768px) {
-  .sidebar { position: fixed; left: -260px; top: 0; bottom: 0; transition: left 0.3s ease; box-shadow: var(--shadow); }
-  .sidebar.open { left: 0; }
-  .menu-btn { display: block; }
-  .notes-container { grid-template-columns: 1fr; grid-template-rows: 150px 1fr; }
-  .grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
-}
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <title>SquadForge — Football Squad Builder</title>
+  <style>
+    :root{
+      --bg:#050b14;--panel:#0a1422;--panel2:#0e1b2d;--line:#1b2b40;
+      --text:#f5f8fc;--muted:#91a3b9;--accent:#5ee6a8;--accent2:#55a8ff;
+      --danger:#ff657a;--gold:#f5c85b;--shadow:0 18px 55px rgba(0,0,0,.32);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(circle at 50% -10%,#173252 0,#081321 35%,#050b14 70%);color:var(--text)}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:1500px;margin:auto;padding:18px}
+    .topbar{position:sticky;top:10px;z-index:30;display:flex;gap:12px;align-items:center;justify-content:space-between;background:rgba(7,17,31,.86);backdrop-filter:blur(18px);border:1px solid var(--line);padding:12px 14px;border-radius:18px;box-shadow:var(--shadow)}
+    .brand{display:flex;align-items:center;gap:11px;font-weight:900;letter-spacing:.3px}
+    .brand-mark{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#4e9cff);display:grid;place-items:center;color:#041019}
+    .brand-mark svg{width:24px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 13px;border-radius:12px;display:inline-flex;align-items:center;gap:8px;transition:.2s}
+    .btn:hover{transform:translateY(-1px);border-color:#355271}
+    .btn.primary{background:linear-gradient(135deg,#58e5a6,#43bfe7);border:0;color:#041019;font-weight:800}
+    .btn.danger{color:#ffb2bc;border-color:#4a2630}
+    .btn svg{width:17px;height:17px}
+    .layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(330px,.7fr);gap:16px;margin-top:16px}
+    .panel{background:rgba(10,20,34,.88);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .panel-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .panel-head h2{font-size:16px;margin:0}
+    .small{font-size:12px;color:var(--muted)}
+    .pitch-wrap{padding:16px}
+    .pitch{position:relative;aspect-ratio:1.12/1;min-height:560px;overflow:hidden;border-radius:18px;border:1px solid rgba(255,255,255,.15);
+      background:
+      linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px) 0 0/10% 100%,
+      repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 10%),
+      linear-gradient(135deg,#0e5a3d,#0a6a43 48%,#0b5c3c);
+    }
+    .pitch:before{content:"";position:absolute;inset:5%;border:2px solid rgba(255,255,255,.72);border-radius:2px}
+    .half{position:absolute;left:5%;right:5%;top:50%;border-top:2px solid rgba(255,255,255,.72)}
+    .circle{position:absolute;width:21%;aspect-ratio:1;border:2px solid rgba(255,255,255,.72);border-radius:50%;left:39.5%;top:39.5%}
+    .box{position:absolute;left:29%;right:29%;top:5%;height:17%;border:2px solid rgba(255,255,255,.72);border-top:0}
+    .box2{position:absolute;left:29%;right:29%;bottom:5%;height:17%;border:2px solid rgba(255,255,255,.72);border-bottom:0}
+    .spot{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;left:50%;top:22%}
+    .spot2{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;left:50%;bottom:22%}
+    .slot{position:absolute;transform:translate(-50%,-50%);width:112px;text-align:center;transition:.25s}
+    .slot:hover{transform:translate(-50%,-50%) scale(1.04)}
+    .avatar{width:66px;height:66px;margin:auto;border-radius:50%;border:3px solid rgba(255,255,255,.85);background:#0a1724;display:grid;place-items:center;overflow:hidden;box-shadow:0 9px 24px rgba(0,0,0,.28)}
+    .avatar img{width:100%;height:100%;object-fit:cover}
+    .avatar .num{font-weight:900;font-size:19px}
+    .player-name{margin-top:7px;font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .player-meta{margin-top:3px;font-size:11px;color:#d4fbe8}
+    .slot.empty .avatar{border-style:dashed;border-color:rgba(255,255,255,.35);color:#c7d4e2}
+    .slot.empty .player-name{color:#b7c6d8}
+    .slot .edit-dot{position:absolute;right:18px;top:-2px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#0b1523;border:1px solid #3a5069;color:#fff}
+    .slot .edit-dot svg{width:11px}
+    .s1{left:50%;top:92%}.s2{left:18%;top:75%}.s3{left:38%;top:75%}.s4{left:62%;top:75%}.s5{left:82%;top:75%}
+    .s6{left:33%;top:53%}.s7{left:50%;top:57%}.s8{left:67%;top:53%}
+    .s9{left:18%;top:27%}.s10{left:50%;top:25%}.s11{left:82%;top:27%}
+    .bench{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;padding:14px 16px 18px}
+    .bench-card{min-width:0;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center;transition:.2s}
+    .bench-card:hover{border-color:#355271}
+    .bench-avatar{width:42px;height:42px;border-radius:50%;margin:0 auto 7px;background:#07111d;border:2px solid #42576f;overflow:hidden;display:grid;place-items:center}
+    .bench-avatar img{width:100%;height:100%;object-fit:cover}
+    .bench-name{font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .bench-price{font-size:10px;color:var(--accent);margin-top:2px}
+    .side{display:flex;flex-direction:column;gap:16px}
+    .budget{padding:18px;background:linear-gradient(135deg,rgba(94,230,168,.1),rgba(85,168,255,.06))}
+    .budget-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px}
+    .budget-value{font-size:34px;font-weight:950;margin:5px 0 12px;letter-spacing:-1px}
+    .budget-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+    .input{width:100%;background:#07111d;border:1px solid var(--line);color:#fff;padding:11px 12px;border-radius:11px;outline:none}
+    .input:focus{border-color:#4b8cc5;box-shadow:0 0 0 3px rgba(85,168,255,.1)}
+    .fields{display:grid;gap:10px;padding:16px}
+    .field label{display:block;color:var(--muted);font-size:11px;margin:0 0 5px}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .player-list{padding:10px 16px 16px;display:grid;gap:7px}
+    .list-row{display:grid;grid-template-columns:34px 1fr 80px 32px;gap:8px;align-items:center;background:#07111d;border:1px solid var(--line);padding:7px;border-radius:12px}
+    .tiny-avatar{width:30px;height:30px;border-radius:50%;background:#102033;border:1px solid #38516d;overflow:hidden;display:grid;place-items:center;font-size:10px;font-weight:800}
+    .tiny-avatar img{width:100%;height:100%;object-fit:cover}
+    .list-main{min-width:0}.list-name{font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.list-pos{font-size:10px;color:var(--muted)}
+    .price{font-size:11px;color:var(--accent);text-align:right}
+    .icon-btn{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:#0d1b2b;color:#c8d6e5;display:grid;place-items:center}
+    .icon-btn svg{width:14px}
+    .cards-panel{margin-top:16px}
+    .cards-toggle{width:100%;background:none;border:0;color:#fff;padding:16px 18px;display:flex;align-items:center;justify-content:space-between}
+    .cards-toggle .chev{transition:.25s}
+    .cards-panel.open .chev{transform:rotate(180deg)}
+    .cards-content{max-height:0;overflow:hidden;transition:max-height .45s ease}
+    .cards-panel.open .cards-content{max-height:1200px}
+    .card-toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 13px}
+    .cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 16px 18px}
+    .game-card{position:relative;min-height:135px;padding:13px;border-radius:16px;background:linear-gradient(160deg,#111f31,#091421);border:1px solid #24364d;transition:.25s}
+    .game-card:hover{transform:translateY(-3px);border-color:#42627f}
+    .game-card.used{opacity:.4;filter:saturate(.25)}
+    .game-card .card-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(94,230,168,.1);color:var(--accent);border:1px solid rgba(94,230,168,.22);margin-bottom:10px}
+    .game-card h4{margin:0;font-size:13px}.game-card p{font-size:11px;color:var(--muted);line-height:1.45;margin:6px 0 10px}
+    .game-card button{font-size:10px;padding:7px 9px;border-radius:8px}
+    .used-tag{position:absolute;top:10px;right:10px;font-size:9px;color:#9ba8b7}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.68);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px;z-index:100}
+    .modal.show{display:flex}
+    .modal-box{width:min(560px,100%);background:#0a1422;border:1px solid #273c55;border-radius:20px;box-shadow:0 30px 100px rgba(0,0,0,.55);overflow:hidden}
+    .modal-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+    .modal-body{padding:17px;display:grid;gap:12px}
+    .modal-actions{padding:0 17px 17px;display:flex;gap:8px;justify-content:flex-end}
+    .tabs{display:flex;gap:6px;padding:3px;background:#07111d;border:1px solid var(--line);border-radius:12px}
+    .tab{flex:1;border:0;background:transparent;color:var(--muted);padding:9px;border-radius:9px}.tab.active{background:#13253a;color:#fff}
+    .hidden{display:none!important}
+    .toast{position:fixed;bottom:18px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#eafbf3;color:#07111d;padding:10px 14px;border-radius:12px;font-size:12px;font-weight:800;z-index:200;transition:.25s}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .footer-note{color:#6f8196;font-size:10px;text-align:center;padding:14px}
+    @media(max-width:1050px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.pitch{min-height:520px}.cards-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:680px){.app{padding:9px}.topbar{top:5px}.actions .label{display:none}.layout{display:block}.side{display:block}.pitch-wrap{padding:9px}.pitch{min-height:500px}.slot{width:82px}.avatar{width:54px;height:54px}.player-name{font-size:11px}.bench{grid-template-columns:repeat(3,1fr)}.cards-grid{grid-template-columns:repeat(2,1fr)}.budget-value{font-size:28px}.box,.box2{left:26%;right:26%}}
+  </style>
 </head>
 <body>
-
 <div class="app">
-  <!-- Sidebar Navigation -->
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M4 7.5h6l1.7 2H20v9H4z"/><path d="M4 7.5V5.5h6l1.5 2"/></svg></div>
-      <span>File Manager Pro</span>
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.7-8 10-4.6-1.3-8-5-8-10V6l8-4Z"/><path d="M8 12l2.5 2.5L16 9"/></svg>
+    </div><span>SquadForge</span></div>
+    <div class="actions">
+      <button class="btn" id="importBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span class="label">Import</span></button>
+      <button class="btn" id="exportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9"/><path d="m7 14 5-5 5 5"/><path d="M5 3h14"/></svg><span class="label">Export</span></button>
+      <button class="btn danger" id="resetBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/></svg><span class="label">Reset</span></button>
+      <input id="fileInput" type="file" accept=".json,application/json" class="hidden">
     </div>
-    <button class="nav-item active" data-view="files"><svg viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> My Files</button>
-    <button class="nav-item" data-view="notes"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Notes</button>
-    <button class="nav-item" data-view="trash"><svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> Trash Bin</button>
+  </header>
 
-    <div class="sidebar-bottom">
-      <button class="nav-item" onclick="triggerImportFiles()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> Import Files</button>
-      <button class="nav-item" onclick="triggerImportFolder()"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><path d="M12 11v6M9 14h6"/></svg> Import Folder</button>
-      <input type="file" id="filePicker" multiple hidden>
-      <input type="file" id="folderPicker" webkitdirectory directory multiple hidden>
-    </div>
-  </aside>
+  <main class="layout">
+    <section class="panel">
+      <div class="panel-head"><div><h2>Starting XI</h2><div class="small">Click a position to edit, add a player, or swap with the bench.</div></div><div class="small" id="formationText">4-3-3</div></div>
+      <div class="pitch-wrap">
+        <div class="pitch" id="pitch">
+          <div class="half"></div><div class="circle"></div><div class="box"></div><div class="box2"></div><div class="spot"></div><div class="spot2"></div>
+        </div>
+      </div>
+      <div class="panel-head"><h2>Bench</h2><div class="small">Tap a bench player to move or swap</div></div>
+      <div class="bench" id="bench"></div>
+    </section>
 
-  <!-- Main Dashboard -->
-  <main class="main">
-    <header class="topbar">
-      <button class="menu-btn" onclick="toggleSidebar()"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      <div class="breadcrumbs" id="breadcrumbs">Home</div>
-      <input type="text" class="search-input" id="searchInput" placeholder="Search...">
-    </header>
+    <aside class="side">
+      <section class="panel budget">
+        <div class="budget-label">Remaining budget</div>
+        <div class="budget-value" id="budgetValue">200M</div>
+        <div class="budget-row">
+          <input class="input" id="budgetInput" value="200M" aria-label="Starting budget">
+          <button class="btn primary" id="setBudgetBtn">Set</button>
+        </div>
+        <div class="small" style="margin-top:8px">Prices support K, M and B (example: 750K, 2.5M).</div>
+      </section>
 
-    <section class="page" id="pageContent"></section>
+      <section class="panel">
+        <div class="panel-head"><h2>Club & Manager</h2></div>
+        <div class="fields">
+          <div class="field"><label>CLUB</label><input class="input" id="clubInput" placeholder="Club name"></div>
+          <div class="field"><label>SQUAD NAME</label><input class="input" id="nameInput" placeholder="Squad name"></div>
+          <div class="field"><label>HEAD COACH</label><input class="input" id="mgrInput" placeholder="Manager"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>Squad Overview</h2><div class="small" id="playerCount">0 / 18</div></div>
+        <div class="player-list" id="playerList"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>Google Translate</h2><div id="google_translate_element"></div></div>
+        <div class="footer-note">English UI • Google Translate can be used from the selector above.</div>
+      </section>
+    </aside>
   </main>
+
+  <section class="panel cards-panel" id="cardsPanel">
+    <button class="cards-toggle" id="cardsToggle"><div><h2 style="margin:0;font-size:16px;text-align:left">Game Cards</h2><div class="small">One-use effects • Use, then the card is marked as spent</div></div>
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="cards-content">
+      <div class="card-toolbar">
+        <button class="btn primary" id="randomCardsBtn">Random Cards</button>
+        <input class="input" id="randomCount" type="number" min="1" max="35" value="5" style="width:100px">
+        <button class="btn" id="addCardBtn">Add Custom Card</button>
+        <button class="btn" id="resetCardsBtn">Reset Used Cards</button>
+      </div>
+      <div class="cards-grid" id="cardsGrid"></div>
+    </div>
+  </section>
 </div>
 
-<!-- Bulk Selection Toolbar -->
-<div class="selection-bar" id="selectionBar">
-  <span id="selectedCount">0 Selected</span>
-  <div class="btn-group">
-    <button class="btn" onclick="handleBulkDownload()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Download</button>
-    <button class="btn" onclick="handleBulkZip()"><svg viewBox="0 0 24 24"><path d="M16 16v1a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h2"/></svg> Compress ZIP</button>
-    <button class="btn danger" onclick="handleBulkDelete()"><svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg> Delete</button>
-  </div>
-</div>
-
-<!-- Context Menu -->
-<div class="context-menu" id="contextMenu"></div>
-
-<!-- Custom Dialog Modal -->
-<div class="modal-overlay" id="customModal">
+<div class="modal" id="playerModal">
   <div class="modal-box">
-    <div class="modal-header" id="modalTitle">Notice</div>
-    <div class="modal-body" id="modalBody">Message text...</div>
-    <div class="btn-group" id="modalFooter" style="justify-content: flex-end;"></div>
+    <div class="modal-head"><h3 id="modalTitle" style="margin:0">Edit Player</h3><button class="icon-btn" data-close="playerModal">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editSlot">
+      <div class="field"><label>PLAYER NAME</label><input class="input" id="playerName" placeholder="Player name"></div>
+      <div class="field-row">
+        <div class="field"><label>PRICE</label><input class="input" id="playerPrice" placeholder="0M"></div>
+        <div class="field"><label>POSITION</label><select class="input" id="playerPos"></select></div>
+      </div>
+      <div class="field"><label>PLAYER IMAGE (OPTIONAL)</label>
+        <div class="tabs"><button class="tab active" id="urlTab">Image URL</button><button class="tab" id="uploadTab">Upload</button></div>
+        <input class="input" id="playerImage" placeholder="https://...">
+        <input id="playerFile" type="file" accept="image/*" class="hidden">
+      </div>
+      <div class="small">The image is stored locally in your browser when uploaded. URLs are saved with the squad.</div>
+    </div>
+    <div class="modal-actions"><button class="btn danger" id="deletePlayerBtn">Remove</button><button class="btn" data-close="playerModal">Cancel</button><button class="btn primary" id="savePlayerBtn">Save Player</button></div>
   </div>
 </div>
 
-<!-- Full Editor Screen -->
-<div class="editor-screen" id="editorScreen">
-  <div class="editor-header">
-    <div style="display:flex; align-items:center; gap:8px;">
-      <button class="btn" onclick="closeEditor()"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back</button>
-      <input type="text" id="editorFileName" class="form-control" style="width:160px; padding:4px 8px;">
+<div class="modal" id="customCardModal">
+  <div class="modal-box">
+    <div class="modal-head"><h3 style="margin:0">Add Custom Card</h3><button class="icon-btn" data-close="customCardModal">×</button></div>
+    <div class="modal-body">
+      <div class="field"><label>CARD NAME</label><input class="input" id="customCardName" placeholder="Extra Transfer"></div>
+      <div class="field"><label>EFFECT / DESCRIPTION</label><input class="input" id="customCardDesc" placeholder="Describe what this card does"></div>
     </div>
-    <div class="btn-group">
-      <select id="editorStyleSelect" class="btn" onchange="changeEditorStyle(this.value)">
-        <option value="normal">Normal</option>
-        <option value="handwritten">Handwritten</option>
-        <option value="gothic">Gothic</option>
-        <option value="classic">Classic</option>
-        <option value="mono">Monospace</option>
-        <option value="terminal">Terminal</option>
-      </select>
-      <button class="btn danger" onclick="clearEditorContent()">Clear All</button>
-      <button class="btn primary" onclick="saveEditorContent()">Save</button>
-    </div>
-  </div>
-  <div class="editor-container">
-    <div class="line-numbers" id="lineNumbers">1</div>
-    <textarea class="code-area" id="codeArea" spellcheck="false" onscroll="syncScroll()" oninput="updateLineNumbers()"></textarea>
+    <div class="modal-actions"><button class="btn" data-close="customCardModal">Cancel</button><button class="btn primary" id="saveCardBtn">Add Card</button></div>
   </div>
 </div>
 
-<div class="toast-msg" id="toast">Action Completed</div>
+<div class="toast" id="toast"></div>
 
 <script>
-const DB_NAME = "FileManagerProDB";
-const DB_VERSION = 2;
-let db = null;
+const POSITIONS = [
+  {key:'GK', label:'GK'}, {key:'RB',label:'RB'}, {key:'CB1',label:'CB'}, {key:'CB2',label:'CB'}, {key:'LB',label:'LB'},
+  {key:'CM',label:'CM'}, {key:'CDM',label:'CDM'}, {key:'CAM',label:'CAM'}, {key:'RW',label:'RW'}, {key:'LW',label:'LW'}, {key:'ST',label:'ST'}
+];
+const BENCH_POS = ['GK','DEF','DEF','MID','MID','ATK','ATK'];
+const defaults = [
+ ['doubleBudget','Double Budget','Double the current remaining budget for this round.'],
+ ['freeTransfer','Free Transfer','Change one player without paying a transfer fee.'],
+ ['swapAnywhere','Swap Anywhere','Swap any two players between XI and bench.'],
+ ['benchBoost','Bench Boost','Promote one bench player into the XI without losing the outgoing player.'],
+ ['priceFreeze','Price Freeze','Lock one player price until your next action.'],
+ ['wildcard','Wildcard','Replace one selected player with a new player at any price.'],
+ ['reroll','Reroll','Reroll one player slot and choose again.'],
+ ['captain','Captain','Mark one XI player as Captain for your league rules.'],
+ ['viceCaptain','Vice Captain','Mark one XI player as Vice Captain.'],
+ ['positionShift','Position Shift','Move a player to a compatible position.'],
+ ['budgetBonus','Budget Bonus','Add 5M to remaining budget.'],
+ ['discount','Discount','Reduce one new player purchase by 2M.'],
+ ['extraBench','Extra Bench','Unlock one temporary extra bench slot.'],
+ ['scout','Scout','Reveal your next random card.'],
+ ['insurance','Insurance','Refund the last player purchase price.'],
+ ['loan','Loan','Temporarily move one bench player into the XI.'],
+ ['fastTrack','Fast Track','Make two lineup swaps in one turn.'],
+ ['freezeBench','Freeze Bench','Prevent one bench player from being swapped out.'],
+ ['clubBoost','Club Boost','Choose a club and give its players a +1 boost in your own rules.'],
+ ['managerBoost','Manager Boost','Give your manager one extra tactical change.'],
+ ['tripleChoice','Triple Choice','Pick one of three random cards.'],
+ ['reserveKeeper','Reserve Keeper','Promote your reserve GK to the starting XI.'],
+ ['extraAttack','Extra Attack','Temporarily use a 3-4-3 formation.'],
+ ['defensiveWall','Defensive Wall','Temporarily use a 5-3-2 formation.']
+];
+const slotClass = {GK:'s1',RB:'s2',CB1:'s3',CB2:'s4',LB:'s5',CM:'s6',CDM:'s7',CAM:'s8',RW:'s9',LW:'s10',ST:'s11'};
+let state = loadState();
 
-let currentView = "files";
-let currentFolderId = null;
-let currentNoteFolderId = null;
-let selectedItems = new Set();
-let activeEditorFile = null;
-let isDirty = false;
-
-// IndexedDB Bootstrapping
-function initDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = (e) => {
-      const d = e.target.result;
-      if (!d.objectStoreNames.contains("items")) d.createObjectStore("items", { keyPath: "id" });
-      if (!d.objectStoreNames.contains("notes")) d.createObjectStore("notes", { keyPath: "id" });
-      if (!d.objectStoreNames.contains("trash")) d.createObjectStore("trash", { keyPath: "id" });
-    };
-    req.onsuccess = () => { db = req.result; resolve(); };
-    req.onerror = () => reject(req.error);
-  });
-}
-
-const dbCall = (storeName, mode, cb) => new Promise((resolve, reject) => {
-  const tx = db.transaction(storeName, mode);
-  const store = tx.objectStore(storeName);
-  const req = cb(store);
-  tx.oncomplete = () => resolve(req ? req.result : null);
-  tx.onerror = () => reject(tx.error);
-});
-
-const getItems = (store="items") => dbCall(store, "readonly", s => s.getAll());
-const getItem = (id, store="items") => dbCall(store, "readonly", s => s.get(id));
-const saveItem = (item, store="items") => dbCall(store, "readwrite", s => s.put(item));
-const removeItem = (id, store="items") => dbCall(store, "readwrite", s => s.delete(id));
-
-const uid = () => Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-
-// Navigation
-function switchView(view) {
-  currentView = view;
-  selectedItems.clear();
-  updateSelectionBar();
-  document.querySelectorAll(".nav-item[data-view]").forEach(el => {
-    el.classList.toggle("active", el.dataset.view === view);
-  });
-  if (window.innerWidth <= 768) document.getElementById("sidebar").classList.remove("open");
-
-  if (view === "files") renderFilesView();
-  else if (view === "notes") renderNotesView();
-  else if (view === "trash") renderTrashView();
-}
-
-document.querySelectorAll(".nav-item[data-view]").forEach(b => {
-  b.addEventListener("click", () => switchView(b.dataset.view));
-});
-
-function toggleSidebar() { document.getElementById("sidebar").classList.toggle("open"); }
-
-// Modal Helper System
-function showCustomModal(title, bodyHTML, buttons = []) {
-  document.getElementById("modalTitle").textContent = title;
-  document.getElementById("modalBody").innerHTML = bodyHTML;
-  const footer = document.getElementById("modalFooter");
-  footer.innerHTML = "";
-
-  buttons.forEach(btn => {
-    const b = document.createElement("button");
-    b.className = `btn ${btn.class || ''}`;
-    b.textContent = btn.label;
-    b.onclick = () => { closeCustomModal(); if(btn.onClick) btn.onClick(); };
-    footer.appendChild(b);
-  });
-
-  document.getElementById("customModal").classList.add("show");
-}
-
-function closeCustomModal() { document.getElementById("customModal").classList.remove("show"); }
-
-function customConfirm(title, message, onConfirm) {
-  showCustomModal(title, message, [
-    { label: "Cancel", class: "" },
-    { label: "Confirm", class: "danger", onClick: onConfirm }
-  ]);
-}
-
-function customPrompt(title, label, defaultValue, onSubmit) {
-  const html = `
-    <div class="form-group">
-      <label>${label}</label>
-      <input type="text" id="promptInput" class="form-control" value="${defaultValue}">
-    </div>`;
-  showCustomModal(title, html, [
-    { label: "Cancel", class: "" },
-    { label: "Save", class: "primary", onClick: () => {
-      const val = document.getElementById("promptInput").value.trim();
-      if(val) onSubmit(val);
-    }}
-  ]);
-  setTimeout(() => document.getElementById("promptInput")?.focus(), 100);
-}
-
-function showToast(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2500);
-}
-
-// Multi Selection Actions
-function toggleSelectItem(id) {
-  if (selectedItems.has(id)) selectedItems.delete(id);
-  else selectedItems.add(id);
-  updateSelectionBar();
-  refreshCurrentView();
-}
-
-function updateSelectionBar() {
-  const bar = document.getElementById("selectionBar");
-  if (selectedItems.size > 0) {
-    bar.classList.add("show");
-    document.getElementById("selectedCount").textContent = `${selectedItems.size} Items Selected`;
-  } else {
-    bar.classList.remove("show");
-  }
-}
-
-// Files Renderer
-async function renderFilesView() {
-  const page = document.getElementById("pageContent");
-  const items = await getItems("items");
-  const currentItems = items.filter(i => (i.parent || null) === currentFolderId);
-  
-  await updateBreadcrumbs();
-
-  page.innerHTML = `
-    <div class="action-bar">
-      <div class="btn-group">
-        <button class="btn primary" onclick="createFolder()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> New Folder</button>
-        <button class="btn" onclick="createFile()"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/></svg> New File</button>
-        <button class="btn" onclick="compressCurrentFolder()"><svg viewBox="0 0 24 24"><path d="M16 16v1a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h2"/></svg> Compress Folder</button>
-      </div>
-    </div>
-    <div class="grid" id="fileGrid"></div>
-  `;
-
-  const grid = document.getElementById("fileGrid");
-  const query = document.getElementById("searchInput").value.toLowerCase();
-  const filtered = currentItems.filter(i => i.name.toLowerCase().includes(query));
-
-  if (filtered.length === 0) {
-    grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--muted);">Folder is empty</div>`;
-    return;
-  }
-
-  grid.innerHTML = filtered.map(item => `
-    <div class="card ${selectedItems.has(item.id) ? 'selected' : ''}" onclick="handleCardClick(event, '${item.id}', '${item.type}')">
-      <input type="checkbox" class="card-checkbox" ${selectedItems.has(item.id) ? 'checked' : ''} onclick="event.stopPropagation(); toggleSelectItem('${item.id}')">
-      <button class="card-more" onclick="event.stopPropagation(); openContextMenu(event, '${item.id}')">⋮</button>
-      <div class="card-icon">${getItemIcon(item)}</div>
-      <div class="card-title">${escapeHTML(item.name)}</div>
-      <div class="card-meta">${item.type === 'folder' ? 'Folder' : formatSize(item.size || 0)}</div>
-    </div>
-  `).join("");
-}
-
-function getItemIcon(item) {
-  if (item.type === 'folder') return `<svg viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>`;
-  if (item.name.endsWith('.zip')) return `<svg viewBox="0 0 24 24"><path d="M16 16v1a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h2"/></svg>`;
-  return `<svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/></svg>`;
-}
-
-async function updateBreadcrumbs() {
-  const container = document.getElementById("breadcrumbs");
-  let path = [{ id: null, name: "Home" }];
-  let curr = currentFolderId;
-  while(curr) {
-    const item = await getItem(curr, "items");
-    if(item) { path.unshift(item); curr = item.parent; }
-    else break;
-  }
-  container.innerHTML = path.map((p, idx) => `
-    <span class="crumb ${idx === path.length - 1 ? 'active' : ''}" onclick="navigateToFolder('${p.id}')">${escapeHTML(p.name)}</span>
-  `).join(" / ");
-}
-
-function navigateToFolder(id) {
-  currentFolderId = id;
-  selectedItems.clear();
-  updateSelectionBar();
-  renderFilesView();
-}
-
-function handleCardClick(event, id, type) {
-  if (type === 'folder') {
-    navigateToFolder(id);
-  } else {
-    getItem(id, "items").then(item => {
-      if (item.name.endsWith('.zip')) {
-        showCustomModal("Compressed ZIP File", "This is a ZIP archive. You need to extract its content first.", [
-          { label: "Cancel", class: "" },
-          { label: "Extract ZIP Now", class: "primary", onClick: () => extractZip(id) }
-        ]);
-      } else {
-        openEditor(item);
-      }
-    });
-  }
-}
-
-// File Operations
-function createFile() {
-  customPrompt("Create New File", "Filename with extension", "untitled.txt", async (name) => {
-    const item = {
-      id: uid(), name, type: "file", parent: currentFolderId,
-      content: "", size: 0, style: "normal", createdAt: Date.now()
-    };
-    await saveItem(item, "items");
-    renderFilesView();
-    openEditor(item);
-  });
-}
-
-function createFolder() {
-  customPrompt("Create New Folder", "Folder Name", "New Folder", async (name) => {
-    const item = {
-      id: uid(), name, type: "folder", parent: currentFolderId, createdAt: Date.now()
-    };
-    await saveItem(item, "items");
-    renderFilesView();
-    showToast("Folder Created");
-  });
-}
-
-// ZIP Compression & Unzipping
-async function compressCurrentFolder() {
-  if (typeof JSZip === "undefined") return showToast("JSZip Library Loading...");
-  const zip = new JSZip();
-  const items = await getItems("items");
-  const children = items.filter(i => (i.parent || null) === currentFolderId);
-
-  if (children.length === 0) return showToast("Folder is empty");
-
-  for (const item of children) {
-    if (item.type === "file") zip.file(item.name, item.content || "");
-  }
-
-  const content = await zip.generateAsync({ type: "base64" });
-  const zipItem = {
-    id: uid(), name: "archive.zip", type: "file", parent: currentFolderId,
-    content: content, size: content.length, createdAt: Date.now()
+function initialState(){
+  const players={};
+  POSITIONS.forEach(p=>players[p.key]={name:'',price:0,pos:p.label,image:''});
+  return {
+    startingBudget:200000000, club:'', squadName:'', manager:'',
+    players, bench:Array.from({length:7},(_,i)=>({name:'',price:0,pos:BENCH_POS[i],image:''})),
+    cards:defaults.map(([id,name,desc])=>({id,name,desc,used:false,custom:false}))
   };
-  await saveItem(zipItem, "items");
-  renderFilesView();
-  showToast("Folder Compressed to ZIP");
 }
-
-async function extractZip(id) {
-  const item = await getItem(id, "items");
-  if (!item || typeof JSZip === "undefined") return;
-
-  try {
-    const zip = await JSZip.loadAsync(item.content, { base64: true });
-    const folderName = item.name.replace('.zip', '') + '_extracted';
-    const folderId = uid();
-    await saveItem({ id: folderId, name: folderName, type: "folder", parent: currentFolderId, createdAt: Date.now() }, "items");
-
-    for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
-      if (!zipEntry.dir) {
-        const text = await zipEntry.async("string");
-        await saveItem({
-          id: uid(), name: relativePath.split('/').pop(), type: "file",
-          parent: folderId, content: text, size: text.length, createdAt: Date.now()
-        }, "items");
-      }
-    }
-    renderFilesView();
-    showToast("ZIP Extracted Successfully");
-  } catch (err) {
-    showToast("Error Extracing ZIP");
-  }
+function loadState(){
+  try{
+    const raw=localStorage.getItem('squadforge_state');
+    if(raw){ const s=JSON.parse(raw); return {...initialState(),...s}; }
+  }catch(e){}
+  return initialState();
 }
-
-// Imports
-function triggerImportFiles() { document.getElementById("filePicker").click(); }
-function triggerImportFolder() { document.getElementById("folderPicker").click(); }
-
-document.getElementById("filePicker").addEventListener("change", async (e) => {
-  const files = Array.from(e.target.files);
-  for (let f of files) {
-    const text = await f.text();
-    await saveItem({
-      id: uid(), name: f.name, type: "file", parent: currentFolderId,
-      content: text, size: f.size, createdAt: Date.now()
-    }, "items");
-  }
-  renderFilesView();
-  showToast("Files Imported");
-});
-
-document.getElementById("folderPicker").addEventListener("change", async (e) => {
-  const files = Array.from(e.target.files);
-  const folderMap = {};
-
-  for (let f of files) {
-    const parts = f.webkitRelativePath.split('/');
-    let parent = currentFolderId;
-
-    for (let i = 0; i < parts.length - 1; i++) {
-      const pathKey = parts.slice(0, i + 1).join('/');
-      if (!folderMap[pathKey]) {
-        const newId = uid();
-        await saveItem({ id: newId, name: parts[i], type: "folder", parent: parent, createdAt: Date.now() }, "items");
-        folderMap[pathKey] = newId;
-      }
-      parent = folderMap[pathKey];
-    }
-
-    const text = await f.text();
-    await saveItem({
-      id: uid(), name: f.name, type: "file", parent: parent,
-      content: text, size: f.size, createdAt: Date.now()
-    }, "items");
-  }
-  renderFilesView();
-  showToast("Folder Imported Successfully");
-});
-
-// Context Menu & File Info Modal
-function openContextMenu(e, id) {
-  e.preventDefault();
-  const menu = document.getElementById("contextMenu");
-  menu.innerHTML = `
-    <button onclick="showInfoModal('${id}')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Detailed Info</button>
-    <button onclick="renameItemDialog('${id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Rename</button>
-    <button class="danger-item" onclick="deleteItemSingle('${id}')"><svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg> Move to Trash</button>
-  `;
-
-  menu.style.display = "block";
-  menu.style.top = Math.min(e.clientY, window.innerHeight - 150) + "px";
-  menu.style.left = Math.min(e.clientX, window.innerWidth - 180) + "px";
+function save(){ localStorage.setItem('squadforge_state',JSON.stringify(state)); }
+function parseMoney(v){
+  if(typeof v==='number') return v;
+  const s=String(v||'').trim().toLowerCase().replace(/[$, ]/g,'');
+  if(!s)return 0;
+  const m=s.match(/^(-?[\d.]+)([kmb])?$/);
+  if(!m)return 0;
+  const n=parseFloat(m[1]); const mult={k:1e3,m:1e6,b:1e9}[m[2]||'']||1;
+  return n*mult;
 }
-
-document.addEventListener("click", () => document.getElementById("contextMenu").style.display = "none");
-
-async function showInfoModal(id) {
-  const storeName = currentView === "notes" ? "notes" : "items";
-  const item = await getItem(id, storeName);
-  if (!item) return;
-
-  let details = "";
-  if (item.type === "folder") {
-    const all = await getItems(storeName);
-    const subFiles = all.filter(i => i.parent === id && i.type !== "folder").length;
-    const subFolders = all.filter(i => i.parent === id && i.type === "folder").length;
-    details = `
-      <b>Type:</b> Folder<br>
-      <b>Name:</b> ${escapeHTML(item.name)}<br>
-      <b>Contains:</b> ${subFiles} files, ${subFolders} folders
-    `;
-  } else {
-    const text = item.content || "";
-    const lines = text.split("\n").length;
-    const chars = text.length;
-    details = `
-      <b>Type:</b> File<br>
-      <b>Name:</b> ${escapeHTML(item.name || item.title)}<br>
-      <b>Characters:</b> ${chars}<br>
-      <b>Lines:</b> ${lines}<br>
-      <b>Size:</b> ${formatSize(chars)}
-    `;
-  }
-
-  showCustomModal("Item Details", details, [{ label: "Close", class: "primary" }]);
+function money(n){
+  n=Math.max(0,Math.round(n||0));
+  if(n>=1e9)return (n/1e9).toFixed(n%1e9?1:0)+'B';
+  if(n>=1e6)return (n/1e6).toFixed(n%1e6?1:0)+'M';
+  if(n>=1e3)return (n/1e3).toFixed(n%1e3?1:0)+'K';
+  return String(n);
 }
-
-function renameItemDialog(id) {
-  const store = currentView === "notes" ? "notes" : "items";
-  getItem(id, store).then(item => {
-    customPrompt("Rename Item", "New Name", item.name || item.title, async (newName) => {
-      if(item.name) item.name = newName;
-      if(item.title) item.title = newName;
-      await saveItem(item, store);
-      refreshCurrentView();
-      showToast("Renamed Successfully");
-    });
-  });
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function icon(name){
+ const paths={
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 3.5-6 8-6s7.2 2 8 6"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/>',
+  trash:'<path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="m6 7 1 14h10l1-14M9 7V4h6v3"/>',
+  bolt:'<path d="m13 2-9 12h7l-1 8 9-12h-7l1-8Z"/>',
+  card:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h5"/>'
+ };
+ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths[name]||paths.card}</svg>`;
 }
-
-function deleteItemSingle(id) {
-  customConfirm("Confirm Delete", "Are you sure you want to move this item to Trash?", async () => {
-    const store = currentView === "notes" ? "notes" : "items";
-    const item = await getItem(id, store);
-    if(item) {
-      item.deletedAt = Date.now();
-      item.originalStore = store;
-      await saveItem(item, "trash");
-      await removeItem(id, store);
-      refreshCurrentView();
-      showToast("Moved to Trash");
-    }
-  });
+function render(){
+ document.getElementById('budgetValue').textContent=money(remainingBudget());
+ document.getElementById('budgetInput').value=money(state.startingBudget);
+ document.getElementById('clubInput').value=state.club;
+ document.getElementById('nameInput').value=state.squadName;
+ document.getElementById('mgrInput').value=state.manager;
+ const pitch=document.getElementById('pitch');
+ pitch.querySelectorAll('.slot').forEach(x=>x.remove());
+ POSITIONS.forEach(p=>{
+   const pl=state.players[p.key];
+   const el=document.createElement('div'); el.className='slot '+slotClass[p.key]+(pl.name?'':' empty');
+   el.innerHTML=`<div class="avatar">${pl.image?`<img src="${esc(pl.image)}" alt="">`:`<span class="num">${esc(p.label)}</span>`}</div>
+     <div class="player-name">${esc(pl.name||'Add '+p.label)}</div>
+     <div class="player-meta">${pl.name?money(pl.price):p.label}</div><span class="edit-dot">${icon('edit')}</span>`;
+   el.onclick=()=>openPlayer(p.key,false);
+   pitch.appendChild(el);
+ });
+ const bench=document.getElementById('bench'); bench.innerHTML='';
+ state.bench.forEach((pl,i)=>{
+   const el=document.createElement('div');el.className='bench-card';
+   el.innerHTML=`<div class="bench-avatar">${pl.image?`<img src="${esc(pl.image)}" alt="">`:`<span>${esc(pl.pos)}</span>`}</div><div class="bench-name">${esc(pl.name||'Empty slot')}</div><div class="bench-price">${pl.name?money(pl.price):pl.pos}</div>`;
+   el.onclick=()=>openPlayer('bench'+i,true); bench.appendChild(el);
+ });
+ const list=document.getElementById('playerList'); list.innerHTML='';
+ const all=[...POSITIONS.map(p=>state.players[p.key]),...state.bench];
+ all.forEach((pl,i)=>{
+   if(!pl.name)return;
+   const row=document.createElement('div');row.className='list-row';
+   row.innerHTML=`<div class="tiny-avatar">${pl.image?`<img src="${esc(pl.image)}">`:icon('user')}</div><div class="list-main"><div class="list-name">${esc(pl.name)}</div><div class="list-pos">${esc(pl.pos)}</div></div><div class="price">${money(pl.price)}</div><button class="icon-btn" title="Edit">${icon('edit')}</button>`;
+   row.querySelector('button').onclick=()=>openPlayer(i<11?POSITIONS[i].key:'bench'+(i-11),i>=11);
+   list.appendChild(row);
+ });
+ document.getElementById('playerCount').textContent=all.filter(p=>p.name).length+' / 18';
+ renderCards(); save();
 }
-
-// Notes System & Folders
-async function renderNotesView() {
-  const page = document.getElementById("pageContent");
-  const notes = await getItems("notes");
-  const currentNotes = notes.filter(n => (n.parent || null) === currentNoteFolderId);
-
-  page.innerHTML = `
-    <div class="action-bar">
-      <div class="btn-group">
-        <button class="btn primary" onclick="createNote()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> New Note</button>
-        <button class="btn" onclick="createNoteFolder()"><svg viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> New Note Folder</button>
-      </div>
-    </div>
-    <div class="notes-container">
-      <div class="notes-sidebar" id="notesList"></div>
-      <div class="note-editor-panel" id="notePanel">
-        <div style="text-align:center; color: var(--muted); padding-top: 50px;">Select a note to edit</div>
-      </div>
-    </div>
-  `;
-
-  renderNotesList(currentNotes);
+function totalSpent(){return POSITIONS.reduce((a,p)=>a+parseMoney(state.players[p.key].price),0)+state.bench.reduce((a,p)=>a+parseMoney(p.price),0)}
+function remainingBudget(){return Math.max(0,state.startingBudget-totalSpent())}
+function openPlayer(slot,isBench){
+ const pl=isBench?state.bench[+slot.replace('bench','')]:state.players[slot];
+ document.getElementById('editSlot').value=slot;
+ document.getElementById('modalTitle').textContent=pl.name?'Edit Player':'Add Player';
+ document.getElementById('playerName').value=pl.name||'';
+ document.getElementById('playerPrice').value=pl.name?money(pl.price):'';
+ document.getElementById('playerImage').value=pl.image||'';
+ const select=document.getElementById('playerPos'); select.innerHTML='';
+ const opts=isBench?BENCH_POS:POSITIONS.map(p=>p.label);
+ [...new Set(opts)].forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;select.appendChild(op)});
+ select.value=pl.pos;
+ document.getElementById('deletePlayerBtn').style.display=pl.name?'inline-flex':'none';
+ document.getElementById('playerModal').classList.add('show');
 }
-
-function renderNotesList(notes) {
-  const list = document.getElementById("notesList");
-  if (notes.length === 0) {
-    list.innerHTML = `<div style="text-align:center; color: var(--muted); padding: 20px;">No Notes Found</div>`;
-    return;
-  }
-
-  list.innerHTML = notes.map(n => `
-    <div class="note-item" onclick="${n.type === 'folder' ? `openNoteFolder('${n.id}')` : `openNoteEditor('${n.id}')`}">
-      <div class="note-item-title">${n.type === 'folder' ? '📁 ' : ''}${escapeHTML(n.title || n.name || "Untitled")}</div>
-      <div class="note-item-snippet">${n.type === 'folder' ? 'Folder' : escapeHTML(n.content || "Empty...")}</div>
-    </div>
-  `).join("");
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
+document.getElementById('savePlayerBtn').onclick=()=>{
+ const slot=document.getElementById('editSlot').value, isBench=slot.startsWith('bench');
+ const old=isBench?state.bench[+slot.replace('bench','')]:state.players[slot];
+ const name=document.getElementById('playerName').value.trim(), price=parseMoney(document.getElementById('playerPrice').value);
+ if(name && price>remainingBudget()+parseMoney(old.price)){toast('Not enough remaining budget.');return}
+ const data={name,price,pos:document.getElementById('playerPos').value,image:document.getElementById('playerImage').value.trim()};
+ if(isBench)state.bench[+slot.replace('bench','')]=data;else state.players[slot]=data;
+ closeModal('playerModal');render();toast(name?'Player saved':'Slot cleared');
+};
+document.getElementById('deletePlayerBtn').onclick=()=>{
+ const slot=document.getElementById('editSlot').value;
+ if(slot.startsWith('bench'))state.bench[+slot.replace('bench','')]={name:'',price:0,pos:BENCH_POS[+slot.replace('bench','')],image:''};
+ else state.players[slot]={name:'',price:0,pos:POSITIONS.find(p=>p.key===slot).label,image:''};
+ closeModal('playerModal');render();toast('Player removed');
+};
+document.getElementById('urlTab').onclick=()=>{document.getElementById('urlTab').classList.add('active');document.getElementById('uploadTab').classList.remove('active');document.getElementById('playerFile').classList.add('hidden');document.getElementById('playerImage').classList.remove('hidden')};
+document.getElementById('uploadTab').onclick=()=>{document.getElementById('uploadTab').classList.add('active');document.getElementById('urlTab').classList.remove('active');document.getElementById('playerFile').classList.remove('hidden');document.getElementById('playerImage').classList.add('hidden')};
+document.getElementById('playerFile').onchange=e=>{
+ const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>document.getElementById('playerImage').value=r.result;r.readAsDataURL(f);
+ document.getElementById('urlTab').click();
+};
+['clubInput','nameInput','mgrInput'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{
+ state[{clubInput:'club',nameInput:'squadName',mgrInput:'manager'}[id]]=e.target.value;save();
+}));
+document.getElementById('setBudgetBtn').onclick=()=>{
+ const n=parseMoney(document.getElementById('budgetInput').value);
+ if(n<totalSpent()){toast('Starting budget cannot be lower than total squad cost.');return}
+ state.startingBudget=n;render();toast('Budget updated');
+};
+document.getElementById('cardsToggle').onclick=()=>document.getElementById('cardsPanel').classList.toggle('open');
+function renderCards(){
+ const grid=document.getElementById('cardsGrid');grid.innerHTML='';
+ state.cards.forEach(c=>{
+   const el=document.createElement('article');el.className='game-card'+(c.used?' used':'');
+   el.innerHTML=`<div class="card-icon">${icon('bolt')}</div>${c.used?'<span class="used-tag">USED</span>':''}<h4>${esc(c.name)}</h4><p>${esc(c.desc)}</p><button class="btn ${c.used?'':'primary'}" ${c.used?'disabled':''}>${c.used?'Spent':'Use Card'}</button>`;
+   el.querySelector('button').onclick=()=>{c.used=true;save();renderCards();toast(c.name+' used');};
+   grid.appendChild(el);
+ });
 }
-
-function createNoteFolder() {
-  customPrompt("Create Note Folder", "Folder Name", "Notes Folder", async (name) => {
-    const item = { id: uid(), name, title: name, type: "folder", parent: currentNoteFolderId, createdAt: Date.now() };
-    await saveItem(item, "notes");
-    renderNotesView();
-    showToast("Note Folder Created");
-  });
-}
-
-function openNoteFolder(id) {
-  currentNoteFolderId = id;
-  renderNotesView();
-}
-
-async function createNote() {
-  const note = {
-    id: uid(), title: "New Note", type: "note", parent: currentNoteFolderId,
-    content: "", fontStyle: "normal", createdAt: Date.now()
-  };
-  await saveItem(note, "notes");
-  renderNotesView();
-  openNoteEditor(note.id);
-}
-
-async function openNoteEditor(id) {
-  const note = await getItem(id, "notes");
-  if (!note || note.type === "folder") return;
-
-  const panel = document.getElementById("notePanel");
-  panel.innerHTML = `
-    <div style="display:flex; gap:10px; align-items:center;">
-      <input type="text" id="noteTitleInput" class="form-control" value="${escapeHTML(note.title)}" placeholder="Note Title">
-      <select id="noteFontSelect" class="btn" onchange="applyNoteFont(this.value)">
-        <option value="normal" ${note.fontStyle==='normal'?'selected':''}>Normal</option>
-        <option value="handwritten" ${note.fontStyle==='handwritten'?'selected':''}>Handwritten</option>
-        <option value="gothic" ${note.fontStyle==='gothic'?'selected':''}>Gothic</option>
-        <option value="classic" ${note.fontStyle==='classic'?'selected':''}>Classic</option>
-        <option value="mono" ${note.fontStyle==='mono'?'selected':''}>Monospace</option>
-      </select>
-    </div>
-    <textarea id="noteBody" class="note-textarea font-${note.fontStyle || 'normal'}" placeholder="Type your notes here...">${escapeHTML(note.content)}</textarea>
-    <div class="btn-group" style="justify-content: flex-end;">
-      <button class="btn danger" onclick="clearNoteContent()">Clear Text</button>
-      <button class="btn danger" onclick="deleteItemSingle('${note.id}')">Delete</button>
-      <button class="btn primary" onclick="saveActiveNote('${note.id}')">Save Note</button>
-    </div>
-  `;
-}
-
-function applyNoteFont(font) {
-  document.getElementById("noteBody").className = `note-textarea font-${font}`;
-}
-
-function clearNoteContent() {
-  document.getElementById("noteBody").value = "";
-}
-
-async function saveActiveNote(id) {
-  const note = await getItem(id, "notes");
-  if (!note) return;
-  note.title = document.getElementById("noteTitleInput").value;
-  note.content = document.getElementById("noteBody").value;
-  note.fontStyle = document.getElementById("noteFontSelect").value;
-  await saveItem(note, "notes");
-  renderNotesView();
-  showToast("Note Saved");
-}
-
-// Text & Code Editor Screen
-function openEditor(file) {
-  activeEditorFile = file;
-  isDirty = false;
-  document.getElementById("editorFileName").value = file.name;
-  document.getElementById("codeArea").value = file.content || "";
-  document.getElementById("editorStyleSelect").value = file.style || "normal";
-  changeEditorStyle(file.style || "normal");
-  document.getElementById("editorScreen").classList.add("show");
-  updateLineNumbers();
-
-  history.pushState({ inEditor: true }, "");
-}
-
-function closeEditor() {
-  if (isDirty) {
-    customConfirm("Unsaved Changes", "Are you sure you want to exit without saving?", () => {
-      document.getElementById("editorScreen").classList.remove("show");
-      activeEditorFile = null;
-    });
-  } else {
-    document.getElementById("editorScreen").classList.remove("show");
-    activeEditorFile = null;
-  }
-}
-
-function changeEditorStyle(style) {
-  document.getElementById("codeArea").className = `code-area font-${style}`;
-}
-
-function clearEditorContent() {
-  document.getElementById("codeArea").value = "";
-  updateLineNumbers();
-  isDirty = true;
-}
-
-function updateLineNumbers() {
-  const text = document.getElementById("codeArea").value;
-  const lines = text.split("\n").length;
-  document.getElementById("lineNumbers").innerHTML = Array.from({length: lines}, (_, i) => i + 1).join("<br>");
-  isDirty = true;
-}
-
-function syncScroll() {
-  const codeArea = document.getElementById("codeArea");
-  document.getElementById("lineNumbers").scrollTop = codeArea.scrollTop;
-}
-
-async function saveEditorContent() {
-  if (!activeEditorFile) return;
-  activeEditorFile.name = document.getElementById("editorFileName").value;
-  activeEditorFile.content = document.getElementById("codeArea").value;
-  activeEditorFile.style = document.getElementById("editorStyleSelect").value;
-  activeEditorFile.size = activeEditorFile.content.length;
-
-  await saveItem(activeEditorFile, "items");
-  isDirty = false;
-  showToast("File Saved Successfully");
-  renderFilesView();
-}
-
-// Trash Bin
-async function renderTrashView() {
-  const page = document.getElementById("pageContent");
-  const trashItems = await getItems("trash");
-
-  page.innerHTML = `
-    <div class="action-bar">
-      <div class="btn-group">
-        <button class="btn primary" onclick="restoreAllTrash()">Restore All</button>
-        <button class="btn danger" onclick="emptyTrashAll()">Empty Trash</button>
-      </div>
-    </div>
-    <div class="grid" id="trashGrid"></div>
-  `;
-
-  const grid = document.getElementById("trashGrid");
-  if (trashItems.length === 0) {
-    grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--muted);">Trash Bin is empty</div>`;
-    return;
-  }
-
-  grid.innerHTML = trashItems.map(item => `
-    <div class="card">
-      <div class="card-icon">${getItemIcon(item)}</div>
-      <div class="card-title">${escapeHTML(item.name || item.title)}</div>
-      <div class="btn-group" style="margin-top:10px;">
-        <button class="btn" onclick="restoreTrashItem('${item.id}')">Restore</button>
-        <button class="btn danger" onclick="deleteTrashPermanent('${item.id}')">Delete Permanently</button>
-      </div>
-    </div>
-  `).join("");
-}
-
-async function restoreTrashItem(id) {
-  const item = await getItem(id, "trash");
-  if (item) {
-    const targetStore = item.originalStore || "items";
-    delete item.deletedAt;
-    delete item.originalStore;
-    await saveItem(item, targetStore);
-    await removeItem(id, "trash");
-    renderTrashView();
-    showToast("Item Restored");
-  }
-}
-
-async function deleteTrashPermanent(id) {
-  customConfirm("Permanent Delete", "Are you sure you want to delete this permanently?", async () => {
-    await removeItem(id, "trash");
-    renderTrashView();
-    showToast("Deleted Permanently");
-  });
-}
-
-async function restoreAllTrash() {
-  const items = await getItems("trash");
-  for(let item of items) {
-    const targetStore = item.originalStore || "items";
-    delete item.deletedAt;
-    delete item.originalStore;
-    await saveItem(item, targetStore);
-    await removeItem(item.id, "trash");
-  }
-  renderTrashView();
-  showToast("All Restored");
-}
-
-async function emptyTrashAll() {
-  customConfirm("Empty Trash", "Are you sure you want to empty the trash completely?", async () => {
-    const items = await getItems("trash");
-    for(let item of items) await removeItem(item.id, "trash");
-    renderTrashView();
-    showToast("Trash Emptied");
-  });
-}
-
-// Bulk Helpers
-async function handleBulkDelete() {
-  customConfirm("Delete Selected", "Move selected items to Trash?", async () => {
-    const store = currentView === "notes" ? "notes" : "items";
-    for(let id of selectedItems) {
-      const item = await getItem(id, store);
-      if(item) {
-        item.deletedAt = Date.now();
-        item.originalStore = store;
-        await saveItem(item, "trash");
-        await removeItem(id, store);
-      }
-    }
-    selectedItems.clear();
-    updateSelectionBar();
-    refreshCurrentView();
-    showToast("Selected Items Deleted");
-  });
-}
-
-function refreshCurrentView() {
-  if (currentView === "files") renderFilesView();
-  else if (currentView === "notes") renderNotesView();
-  else if (currentView === "trash") renderTrashView();
-}
-
-function formatSize(bytes) {
-  if (!bytes) return "0 B";
-  const k = 1024, sizes = ["B", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
-}
-
-function escapeHTML(str) {
-  return String(str || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-}
-
-// Mobile Back Listener
-window.addEventListener("popstate", (e) => {
-  if (document.getElementById("editorScreen").classList.contains("show")) {
-    closeEditor();
-  }
-});
-
-// App Start
-initDB().then(() => {
-  switchView("files");
-});
+document.getElementById('resetCardsBtn').onclick=()=>{state.cards.forEach(c=>c.used=false);save();renderCards();toast('Cards reset')};
+document.getElementById('addCardBtn').onclick=()=>document.getElementById('customCardModal').classList.add('show');
+document.getElementById('saveCardBtn').onclick=()=>{
+ const n=document.getElementById('customCardName').value.trim(),d=document.getElementById('customCardDesc').value.trim();
+ if(!n)return;state.cards.push({id:'custom_'+Date.now(),name:n,desc:d||'Custom card effect.',used:false,custom:true});document.getElementById('customCardName').value='';document.getElementById('customCardDesc').value='';closeModal('customCardModal');save();renderCards();toast('Custom card added');
+};
+document.getElementById('randomCardsBtn').onclick=()=>{
+ const count=Math.max(1,Math.min(35,+document.getElementById('randomCount').value||5));
+ const pool=state.cards.filter(c=>!c.used),out=[];
+ while(pool.length&&out.length<count)out.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);
+ state.cards.forEach(c=>c._picked=false);out.forEach(c=>c._picked=true);save();renderCards();
+ setTimeout(()=>out.forEach(c=>c._picked=false),100);
+ toast(out.length+' random card'+(out.length===1?'':'s')+' selected');
+};
+document.getElementById('exportBtn').onclick=()=>{
+ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(state.squadName||'squadforge-squad')+'.json';a.click();URL.revokeObjectURL(a.href);toast('Squad exported');
+};
+document.getElementById('importBtn').onclick=()=>document.getElementById('fileInput').click();
+document.getElementById('fileInput').onchange=e=>{
+ const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state={...initialState(),...JSON.parse(r.result)};save();render();toast('Squad imported')}catch(x){toast('Invalid squad file')}};r.readAsText(f);e.target.value='';
+};
+document.getElementById('resetBtn').onclick=()=>{
+ if(confirm('Reset the entire squad, budget, club and cards? This cannot be undone.')){state=initialState();save();render();toast('Everything reset')}
+};
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>x.classList.remove('show'),1800)}
+render();
 </script>
+<script>
+function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'ar,en,fr,es,de,it,pt,tr'},'google_translate_element');}
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
