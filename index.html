@@ -33,70 +33,73 @@
     .panel-head h2{font-size:16px;margin:0}
     .small{font-size:12px;color:var(--muted)}
 
-    /* العرض فوق الملعب للمعاملات والنادي */
+    /* Pitch Info Overlay Header */
     .pitch-header-info {
       display: flex;
-      gap: 12px;
-      padding: 12px 18px;
-      background: rgba(14,27,45,0.6);
-      border-bottom: 1px solid var(--line);
-      flex-wrap: wrap;
-      align-items: center;
       justify-content: space-between;
-    }
-    .pitch-info-badge {
-      display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--accent2);
-      background: rgba(7,17,29,0.7);
-      padding: 6px 12px;
-      border-radius: 10px;
+      background: rgba(14, 27, 45, 0.95);
       border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 16px;
+      margin-bottom: 12px;
+      gap: 10px;
+      flex-wrap: wrap;
     }
-    .pitch-info-badge span { color: var(--text); font-weight: 500; }
+    .pitch-info-block {
+      display: flex;
+      flex-direction: column;
+    }
+    .pitch-info-label {
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .pitch-info-val {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--accent);
+    }
 
     .pitch-wrap{padding:16px}
-    .pitch{position:relative;aspect-ratio:1/1.2;width:100%;max-width:700px;margin:auto;min-height:520px;overflow:hidden;border-radius:18px;border:1px solid rgba(255,255,255,.15);
+    .pitch{position:relative;aspect-ratio:1.12/1;min-height:560px;overflow:hidden;border-radius:18px;border:1px solid rgba(255,255,255,.15);
       background:
       linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px) 0 0/10% 100%,
       repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 10%),
       linear-gradient(135deg,#0e5a3d,#0a6a43 48%,#0b5c3c);
     }
-    .pitch:before{content:"";position:absolute;inset:4%;border:2px solid rgba(255,255,255,.72);border-radius:2px}
-    .half{position:absolute;left:4%;right:4%;top:50%;border-top:2px solid rgba(255,255,255,.72)}
-    .circle{position:absolute;width:22%;aspect-ratio:1;border:2px solid rgba(255,255,255,.72);border-radius:50%;left:39%;top:39%}
-    .box{position:absolute;left:26%;right:26%;top:4%;height:16%;border:2px solid rgba(255,255,255,.72);border-top:0}
-    .box2{position:absolute;left:26%;right:26%;bottom:4%;height:16%;border:2px solid rgba(255,255,255,.72);border-bottom:0}
-    .spot{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff;left:50%;top:15%;transform:translateX(-50%)}
-    .spot2{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff;left:50%;bottom:15%;transform:translateX(-50%)}
-    
-    .slot{position:absolute;transform:translate(-50%,-50%);width:95px;text-align:center;transition:.25s;z-index:2}
-    .slot:hover{transform:translate(-50%,-50%) scale(1.05)}
-    .avatar{width:58px;height:58px;margin:auto;border-radius:50%;border:3px solid rgba(255,255,255,.85);background:#0a1724;display:grid;place-items:center;overflow:hidden;box-shadow:0 9px 24px rgba(0,0,0,.28)}
+    .pitch:before{content:"";position:absolute;inset:5%;border:2px solid rgba(255,255,255,.72);border-radius:2px}
+    .half{position:absolute;left:5%;right:5%;top:50%;border-top:2px solid rgba(255,255,255,.72)}
+    .circle{position:absolute;width:21%;aspect-ratio:1;border:2px solid rgba(255,255,255,.72);border-radius:50%;left:39.5%;top:39.5%}
+    .box{position:absolute;left:29%;right:29%;top:5%;height:17%;border:2px solid rgba(255,255,255,.72);border-top:0}
+    .box2{position:absolute;left:29%;right:29%;bottom:5%;height:17%;border:2px solid rgba(255,255,255,.72);border-bottom:0}
+    .spot{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;left:50%;top:22%}
+    .spot2{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;left:50%;bottom:22%}
+    .slot{position:absolute;transform:translate(-50%,-50%);width:100px;text-align:center;transition:.25s;z-index:2}
+    .slot:hover{transform:translate(-50%,-50%) scale(1.04)}
+    .avatar{width:60px;height:60px;margin:auto;border-radius:50%;border:3px solid rgba(255,255,255,.85);background:#0a1724;display:grid;place-items:center;overflow:hidden;box-shadow:0 9px 24px rgba(0,0,0,.28)}
     .avatar img{width:100%;height:100%;object-fit:cover}
-    .avatar .num{font-weight:900;font-size:16px}
+    .avatar .num{font-weight:900;font-size:17px}
     .player-name{margin-top:5px;font-weight:800;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .player-meta{margin-top:2px;font-size:10px;color:#d4fbe8}
     .slot.empty .avatar{border-style:dashed;border-color:rgba(255,255,255,.35);color:#c7d4e2}
     .slot.empty .player-name{color:#b7c6d8}
-    .slot .edit-dot{position:absolute;right:12px;top:-2px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:#0b1523;border:1px solid #3a5069;color:#fff}
+    .slot .edit-dot{position:absolute;right:14px;top:-2px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:#0b1523;border:1px solid #3a5069;color:#fff}
     .slot .edit-dot svg{width:10px}
+    
+    /* Optimized positions for responsive layout */
+    .s1{left:50%;top:88%}.s2{left:16%;top:71%}.s3{left:38%;top:71%}.s4{left:62%;top:71%}.s5{left:84%;top:71%}
+    .s6{left:30%;top:48%}.s7{left:50%;top:52%}.s8{left:70%;top:48%}
+    .s9{left:18%;top:24%}.s10{left:50%;top:20%}.s11{left:82%;top:24%}
 
-    /* ضبط مواقع المراكز داخل الملعب */
-    .s1{left:50%;top:88%}.s2{left:16%;top:72%}.s3{left:38%;top:74%}.s4{left:62%;top:74%}.s5{left:84%;top:72%}
-    .s6{left:30%;top:50%}.s7{left:50%;top:52%}.s8{left:70%;top:50%}
-    .s9{left:20%;top:24%}.s10{left:50%;top:20%}.s11{left:80%;top:24%}
-
-    .bench{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;padding:14px 16px 18px;overflow-x:auto}
-    .bench-card{min-width:70px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:8px;text-align:center;transition:.2s}
+    .bench{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;padding:14px 16px 18px}
+    .bench-card{min-width:0;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center;transition:.2s}
     .bench-card:hover{border-color:#355271}
-    .bench-avatar{width:38px;height:38px;border-radius:50%;margin:0 auto 5px;background:#07111d;border:2px solid #42576f;overflow:hidden;display:grid;place-items:center}
+    .bench-avatar{width:42px;height:42px;border-radius:50%;margin:0 auto 7px;background:#07111d;border:2px solid #42576f;overflow:hidden;display:grid;place-items:center}
     .bench-avatar img{width:100%;height:100%;object-fit:cover}
-    .bench-name{font-size:10px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .bench-price{font-size:9px;color:var(--accent);margin-top:2px}
+    .bench-name{font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .bench-price{font-size:10px;color:var(--accent);margin-top:2px}
     .side{display:flex;flex-direction:column;gap:16px}
     .budget{padding:18px;background:linear-gradient(135deg,rgba(94,230,168,.1),rgba(85,168,255,.06))}
     .budget-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px}
@@ -115,21 +118,21 @@
     .price{font-size:11px;color:var(--accent);text-align:right}
     .icon-btn{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:#0d1b2b;color:#c8d6e5;display:grid;place-items:center}
     .icon-btn svg{width:14px}
+    
     .cards-panel{margin-top:16px}
     .cards-toggle{width:100%;background:none;border:0;color:#fff;padding:16px 18px;display:flex;align-items:center;justify-content:space-between}
     .cards-toggle .chev{transition:.25s}
     .cards-panel.open .chev{transform:rotate(180deg)}
     .cards-content{max-height:0;overflow:hidden;transition:max-height .45s ease}
-    .cards-panel.open .cards-content{max-height:1200px}
-    .card-toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 13px}
+    .cards-panel.open .cards-content{max-height:1500px}
+    .card-toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 13px;align-items:center}
     .cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 16px 18px}
-    .game-card{position:relative;min-height:135px;padding:13px;border-radius:16px;background:linear-gradient(160deg,#111f31,#091421);border:1px solid #24364d;transition:.25s}
+    .game-card{position:relative;min-height:110px;padding:13px;border-radius:16px;background:linear-gradient(160deg,#111f31,#091421);border:1px solid #24364d;transition:.25s;display:flex;flex-direction:column;justify-content:space-between}
     .game-card:hover{transform:translateY(-3px);border-color:#42627f}
-    .game-card.used{opacity:.4;filter:saturate(.25)}
-    .game-card .card-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(94,230,168,.1);color:var(--accent);border:1px solid rgba(94,230,168,.22);margin-bottom:10px}
-    .game-card h4{margin:0;font-size:13px}.game-card p{font-size:11px;color:var(--muted);line-height:1.45;margin:6px 0 10px}
-    .game-card button{font-size:10px;padding:7px 9px;border-radius:8px}
-    .used-tag{position:absolute;top:10px;right:10px;font-size:9px;color:#9ba8b7}
+    .game-card .card-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(94,230,168,.1);color:var(--accent);border:1px solid rgba(94,230,168,.22);margin-bottom:8px}
+    .game-card h4{margin:0;font-size:13px;word-break:break-word;}.game-card p{font-size:11px;color:var(--muted);line-height:1.45;margin:4px 0 8px}
+    .game-card .card-actions{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.68);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px;z-index:100}
     .modal.show{display:flex}
     .modal-box{width:min(560px,100%);background:#0a1422;border:1px solid #273c55;border-radius:20px;box-shadow:0 30px 100px rgba(0,0,0,.55);overflow:hidden}
@@ -139,24 +142,14 @@
     .tabs{display:flex;gap:6px;padding:3px;background:#07111d;border:1px solid var(--line);border-radius:12px}
     .tab{flex:1;border:0;background:transparent;color:var(--muted);padding:9px;border-radius:9px}.tab.active{background:#13253a;color:#fff}
     .hidden{display:none!important}
-    
-    /* التنبيه المخصص (Toast) */
-    .toast{position:fixed;bottom:18px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#102033;color:var(--accent);border:1px solid var(--accent);padding:12px 18px;border-radius:12px;font-size:13px;font-weight:800;z-index:200;transition:.25s;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+    .toast{position:fixed;bottom:18px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#eafbf3;color:#07111d;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:800;z-index:200;transition:.25s;box-shadow:0 10px 30px rgba(0,0,0,0.4);border:1px solid #5ee6a8;text-align:center}
     .toast.show{opacity:1;transform:translate(-50%,0)}
-    .toast.error{color:var(--danger);border-color:var(--danger)}
-
-    @media(max-width:1050px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.cards-grid{grid-template-columns:repeat(3,1fr)}}
+    
+    @media(max-width:1050px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.pitch{min-height:500px}.cards-grid{grid-template-columns:repeat(3,1fr)}}
     @media(max-width:680px){
-      .app{padding:9px}.topbar{top:5px}.actions .label{display:none}.layout{display:block}.side{display:block}.pitch-wrap{padding:6px}
-      .pitch{min-height:440px;aspect-ratio:1/1.25}
-      .slot{width:70px}
-      .avatar{width:44px;height:44px}
-      .player-name{font-size:10px}
-      .bench-card{min-width:55px;padding:5px}
-      .cards-grid{grid-template-columns:repeat(2,1fr)}
-      .budget-value{font-size:28px}
-      .pitch-header-info{gap:6px;padding:8px 10px}
-      .pitch-info-badge{font-size:11px;padding:4px 8px}
+      .app{padding:9px}.topbar{top:5px}.actions .label{display:none}.layout{display:block}.side{display:block}
+      .pitch-wrap{padding:9px}.pitch{min-height:460px;aspect-ratio:0.9/1}.slot{width:70px}.avatar{width:46px;height:46px}.avatar .num{font-size:14px}.player-name{font-size:10px}.player-meta{font-size:9px}
+      .bench{grid-template-columns:repeat(3,1fr)}.cards-grid{grid-template-columns:repeat(2,1fr)}.budget-value{font-size:28px}.box,.box2{left:22%;right:22%}
     }
   </style>
 </head>
@@ -176,23 +169,17 @@
 
   <main class="layout">
     <section class="panel">
-      <div class="panel-head">
-        <div>
-          <h2>Starting XI</h2>
-          <div class="small">Click a position to edit, add a player, or swap with the bench.</div>
-        </div>
-        <div class="small" id="formationText">4-3-3</div>
-      </div>
-
-      <!-- عرض معلومات الفريق والمدرب والمستخدم أعلى الملعب مباشرة -->
-      <div class="pitch-header-info">
-        <div class="pitch-info-badge">Club: <span id="dispClub">---</span></div>
-        <div class="pitch-info-badge">Squad: <span id="dispSquad">---</span></div>
-        <div class="pitch-info-badge">Coach: <span id="dispManager">---</span></div>
-        <div class="pitch-info-badge">User: <span id="dispUser">---</span></div>
-      </div>
-
+      <div class="panel-head"><div><h2>Starting XI</h2><div class="small">Click a position to edit, add a player, or swap with the bench.</div></div><div class="small" id="formationText">4-3-3</div></div>
       <div class="pitch-wrap">
+        
+        <!-- Interactive Team Details Header above pitch -->
+        <div class="pitch-header-info">
+          <div class="pitch-info-block"><span class="pitch-info-label">Club</span><span class="pitch-info-val" id="dispClub">---</span></div>
+          <div class="pitch-info-block"><span class="pitch-info-label">Squad</span><span class="pitch-info-val" id="dispSquad">---</span></div>
+          <div class="pitch-info-block"><span class="pitch-info-label">Manager</span><span class="pitch-info-val" id="dispMgr">---</span></div>
+          <div class="pitch-info-block"><span class="pitch-info-label">Owner / User</span><span class="pitch-info-val" id="dispUser">---</span></div>
+        </div>
+
         <div class="pitch" id="pitch">
           <div class="half"></div><div class="circle"></div><div class="box"></div><div class="box2"></div><div class="spot"></div><div class="spot2"></div>
         </div>
@@ -218,7 +205,7 @@
           <div class="field"><label>CLUB</label><input class="input" id="clubInput" placeholder="Club name"></div>
           <div class="field"><label>SQUAD NAME</label><input class="input" id="nameInput" placeholder="Squad name"></div>
           <div class="field"><label>HEAD COACH</label><input class="input" id="mgrInput" placeholder="Manager"></div>
-          <div class="field"><label>USER NAME</label><input class="input" id="userInput" placeholder="Your Name"></div>
+          <div class="field"><label>YOUR NAME</label><input class="input" id="userInput" placeholder="Your Name"></div>
         </div>
       </section>
 
@@ -229,18 +216,22 @@
     </aside>
   </main>
 
-  <section class="panel cards-panel" id="cardsPanel">
-    <button class="cards-toggle" id="cardsToggle"><div><h2 style="margin:0;font-size:16px;text-align:left">Game Cards</h2><div class="small">One-use effects • Use, then the card is marked as spent</div></div>
+  <section class="panel cards-panel open" id="cardsPanel">
+    <button class="cards-toggle" id="cardsToggle"><div><h2 style="margin:0;font-size:16px;text-align:left">Game Cards</h2><div class="small">Add custom cards and draw randomly when needed</div></div>
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
     </button>
     <div class="cards-content">
       <div class="card-toolbar">
-        <button class="btn primary" id="randomCardsBtn">Random Cards</button>
-        <input class="input" id="randomCount" type="number" min="1" max="35" value="3" style="width:100px">
+        <button class="btn primary" id="randomCardsBtn">Draw Random Cards</button>
+        <input class="input" id="randomCount" type="number" min="1" value="3" style="width:90px" placeholder="Count">
         <button class="btn" id="addCardBtn">Add Custom Card</button>
-        <button class="btn" id="resetCardsBtn">Reset Used Cards</button>
       </div>
+
+      <div style="padding: 0 16px 8px;"><h4 style="margin: 0; font-size:13px; color:var(--accent);">Available Pool Cards (<span id="availCardsCount">0</span>)</h4></div>
       <div class="cards-grid" id="cardsGrid"></div>
+
+      <div style="padding: 10px 16px 8px; border-top:1px solid var(--line);"><h4 style="margin: 0; font-size:13px; color:var(--accent2);">Drawn / Selected Cards</h4></div>
+      <div class="cards-grid" id="drawnCardsGrid"></div>
     </div>
   </section>
 </div>
@@ -270,8 +261,8 @@
   <div class="modal-box">
     <div class="modal-head"><h3 style="margin:0">Add Custom Card</h3><button class="icon-btn" data-close="customCardModal">×</button></div>
     <div class="modal-body">
-      <div class="field"><label>CARD NAME</label><input class="input" id="customCardName" placeholder="Extra Transfer"></div>
-      <div class="field"><label>EFFECT / DESCRIPTION</label><input class="input" id="customCardDesc" placeholder="Describe what this card does"></div>
+      <div class="field"><label>CARD NAME</label><input class="input" id="customCardName" placeholder="e.g. Free Transfer"></div>
+      <div class="field"><label>EFFECT / DESCRIPTION</label><input class="input" id="customCardDesc" placeholder="Describe card action..."></div>
     </div>
     <div class="modal-actions"><button class="btn" data-close="customCardModal">Cancel</button><button class="btn primary" id="saveCardBtn">Add Card</button></div>
   </div>
@@ -285,6 +276,8 @@ const POSITIONS = [
   {key:'CM',label:'CM'}, {key:'CDM',label:'CDM'}, {key:'CAM',label:'CAM'}, {key:'RW',label:'RW'}, {key:'LW',label:'LW'}, {key:'ST',label:'ST'}
 ];
 const BENCH_POS = ['GK','DEF','DEF','MID','MID','ATK','ATK'];
+// Initial pool empty as requested
+const defaults = [];
 const slotClass = {GK:'s1',RB:'s2',CB1:'s3',CB2:'s4',LB:'s5',CM:'s6',CDM:'s7',CAM:'s8',RW:'s9',LW:'s10',ST:'s11'};
 let state = loadState();
 
@@ -294,7 +287,7 @@ function initialState(){
   return {
     startingBudget:200000000, club:'', squadName:'', manager:'', userName:'',
     players, bench:Array.from({length:7},(_,i)=>({name:'',price:0,pos:BENCH_POS[i],image:''})),
-    cards:[] // البدء بدون أي كروت افتراضية
+    cards:[], drawnCards:[]
   };
 }
 function loadState(){
@@ -335,16 +328,16 @@ function icon(name){
 function render(){
  document.getElementById('budgetValue').textContent=money(remainingBudget());
  document.getElementById('budgetInput').value=money(state.startingBudget);
- document.getElementById('clubInput').value=state.club || '';
- document.getElementById('nameInput').value=state.squadName || '';
- document.getElementById('mgrInput').value=state.manager || '';
- document.getElementById('userInput').value=state.userName || '';
+ document.getElementById('clubInput').value=state.club||'';
+ document.getElementById('nameInput').value=state.squadName||'';
+ document.getElementById('mgrInput').value=state.manager||'';
+ document.getElementById('userInput').value=state.userName||'';
 
- // تحديث العرض العلوي للمعلومات
- document.getElementById('dispClub').textContent = state.club || '---';
- document.getElementById('dispSquad').textContent = state.squadName || '---';
- document.getElementById('dispManager').textContent = state.manager || '---';
- document.getElementById('dispUser').textContent = state.userName || '---';
+ // Display Info above pitch
+ document.getElementById('dispClub').textContent=state.club||'---';
+ document.getElementById('dispSquad').textContent=state.squadName||'---';
+ document.getElementById('dispMgr').textContent=state.manager||'---';
+ document.getElementById('dispUser').textContent=state.userName||'---';
 
  const pitch=document.getElementById('pitch');
  pitch.querySelectorAll('.slot').forEach(x=>x.remove());
@@ -397,7 +390,7 @@ document.getElementById('savePlayerBtn').onclick=()=>{
  const slot=document.getElementById('editSlot').value, isBench=slot.startsWith('bench');
  const old=isBench?state.bench[+slot.replace('bench','')]:state.players[slot];
  const name=document.getElementById('playerName').value.trim(), price=parseMoney(document.getElementById('playerPrice').value);
- if(name && price>remainingBudget()+parseMoney(old.price)){toast('Not enough remaining budget.', true);return}
+ if(name && price>remainingBudget()+parseMoney(old.price)){toast('Not enough remaining budget.');return}
  const data={name,price,pos:document.getElementById('playerPos').value,image:document.getElementById('playerImage').value.trim()};
  if(isBench)state.bench[+slot.replace('bench','')]=data;else state.players[slot]=data;
  closeModal('playerModal');render();toast(name?'Player saved':'Slot cleared');
@@ -415,59 +408,72 @@ document.getElementById('playerFile').onchange=e=>{
  document.getElementById('urlTab').click();
 };
 ['clubInput','nameInput','mgrInput','userInput'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{
- state[{clubInput:'club',nameInput:'squadName',mgrInput:'manager',userInput:'userName'}[id]]=e.target.value;
- render();
+ const keys={clubInput:'club',nameInput:'squadName',mgrInput:'manager',userInput:'userName'};
+ state[keys[id]]=e.target.value;
+ save();
+ document.getElementById({clubInput:'dispClub',nameInput:'dispSquad',mgrInput:'dispMgr',userInput:'dispUser'}[id]).textContent=e.target.value||'---';
 }));
 document.getElementById('setBudgetBtn').onclick=()=>{
  const n=parseMoney(document.getElementById('budgetInput').value);
- if(n<totalSpent()){toast('Starting budget cannot be lower than total squad cost.', true);return}
+ if(n<totalSpent()){toast('Starting budget cannot be lower than total squad cost.');return}
  state.startingBudget=n;render();toast('Budget updated');
 };
 document.getElementById('cardsToggle').onclick=()=>document.getElementById('cardsPanel').classList.toggle('open');
+
 function renderCards(){
- const grid=document.getElementById('cardsGrid');grid.innerHTML='';
- if(state.cards.length === 0){
-   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:20px;">No cards added yet. Click "Add Custom Card" to create one.</div>';
-   return;
- }
- state.cards.forEach(c=>{
-   const el=document.createElement('article');el.className='game-card'+(c.used?' used':'');
-   el.innerHTML=`<div class="card-icon">${icon('bolt')}</div>${c.used?'<span class="used-tag">USED</span>':''}<h4>${esc(c.name)}</h4><p>${esc(c.desc)}</p><button class="btn ${c.used?'':'primary'}" ${c.used?'disabled':''}>${c.used?'Spent':'Use Card'}</button>`;
-   el.querySelector('button').onclick=()=>{c.used=true;save();renderCards();toast(c.name+' used');};
+ const grid=document.getElementById('cardsGrid'); grid.innerHTML='';
+ document.getElementById('availCardsCount').textContent=state.cards.length;
+ state.cards.forEach((c, idx)=>{
+   const el=document.createElement('article');el.className='game-card';
+   el.innerHTML=`<div class="card-icon">${icon('bolt')}</div><h4>${esc(c.name)}</h4><p>${esc(c.desc)}</p>
+   <div class="card-actions"><button class="btn danger" style="padding:4px 8px;font-size:10px;">Remove</button></div>`;
+   el.querySelector('button').onclick=()=>{
+     state.cards.splice(idx,1); save(); renderCards(); toast('Card removed from pool');
+   };
    grid.appendChild(el);
  });
+
+ const drawnGrid=document.getElementById('drawnCardsGrid'); drawnGrid.innerHTML='';
+ (state.drawnCards||[]).forEach(c=>{
+   const el=document.createElement('article');el.className='game-card';
+   el.style.borderColor='var(--accent2)';
+   el.innerHTML=`<div class="card-icon" style="color:var(--accent2);background:rgba(85,168,255,0.1);border-color:rgba(85,168,255,0.22);">${icon('card')}</div><h4>${esc(c.name)}</h4><p>${esc(c.desc)}</p>`;
+   drawnGrid.appendChild(el);
+ });
 }
-document.getElementById('resetCardsBtn').onclick=()=>{state.cards.forEach(c=>c.used=false);save();renderCards();toast('Cards reset')};
+
 document.getElementById('addCardBtn').onclick=()=>document.getElementById('customCardModal').classList.add('show');
 document.getElementById('saveCardBtn').onclick=()=>{
  const n=document.getElementById('customCardName').value.trim(),d=document.getElementById('customCardDesc').value.trim();
- if(!n)return;state.cards.push({id:'custom_'+Date.now(),name:n,desc:d||'Custom card effect.',used:false,custom:true});document.getElementById('customCardName').value='';document.getElementById('customCardDesc').value='';closeModal('customCardModal');save();renderCards();toast('Custom card added');
+ if(!n)return;
+ state.cards.push({id:'custom_'+Date.now(),name:n,desc:d||'Custom card effect.'});
+ document.getElementById('customCardName').value='';document.getElementById('customCardDesc').value='';
+ closeModal('customCardModal');save();renderCards();toast('Custom card added');
 };
 
-// السحب العشوائي مع التنبيه المخصص
 document.getElementById('randomCardsBtn').onclick=()=>{
- const requestedCount = parseInt(document.getElementById('randomCount').value) || 0;
- const availableCards = state.cards.filter(c=>!c.used);
- 
- if(availableCards.length === 0){
-   toast('No available cards to draw!', true);
+ const count = parseInt(document.getElementById('randomCount').value);
+ if(isNaN(count) || count <= 0){
+   toast('Please enter a valid count');
    return;
  }
- 
- if(requestedCount > availableCards.length){
-   toast(`Cannot draw ${requestedCount} cards. Only ${availableCards.length} available!`, true);
+ if(state.cards.length === 0){
+   toast('No cards available! Add custom cards first.');
+   return;
+ }
+ if(count > state.cards.length){
+   toast(`Warning: Only ${state.cards.length} card(s) available in pool! Cannot draw ${count}.`);
    return;
  }
 
- const pool = [...availableCards], out = [];
- for(let i = 0; i < requestedCount; i++){
-   out.push(pool.splice(Math.floor(Math.random()*pool.length), 1)[0]);
+ const pool=[...state.cards], out=[];
+ for(let i=0; i<count; i++){
+   const idx = Math.floor(Math.random()*pool.length);
+   out.push(pool.splice(idx,1)[0]);
  }
-
- state.cards.forEach(c => c._picked = false);
- out.forEach(c => c._picked = true);
+ state.drawnCards = out;
  save(); renderCards();
- toast(out.length+' random card'+(out.length===1?'':'s')+' selected');
+ toast(`${out.length} random card(s) drawn!`);
 };
 
 document.getElementById('exportBtn').onclick=()=>{
@@ -475,21 +481,13 @@ document.getElementById('exportBtn').onclick=()=>{
 };
 document.getElementById('importBtn').onclick=()=>document.getElementById('fileInput').click();
 document.getElementById('fileInput').onchange=e=>{
- const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state={...initialState(),...JSON.parse(r.result)};save();render();toast('Squad imported')}catch(x){toast('Invalid squad file', true)}};r.readAsText(f);e.target.value='';
+ const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state={...initialState(),...JSON.parse(r.result)};save();render();toast('Squad imported')}catch(x){toast('Invalid squad file')}};r.readAsText(f);e.target.value='';
 };
 document.getElementById('resetBtn').onclick=()=>{
- if(confirm('Reset the entire squad, budget, club and cards? This cannot be undone.')){state=initialState();save();render();toast('Everything reset')}
+ state=initialState();save();render();toast('Everything reset');
 };
 
-function toast(t, isError = false){
-  const x=document.getElementById('toast');
-  x.textContent=t;
-  if(isError) x.classList.add('error'); else x.classList.remove('error');
-  x.classList.add('show');
-  clearTimeout(window.__toast);
-  window.__toast=setTimeout(()=>x.classList.remove('show'),2500);
-}
-
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>x.classList.remove('show'),3000)}
 render();
 </script>
 </body>
