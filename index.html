@@ -93,6 +93,16 @@
     .input{width:100%;background:#07111d;border:1px solid var(--line);color:#fff;padding:11px 12px;border-radius:11px;outline:none}
     .input:focus{border-color:#4b8cc5;box-shadow:0 0 0 3px rgba(85,168,255,.1)}
     .fields{display:grid;gap:10px;padding:16px}
+    .manager-card{margin:0 16px 16px;padding:14px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#0b1a2b,#07111d);display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;transition:.25s}
+    .manager-card:hover{transform:translateY(-2px);border-color:#355271}
+    .manager-avatar{width:64px;height:64px;border-radius:16px;overflow:hidden;background:#0d1b2b;border:1px solid #3a5069;display:grid;place-items:center;font-weight:900;color:#bcd0e5}
+    .manager-avatar img{width:100%;height:100%;object-fit:cover}
+    .manager-name{font-weight:900;font-size:14px}.manager-price{font-size:11px;color:var(--accent);margin-top:4px}.manager-empty{color:var(--muted);font-size:12px}
+    .deck-summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 16px 12px}.count-pill{background:#07111d;border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:11px;font-weight:850;color:#dce8f4}
+    .hidden-cards{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;padding:0 16px 16px}.hidden-card{aspect-ratio:1/1.12;border:1px solid #2a4058;background:linear-gradient(145deg,#102137,#081321);border-radius:14px;color:#8fa6bd;font-weight:900;font-size:12px;display:grid;place-items:center;transition:.22s;position:relative;overflow:hidden}.hidden-card:before{content:'?';position:absolute;font-size:42px;color:rgba(94,230,168,.08)}.hidden-card span{position:relative}.hidden-card:hover{transform:translateY(-3px) rotate(-1deg);border-color:#4b6f91;color:#e9f5ff}.hidden-card:active{transform:scale(.96)}
+    .used-list{display:grid;gap:7px;padding:0 16px 16px}.used-row{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center;background:#07111d;border:1px solid var(--line);padding:9px 10px;border-radius:12px}.used-row b{font-size:12px}.used-row span{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+    .manager-modal-preview{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:14px;background:#07111d}.manager-modal-preview .manager-avatar{width:72px;height:72px}
+
     .field label{display:block;color:var(--muted);font-size:11px;margin:0 0 5px}
     .field-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
     .player-list{padding:10px 16px 16px;display:grid;gap:7px}
@@ -107,8 +117,8 @@
     .cards-toggle{width:100%;background:none;border:0;color:#fff;padding:16px 18px;display:flex;align-items:center;justify-content:space-between}
     .cards-toggle .chev{transition:.25s}
     .cards-panel.open .chev{transform:rotate(180deg)}
-    .cards-content{max-height:0;overflow:hidden;transition:max-height .45s ease}
-    .cards-panel.open .cards-content{max-height:1200px}
+    .cards-content{max-height:0;overflow:hidden;transition:max-height .55s ease}
+    .cards-panel.open .cards-content{max-height:2200px}
     .card-toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 13px}
     .cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 16px 18px}
     .game-card{position:relative;min-height:135px;padding:13px;border-radius:16px;background:linear-gradient(160deg,#111f31,#091421);border:1px solid #24364d;transition:.25s}
@@ -118,6 +128,15 @@
     .game-card h4{margin:0;font-size:13px}.game-card p{font-size:11px;color:var(--muted);line-height:1.45;margin:6px 0 10px}
     .game-card button{font-size:10px;padding:7px 9px;border-radius:8px}
     .used-tag{position:absolute;top:10px;right:10px;font-size:9px;color:#9ba8b7}
+    /* File inputs use the site's dark visual language instead of the browser's white native control. */
+    input[type=file]{width:100%;background:#07111d;color:#cbd8e6;border:1px solid var(--line);padding:8px;border-radius:11px;font-size:12px}
+    input[type=file]::file-selector-button{border:1px solid #2d4660;background:#102238;color:#eef6ff;border-radius:8px;padding:7px 10px;margin-right:9px;font:inherit;font-weight:700;cursor:pointer;transition:.2s}
+    input[type=file]::file-selector-button:hover{background:#17304a;border-color:#466887}
+    .modal-actions{flex-wrap:wrap;align-items:center}
+    .modal-actions .btn{flex:0 0 auto;min-width:0;white-space:nowrap}
+    .used-row .card-use-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+    .used-row .card-row-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+    .spent-row{opacity:.65}
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.68);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px;z-index:100}
     .modal.show{display:flex}
     .modal-box{width:min(560px,100%);background:#0a1422;border:1px solid #273c55;border-radius:20px;box-shadow:0 30px 100px rgba(0,0,0,.55);overflow:hidden}
@@ -130,7 +149,7 @@
     .toast{position:fixed;bottom:18px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#eafbf3;color:#07111d;padding:10px 14px;border-radius:12px;font-size:12px;font-weight:800;z-index:200;transition:.25s}
     .toast.show{opacity:1;transform:translate(-50%,0)}
     .footer-note{color:#6f8196;font-size:10px;text-align:center;padding:14px}
-    @media(max-width:1050px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.cards-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:1050px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.cards-grid{grid-template-columns:repeat(3,1fr)}.hidden-cards{grid-template-columns:repeat(6,1fr)}}
     @media(max-width:680px){
       .app{padding:8px}.topbar{top:4px;padding:9px 10px}.brand-mark{width:36px;height:36px}.brand{font-size:14px}.actions{gap:5px}.actions .label{display:none}.btn{padding:9px 10px}
       .layout{display:block}.side{display:block}.pitch-wrap{padding:9px}.pitch{width:100%;aspect-ratio:.74/1;min-height:0;border-radius:15px}
@@ -139,8 +158,9 @@
       .s1{top:91%}.s2{left:16%;top:73%}.s3{left:39%;top:73%}.s4{left:61%;top:73%}.s5{left:84%;top:73%}
       .s6{left:28%;top:52%}.s7{left:50%;top:52%}.s8{left:72%;top:52%}.s9{left:16%;top:26%}.s10{left:50%;top:23%}.s11{left:84%;top:26%}
       .bench{grid-template-columns:repeat(3,1fr);padding:12px 9px 15px}.bench-card{padding:8px 5px}.bench-avatar{width:38px;height:38px}
-      .field-row{grid-template-columns:1fr}.cards-grid{grid-template-columns:1fr}.cards-form{padding:0 10px 11px}.cards-list{padding:0 10px 14px}.deck-row{grid-template-columns:1fr}.deck-actions{justify-content:flex-start}
+      .field-row{grid-template-columns:1fr}.cards-grid{grid-template-columns:1fr}.cards-form{padding:0 10px 11px}.cards-list{padding:0 10px 14px}.deck-row{grid-template-columns:1fr}.deck-actions{justify-content:flex-start}.hidden-cards{grid-template-columns:repeat(4,1fr);padding:0 10px 14px}.manager-card{margin:0 10px 12px;grid-template-columns:54px 1fr auto}.manager-avatar{width:54px;height:54px}
       .budget,.fields{padding:14px}.panel-head{padding:14px}.panel{border-radius:16px}.cards-panel{margin-top:12px}.draw-result{margin:0 10px 12px}
+      .modal{padding:10px}.modal-box{max-height:92vh;overflow:auto;border-radius:16px}.modal-head{padding:13px 14px}.modal-body{padding:14px;gap:10px}.modal-actions{padding:0 14px 14px;gap:6px;justify-content:flex-end}.modal-actions .btn{padding:8px 10px;font-size:11px;min-height:36px}.modal-actions .btn svg{width:14px;height:14px}.tabs{gap:4px}.tab{padding:8px;font-size:11px}
     }
   </style>
 </head>
@@ -191,8 +211,12 @@
         <div class="fields">
           <div class="field"><label>CLUB</label><input class="input" id="clubInput" placeholder="Club name"></div>
           <div class="field"><label>SQUAD NAME</label><input class="input" id="nameInput" placeholder="Squad name"></div>
-          <div class="field"><label>HEAD COACH</label><input class="input" id="mgrInput" placeholder="Manager"></div>
         </div>
+        <button class="manager-card" id="managerCard" type="button">
+          <div class="manager-avatar" id="managerAvatar">HC</div>
+          <div style="min-width:0;text-align:left"><div class="manager-name" id="managerCardName">Add Head Coach</div><div class="manager-price" id="managerCardPrice">0</div></div>
+          <span class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg></span>
+        </button>
       </section>
 
       <section class="panel">
@@ -204,25 +228,43 @@
   </main>
 
   <section class="panel cards-panel" id="cardsPanel">
-    <button class="cards-toggle" id="cardsToggle"><div><h2 style="margin:0;font-size:16px;text-align:left">Card Deck</h2><div class="small">Add your own cards, draw one, or draw a random set</div></div>
+    <button class="cards-toggle" id="cardsToggle"><div><h2 style="margin:0;font-size:16px;text-align:left">Card Deck</h2><div class="small">Your cards stay hidden until you draw them</div></div>
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
     </button>
     <div class="cards-content">
-      <div class="cards-form">
-        <textarea class="input" id="cardInput" placeholder="Write one card per line&#10;Example: Free Transfer&#10;Double Budget&#10;Swap Any Player"></textarea>
-        <div class="card-toolbar" style="padding:0">
-          <button class="btn primary" id="addCardsBtn">Add Cards</button>
-          <button class="btn" id="drawOneBtn">Draw 1 Random</button>
-          <input class="input" id="randomCount" type="number" min="1" max="999" value="1" style="width:88px" aria-label="Random card count">
-          <button class="btn" id="drawManyBtn">Draw Random Set</button>
-          <button class="btn danger" id="clearDeckBtn">Clear Deck</button>
-        </div>
-        <div class="cards-help">Cards are stored locally. Drawing removes the selected cards from the available deck.</div>
+      <div class="deck-summary">
+        <span class="count-pill">Available: <b id="availableCount">0</b></span>
+        <span class="count-pill">Won: <b id="usedCount">0</b></span>
+        <button class="btn primary sm" id="drawOneBtn">Draw Random</button>
+        <input class="input" id="randomCount" type="number" min="1" max="999" value="1" style="width:80px" aria-label="Random card count">
+        <button class="btn sm" id="drawManyBtn">Draw Set</button>
+        <button class="btn sm" id="manageCardsBtn">Manage Cards</button>
       </div>
-      <div id="drawResult" class="draw-result hidden"><h3>Draw Result</h3><div class="draw-result-list" id="drawResultList"></div></div>
-      <div class="cards-list" id="cardsList"></div>
+      <div id="drawResult" class="draw-result hidden"><h3>Cards Won</h3><div class="draw-result-list" id="drawResultList"></div></div>
+      <div class="small" style="padding:0 16px 8px">Hidden deck • tap a hidden card if you want to draw that exact slot.</div>
+      <div class="hidden-cards" id="hiddenCards"></div>
+      <div class="panel-head" style="border-top:1px solid var(--line)"><h2>Won Cards</h2><div class="small">Saved until you delete them</div></div>
+      <div class="used-list" id="usedCardsList"></div>
     </div>
   </section>
+</div>
+
+<div class="modal" id="managerModal">
+  <div class="modal-box">
+    <div class="modal-head"><h3 style="margin:0">Head Coach</h3><button class="icon-btn" data-close="managerModal">×</button></div>
+    <div class="modal-body">
+      <div class="manager-modal-preview"><div class="manager-avatar" id="managerPreviewAvatar">HC</div><div><div class="manager-name" id="managerPreviewName">No manager</div><div class="manager-price" id="managerPreviewPrice">0</div></div></div>
+      <div class="field"><label>COACH NAME</label><input class="input" id="managerName" placeholder="Manager name"></div>
+      <div class="field"><label>PRICE</label><input class="input" id="managerPrice" placeholder="10M"></div>
+      <div class="field"><label>COACH IMAGE (OPTIONAL)</label>
+        <div class="tabs"><button class="tab active" id="managerUrlTab">Image URL</button><button class="tab" id="managerUploadTab">Upload</button></div>
+        <input class="input" id="managerImage" placeholder="https://...">
+        <input id="managerFile" type="file" accept="image/*" class="hidden">
+      </div>
+      <div class="small">The coach price is counted from the same budget as the players.</div>
+    </div>
+    <div class="modal-actions"><button class="btn danger" id="deleteManagerBtn">Remove</button><button class="btn" data-close="managerModal">Cancel</button><button class="btn primary" id="saveManagerBtn">Save Coach</button></div>
+  </div>
 </div>
 
 <div class="modal" id="playerModal">
@@ -243,6 +285,22 @@
       <div class="small">The image is stored locally in your browser when uploaded. URLs are saved with the squad.</div>
     </div>
     <div class="modal-actions"><button class="btn danger" id="deletePlayerBtn">Remove</button><button class="btn swap" id="swapPlayerBtn">Swap with Bench</button><button class="btn" data-close="playerModal">Cancel</button><button class="btn primary" id="savePlayerBtn">Save Player</button></div>
+  </div>
+</div>
+
+<div class="modal" id="cardManagerModal">
+  <div class="modal-box">
+    <div class="modal-head"><h3 style="margin:0">Manage Hidden Cards</h3><button class="icon-btn" data-close="cardManagerModal">×</button></div>
+    <div class="modal-body">
+      <div class="small">Add one card per line. Names are hidden after adding. The deck is shuffled automatically.</div>
+      <textarea class="input" id="cardInput" placeholder="One card per line
+Steal
+Free Transfer
+Swap Player"></textarea>
+      <div class="modal-actions" style="padding:0"><button class="btn" id="shuffleDeckBtn">Shuffle Deck</button><button class="btn primary" id="addCardsBtn">Add Cards</button></div>
+      <div class="small" id="manageCardCount">0 cards in deck</div>
+    </div>
+    <div class="modal-actions"><button class="btn danger" id="clearDeckBtn">Clear Available Deck</button><button class="btn" data-close="cardManagerModal">Done</button></div>
   </div>
 </div>
 
@@ -277,9 +335,9 @@ function initialState(){
   const players={};
   POSITIONS.forEach(p=>players[p.key]={name:'',price:0,pos:p.label,image:''});
   return {
-    version:2, startingBudget:200000000, club:'', squadName:'', manager:'',
+    version:4, startingBudget:200000000, club:'', squadName:'', manager:{name:'',price:0,image:''},
     players, bench:Array.from({length:7},(_,i)=>({name:'',price:0,pos:BENCH_POS[i],image:''})),
-    cards:[]
+    cards:[], usedCards:[], spentCards:[]
   };
 }
 function loadState(){
@@ -287,8 +345,12 @@ function loadState(){
     const raw=localStorage.getItem('squadforge_state');
     if(raw){
       const parsed=JSON.parse(raw), base=initialState(), s={...base,...parsed};
-      if(!parsed.version || parsed.version<2){s.cards=[];s.version=2;}
-      s.cards=Array.isArray(s.cards)?s.cards.filter(c=>c&&c.name):[];
+      if(!parsed.version || parsed.version<3){s.cards=[];s.usedCards=[];s.spentCards=[];s.version=4;} else {s.version=4;}
+      if(typeof s.manager==='string') s.manager={name:s.manager,price:0,image:''};
+      s.manager={name:s.manager?.name||'',price:parseMoney(s.manager?.price||0),image:s.manager?.image||''};
+      s.cards=Array.isArray(s.cards)?s.cards.filter(c=>c&&c.name).map(c=>({...c,id:c.id||('card_'+Math.random().toString(36).slice(2))})):[];
+      s.usedCards=Array.isArray(s.usedCards)?s.usedCards.filter(c=>c&&c.name):[];
+      s.spentCards=Array.isArray(s.spentCards)?s.spentCards.filter(c=>c&&c.name):[];
       return s;
     }
   }catch(e){}
@@ -327,8 +389,8 @@ function render(){
  document.getElementById('budgetInput').value=money(state.startingBudget);
  document.getElementById('clubInput').value=state.club;
  document.getElementById('nameInput').value=state.squadName;
- document.getElementById('mgrInput').value=state.manager;
- [['pitchClub',state.club],['pitchSquad',state.squadName],['pitchManager',state.manager]].forEach(([id,val])=>{
+ renderManager();
+ [['pitchClub',state.club],['pitchSquad',state.squadName],['pitchManager',state.manager.name ? `${state.manager.name} • ${money(state.manager.price)}` : 'Not set']].forEach(([id,val])=>{
    const el=document.getElementById(id); el.textContent=val||'Not set'; el.classList.toggle('pitch-empty',!val);
  });
  const pitch=document.getElementById('pitch');
@@ -360,7 +422,7 @@ function render(){
  document.getElementById('playerCount').textContent=all.filter(p=>p.name).length+' / 18';
  renderCards(); save();
 }
-function totalSpent(){return POSITIONS.reduce((a,p)=>a+parseMoney(state.players[p.key].price),0)+state.bench.reduce((a,p)=>a+parseMoney(p.price),0)}
+function totalSpent(){return POSITIONS.reduce((a,p)=>a+parseMoney(state.players[p.key].price),0)+state.bench.reduce((a,p)=>a+parseMoney(p.price),0)+parseMoney(state.manager.price)}
 function remainingBudget(){return Math.max(0,state.startingBudget-totalSpent())}
 function openPlayer(slot,isBench){
  const pl=isBench?state.bench[+slot.replace('bench','')]:state.players[slot];
@@ -368,7 +430,7 @@ function openPlayer(slot,isBench){
  document.getElementById('modalTitle').textContent=pl.name?'Edit Player':'Add Player';
  document.getElementById('playerName').value=pl.name||'';
  document.getElementById('playerPrice').value=pl.name?money(pl.price):'';
- document.getElementById('playerImage').value=pl.image||'';
+ document.getElementById('playerImage').value=pl.image||'';document.getElementById('playerFile').value='';
  const select=document.getElementById('playerPos'); select.innerHTML='';
  const opts=isBench?BENCH_POS:POSITIONS.map(p=>p.label);
  [...new Set(opts)].forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;select.appendChild(op)});
@@ -400,60 +462,113 @@ document.getElementById('playerFile').onchange=e=>{
  const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>document.getElementById('playerImage').value=r.result;r.readAsDataURL(f);
  document.getElementById('urlTab').click();
 };
-['clubInput','nameInput','mgrInput'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{
- state[{clubInput:'club',nameInput:'squadName',mgrInput:'manager'}[id]]=e.target.value;save();
+['clubInput','nameInput'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{
+ state[{clubInput:'club',nameInput:'squadName'}[id]]=e.target.value;render();
 }));
+
+function renderManager(){
+ const m=state.manager||{name:'',price:0,image:''};
+ document.getElementById('managerCardName').textContent=m.name||'Add Head Coach';
+ document.getElementById('managerCardPrice').textContent=m.name?money(m.price):'Set coach price';
+ const avatar=document.getElementById('managerAvatar');
+ avatar.innerHTML=m.image?`<img src="${esc(m.image)}" alt="">`:'HC';
+ document.getElementById('managerPreviewName').textContent=m.name||'No manager';
+ document.getElementById('managerPreviewPrice').textContent=m.name?money(m.price):'0';
+ const prev=document.getElementById('managerPreviewAvatar'); prev.innerHTML=m.image?`<img src="${esc(m.image)}" alt="">`:'HC';
+}
+document.getElementById('managerCard').onclick=()=>openManager();
+function openManager(){
+ const m=state.manager||{name:'',price:0,image:''};
+ document.getElementById('managerName').value=m.name;document.getElementById('managerPrice').value=m.name?money(m.price):'';document.getElementById('managerImage').value=m.image||'';document.getElementById('managerFile').value='';
+ document.getElementById('deleteManagerBtn').style.display=m.name?'inline-flex':'none';document.getElementById('managerModal').classList.add('show');
+}
+document.getElementById('saveManagerBtn').onclick=()=>{
+ const name=document.getElementById('managerName').value.trim(),price=parseMoney(document.getElementById('managerPrice').value),old=parseMoney(state.manager.price);
+ if(name && price>remainingBudget()+old){toast('Not enough remaining budget for the coach.');return;}
+ state.manager={name,price,image:document.getElementById('managerImage').value.trim()};closeModal('managerModal');render();toast(name?'Coach saved':'Coach removed');
+};
+document.getElementById('deleteManagerBtn').onclick=()=>{state.manager={name:'',price:0,image:''};closeModal('managerModal');render();toast('Coach removed')};
+document.getElementById('managerUrlTab').onclick=()=>{document.getElementById('managerUrlTab').classList.add('active');document.getElementById('managerUploadTab').classList.remove('active');document.getElementById('managerFile').classList.add('hidden');document.getElementById('managerImage').classList.remove('hidden')};
+document.getElementById('managerUploadTab').onclick=()=>{document.getElementById('managerUploadTab').classList.add('active');document.getElementById('managerUrlTab').classList.remove('active');document.getElementById('managerFile').classList.remove('hidden');document.getElementById('managerImage').classList.add('hidden')};
+document.getElementById('managerFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{document.getElementById('managerImage').value=r.result;document.getElementById('managerUrlTab').click()};r.readAsDataURL(f)};
 document.getElementById('setBudgetBtn').onclick=()=>{
  const n=parseMoney(document.getElementById('budgetInput').value);
  if(n<totalSpent()){toast('Starting budget cannot be lower than total squad cost.');return}
  state.startingBudget=n;render();toast('Budget updated');
 };
 document.getElementById('cardsToggle').onclick=()=>document.getElementById('cardsPanel').classList.toggle('open');
+function shuffleDeck(){
+ state.cards.sort(()=>Math.random()-.5);
+ state.cards.forEach((c,i)=>c.hiddenNumber=i+1);
+ save();renderCards();
+}
 function renderCards(){
- const list=document.getElementById('cardsList'); list.innerHTML='';
- if(!state.cards.length){list.innerHTML='<div class="card-empty">Your deck is empty. Add cards above to start.</div>';return;}
+ const hidden=document.getElementById('hiddenCards'),used=document.getElementById('usedCardsList');
+ document.getElementById('availableCount').textContent=state.cards.length;document.getElementById('usedCount').textContent=state.usedCards.length;
+ hidden.innerHTML='';
+ if(!state.cards.length){hidden.innerHTML='<div class="card-empty" style="grid-column:1/-1">No hidden cards. Open Manage Cards to add your deck.</div>';}
  state.cards.forEach((c,i)=>{
-   const row=document.createElement('div');row.className='deck-row';
-   row.innerHTML=`<div><div class="deck-name">${esc(c.name)}</div><div class="deck-state">Available card ${i+1}</div></div>
-     <div class="deck-actions"><button class="btn sm primary">Draw</button><button class="icon-btn" title="Remove">${icon('trash')}</button></div>`;
-   row.querySelector('.primary').onclick=()=>drawSpecific(i);
-   row.querySelector('.icon-btn').onclick=()=>{state.cards.splice(i,1);save();renderCards();toast('Card removed')};
-   list.appendChild(row);
+   const b=document.createElement('button');b.className='hidden-card';b.innerHTML=`<span>${i+1}</span>`;b.title='Draw this hidden card';b.onclick=()=>drawSpecific(i);hidden.appendChild(b);
  });
+ used.innerHTML='';
+ if(!state.usedCards.length && !state.spentCards?.length){used.innerHTML='<div class="card-empty" style="border:0;padding:10px 0 0">No cards won yet.</div>';return;}
+ if(state.usedCards.length){
+   const readyTitle=document.createElement('div');readyTitle.className='small';readyTitle.style.cssText='padding:2px 0 5px;color:#7f93a8';readyTitle.textContent=`Ready to use: ${state.usedCards.length}`;used.appendChild(readyTitle);
+   state.usedCards.forEach((c,i)=>{
+     const row=document.createElement('div');row.className='used-row';
+     row.innerHTML=`<div><b>${esc(c.name)}</b><span>Owned • ready to use</span></div><div class="card-row-actions"><button class="btn primary sm card-use-btn" title="Use card">${icon('bolt')}Use Card</button><button class="icon-btn" title="Delete">${icon('trash')}</button></div>`;
+     row.querySelector('.card-use-btn').onclick=()=>useWonCard(i);
+     row.querySelector('.icon-btn').onclick=()=>{state.usedCards.splice(i,1);save();renderCards();toast('Won card deleted')};used.appendChild(row);
+   });
+ }
+ if(state.spentCards?.length){
+   const title=document.createElement('div');title.className='small';title.style.cssText='padding:10px 0 5px;color:#7f93a8';title.textContent=`Used / locked: ${state.spentCards.length}`;used.appendChild(title);
+   state.spentCards.forEach((c,i)=>{
+     const row=document.createElement('div');row.className='used-row spent-row';
+     row.innerHTML=`<div><b>${esc(c.name)}</b><span>Used • locked</span></div><div class="card-row-actions"><button class="btn sm card-use-btn" disabled title="Card already used">${icon('bolt')}Used</button><button class="icon-btn" title="Delete">${icon('trash')}</button></div>`;
+     row.querySelector('.icon-btn').onclick=()=>{state.spentCards.splice(i,1);save();renderCards();toast('Used card deleted')};used.appendChild(row);
+   });
+ }
+}
+function useWonCard(index){
+ const card=state.usedCards[index];
+ if(!card)return;
+ state.usedCards.splice(index,1);
+ state.spentCards=Array.isArray(state.spentCards)?state.spentCards:[];
+ state.spentCards.unshift({...card,usedAt:Date.now()});
+ save();renderCards();toast(`Used: ${card.name}`);
 }
 function showDrawResult(cards){
- const box=document.getElementById('drawResult'), list=document.getElementById('drawResultList');
- list.innerHTML=cards.map(c=>`<span class="draw-pill">${esc(c.name)}</span>`).join('');
- box.classList.remove('hidden');
+ const box=document.getElementById('drawResult'),list=document.getElementById('drawResultList');
+ list.innerHTML=cards.map(c=>`<span class="draw-pill">${esc(c.name)}</span>`).join('');box.classList.remove('hidden');
 }
 function drawSpecific(index){
  if(index<0||index>=state.cards.length)return;
  const picked=state.cards.splice(index,1);
- save();renderCards();showDrawResult(picked);toast('Card drawn');
+ state.usedCards.push(...picked);shuffleAfterDraw();showDrawResult(picked);toast('Card won');
 }
 function drawRandom(count){
  const available=state.cards.length;
- if(!available){toast('Your card deck is empty. Add cards first.');return;}
+ if(!available){toast('No cards available. Add cards first.');return;}
  count=Math.max(1,Math.floor(count||1));
- if(count>available){toast(`You only have ${available} card${available===1?'':'s'} available.`);return;}
- const pool=[...state.cards],picked=[];
- while(picked.length<count){picked.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);}
- const ids=new Set(picked.map(c=>c.id));
- state.cards=state.cards.filter(c=>!ids.has(c.id));
- save();renderCards();showDrawResult(picked);toast(`${picked.length} random card${picked.length===1?'':'s'} drawn`);
+ if(count>available){toast(`You have ${available} card${available===1?'':'s'} available. You cannot draw ${count}.`);return;}
+ const pool=[...state.cards],picked=[];while(picked.length<count)picked.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);
+ const ids=new Set(picked.map(c=>c.id));state.cards=state.cards.filter(c=>!ids.has(c.id));state.usedCards.push(...picked);
+ shuffleAfterDraw();showDrawResult(picked);toast(`${picked.length} card${picked.length===1?'':'s'} won`);
 }
+function shuffleAfterDraw(){state.cards.sort(()=>Math.random()-.5);state.cards.forEach((c,i)=>c.hiddenNumber=i+1);save();renderCards()}
+document.getElementById('manageCardsBtn').onclick=()=>{document.getElementById('manageCardCount').textContent=`${state.cards.length} cards currently hidden in the deck`;document.getElementById('cardManagerModal').classList.add('show')};
 document.getElementById('addCardsBtn').onclick=()=>{
  const names=document.getElementById('cardInput').value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
  if(!names.length){toast('Write at least one card first.');return;}
- names.forEach(name=>state.cards.push({id:'card_'+Date.now()+'_'+Math.random().toString(36).slice(2),name}));
- document.getElementById('cardInput').value='';save();renderCards();toast(`${names.length} card${names.length===1?'':'s'} added`);
+ names.forEach(name=>state.cards.push({id:'card_'+Date.now()+'_'+Math.random().toString(36).slice(2),name,hiddenNumber:0}));
+ document.getElementById('cardInput').value='';shuffleDeck();document.getElementById('manageCardCount').textContent=`${state.cards.length} cards currently hidden in the deck`;toast(`${names.length} card${names.length===1?'':'s'} added and shuffled`);
 };
+document.getElementById('shuffleDeckBtn').onclick=()=>{if(state.cards.length<2){toast('Add at least 2 cards to shuffle.');return;}shuffleDeck();toast('Deck shuffled')};
 document.getElementById('drawOneBtn').onclick=()=>drawRandom(1);
 document.getElementById('drawManyBtn').onclick=()=>drawRandom(+document.getElementById('randomCount').value||1);
-document.getElementById('clearDeckBtn').onclick=()=>{
- if(!state.cards.length){toast('The deck is already empty.');return;}
- askConfirm('Clear all available cards?',()=>{state.cards=[];save();renderCards();document.getElementById('drawResult').classList.add('hidden');toast('Deck cleared');});
-};
+document.getElementById('clearDeckBtn').onclick=()=>{if(!state.cards.length){toast('The available deck is already empty.');return;}askConfirm('Clear all hidden cards from the available deck?',()=>{state.cards=[];save();renderCards();document.getElementById('manageCardCount').textContent='0 cards currently hidden in the deck';toast('Available deck cleared')})};
+
 document.getElementById('swapPlayerBtn').onclick=()=>{
  const slot=document.getElementById('editSlot').value;
  if(slot.startsWith('bench')){toast('Choose a starting XI player first.');return;}
@@ -475,7 +590,13 @@ document.getElementById('exportBtn').onclick=()=>{
 };
 document.getElementById('importBtn').onclick=()=>document.getElementById('fileInput').click();
 document.getElementById('fileInput').onchange=e=>{
- const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state={...initialState(),...JSON.parse(r.result)};save();render();toast('Squad imported')}catch(x){toast('Invalid squad file')}};r.readAsText(f);e.target.value='';
+ const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{
+   const imported=JSON.parse(r.result);state={...initialState(),...imported};
+   state.cards=Array.isArray(state.cards)?state.cards.filter(c=>c&&c.name):[];
+   state.usedCards=Array.isArray(state.usedCards)?state.usedCards.filter(c=>c&&c.name):[];
+   state.spentCards=Array.isArray(state.spentCards)?state.spentCards.filter(c=>c&&c.name):[];
+   state.version=4;save();render();toast('Squad imported with card status');
+ }catch(x){toast('Invalid squad file')}};r.readAsText(f);e.target.value='';
 };
 document.getElementById('resetBtn').onclick=()=>{
  askConfirm('Reset the entire squad, budget, club and cards? This cannot be undone.',()=>{state=initialState();save();render();toast('Everything reset')})
