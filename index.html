@@ -32,38 +32,8 @@
     .panel-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
     .panel-head h2{font-size:16px;margin:0}
     .small{font-size:12px;color:var(--muted)}
-
-    /* Pitch Info Overlay Header */
-    .pitch-header-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(14, 27, 45, 0.95);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 10px 16px;
-      margin-bottom: 12px;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .pitch-info-block {
-      display: flex;
-      flex-direction: column;
-    }
-    .pitch-info-label {
-      font-size: 9px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-    .pitch-info-val {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--accent);
-    }
-
     .pitch-wrap{padding:16px}
-    .pitch{position:relative;aspect-ratio:1.12/1;min-height:560px;overflow:hidden;border-radius:18px;border:1px solid rgba(255,255,255,.15);
+    .pitch{position:relative;width:100%;aspect-ratio:1.38/1;min-height:0;overflow:hidden;border-radius:18px;border:1px solid rgba(255,255,255,.15);
       background:
       linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px) 0 0/10% 100%,
       repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 10%),
@@ -76,23 +46,38 @@
     .box2{position:absolute;left:29%;right:29%;bottom:5%;height:17%;border:2px solid rgba(255,255,255,.72);border-bottom:0}
     .spot{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;left:50%;top:22%}
     .spot2{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;left:50%;bottom:22%}
-    .slot{position:absolute;transform:translate(-50%,-50%);width:100px;text-align:center;transition:.25s;z-index:2}
+    .slot{position:absolute;transform:translate(-50%,-50%);width:112px;text-align:center;transition:.25s}
     .slot:hover{transform:translate(-50%,-50%) scale(1.04)}
-    .avatar{width:60px;height:60px;margin:auto;border-radius:50%;border:3px solid rgba(255,255,255,.85);background:#0a1724;display:grid;place-items:center;overflow:hidden;box-shadow:0 9px 24px rgba(0,0,0,.28)}
+    .avatar{width:66px;height:66px;margin:auto;border-radius:50%;border:3px solid rgba(255,255,255,.85);background:#0a1724;display:grid;place-items:center;overflow:hidden;box-shadow:0 9px 24px rgba(0,0,0,.28)}
     .avatar img{width:100%;height:100%;object-fit:cover}
-    .avatar .num{font-weight:900;font-size:17px}
-    .player-name{margin-top:5px;font-weight:800;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .player-meta{margin-top:2px;font-size:10px;color:#d4fbe8}
+    .avatar .num{font-weight:900;font-size:19px}
+    .player-name{margin-top:7px;font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .player-meta{margin-top:3px;font-size:11px;color:#d4fbe8}
     .slot.empty .avatar{border-style:dashed;border-color:rgba(255,255,255,.35);color:#c7d4e2}
     .slot.empty .player-name{color:#b7c6d8}
-    .slot .edit-dot{position:absolute;right:14px;top:-2px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:#0b1523;border:1px solid #3a5069;color:#fff}
-    .slot .edit-dot svg{width:10px}
-    
-    /* Optimized positions for responsive layout */
-    .s1{left:50%;top:88%}.s2{left:16%;top:71%}.s3{left:38%;top:71%}.s4{left:62%;top:71%}.s5{left:84%;top:71%}
-    .s6{left:30%;top:48%}.s7{left:50%;top:52%}.s8{left:70%;top:48%}
-    .s9{left:18%;top:24%}.s10{left:50%;top:20%}.s11{left:82%;top:24%}
-
+    .slot .edit-dot{position:absolute;right:18px;top:-2px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#0b1523;border:1px solid #3a5069;color:#fff}
+    .slot .edit-dot svg{width:11px}
+    .s1{left:50%;top:91%}.s2{left:17%;top:73%}.s3{left:39%;top:73%}.s4{left:61%;top:73%}.s5{left:83%;top:73%}
+    .s6{left:30%;top:52%}.s7{left:50%;top:52%}.s8{left:70%;top:52%}
+    .s9{left:17%;top:27%}.s10{left:50%;top:24%}.s11{left:83%;top:27%}
+    .pitch-info{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 2px}
+    .pitch-chip{display:flex;align-items:center;gap:7px;background:#071421;border:1px solid var(--line);padding:8px 11px;border-radius:11px;min-width:0}
+    .pitch-chip b{font-size:11px;color:var(--muted);font-weight:700}
+    .pitch-chip span{font-size:12px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px}
+    .pitch-empty{color:#71859c}
+    .draw-result{margin:0 16px 16px;padding:12px;border-radius:14px;background:linear-gradient(135deg,rgba(94,230,168,.08),rgba(85,168,255,.06));border:1px solid #24394e}
+    .draw-result h3{margin:0 0 8px;font-size:12px}.draw-result-list{display:flex;gap:7px;flex-wrap:wrap}.draw-pill{background:#0b1928;border:1px solid #2c4560;padding:8px 10px;border-radius:10px;font-size:11px;font-weight:800}
+    .cards-form{display:grid;gap:9px;padding:0 16px 13px}
+    .cards-form textarea{min-height:105px;resize:vertical;line-height:1.5}
+    .cards-help{font-size:11px;color:var(--muted)}
+    .cards-list{display:grid;gap:7px;padding:0 16px 18px}
+    .deck-row{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center;background:#07111d;border:1px solid var(--line);padding:9px;border-radius:12px}
+    .deck-name{font-size:12px;font-weight:850}.deck-state{font-size:10px;color:var(--muted);margin-top:2px}
+    .deck-actions{display:flex;gap:6px}
+    .btn.sm{padding:7px 9px;font-size:10px}
+    .card-empty{padding:18px 16px;color:var(--muted);font-size:12px;text-align:center;border-top:1px solid var(--line)}
+    .choice-list{display:grid;gap:7px;max-height:260px;overflow:auto}.choice-btn{width:100%;text-align:left;border:1px solid var(--line);background:#07111d;color:#fff;padding:10px;border-radius:10px}.choice-btn:hover{border-color:#42627f}
+    .modal-actions .btn.swap{display:none}
     .bench{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;padding:14px 16px 18px}
     .bench-card{min-width:0;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center;transition:.2s}
     .bench-card:hover{border-color:#355271}
@@ -118,21 +103,21 @@
     .price{font-size:11px;color:var(--accent);text-align:right}
     .icon-btn{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:#0d1b2b;color:#c8d6e5;display:grid;place-items:center}
     .icon-btn svg{width:14px}
-    
     .cards-panel{margin-top:16px}
     .cards-toggle{width:100%;background:none;border:0;color:#fff;padding:16px 18px;display:flex;align-items:center;justify-content:space-between}
     .cards-toggle .chev{transition:.25s}
     .cards-panel.open .chev{transform:rotate(180deg)}
     .cards-content{max-height:0;overflow:hidden;transition:max-height .45s ease}
-    .cards-panel.open .cards-content{max-height:1500px}
-    .card-toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 13px;align-items:center}
+    .cards-panel.open .cards-content{max-height:1200px}
+    .card-toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 13px}
     .cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 16px 18px}
-    .game-card{position:relative;min-height:110px;padding:13px;border-radius:16px;background:linear-gradient(160deg,#111f31,#091421);border:1px solid #24364d;transition:.25s;display:flex;flex-direction:column;justify-content:space-between}
+    .game-card{position:relative;min-height:135px;padding:13px;border-radius:16px;background:linear-gradient(160deg,#111f31,#091421);border:1px solid #24364d;transition:.25s}
     .game-card:hover{transform:translateY(-3px);border-color:#42627f}
-    .game-card .card-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(94,230,168,.1);color:var(--accent);border:1px solid rgba(94,230,168,.22);margin-bottom:8px}
-    .game-card h4{margin:0;font-size:13px;word-break:break-word;}.game-card p{font-size:11px;color:var(--muted);line-height:1.45;margin:4px 0 8px}
-    .game-card .card-actions{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
-
+    .game-card.used{opacity:.4;filter:saturate(.25)}
+    .game-card .card-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(94,230,168,.1);color:var(--accent);border:1px solid rgba(94,230,168,.22);margin-bottom:10px}
+    .game-card h4{margin:0;font-size:13px}.game-card p{font-size:11px;color:var(--muted);line-height:1.45;margin:6px 0 10px}
+    .game-card button{font-size:10px;padding:7px 9px;border-radius:8px}
+    .used-tag{position:absolute;top:10px;right:10px;font-size:9px;color:#9ba8b7}
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.68);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px;z-index:100}
     .modal.show{display:flex}
     .modal-box{width:min(560px,100%);background:#0a1422;border:1px solid #273c55;border-radius:20px;box-shadow:0 30px 100px rgba(0,0,0,.55);overflow:hidden}
@@ -142,14 +127,20 @@
     .tabs{display:flex;gap:6px;padding:3px;background:#07111d;border:1px solid var(--line);border-radius:12px}
     .tab{flex:1;border:0;background:transparent;color:var(--muted);padding:9px;border-radius:9px}.tab.active{background:#13253a;color:#fff}
     .hidden{display:none!important}
-    .toast{position:fixed;bottom:18px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#eafbf3;color:#07111d;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:800;z-index:200;transition:.25s;box-shadow:0 10px 30px rgba(0,0,0,0.4);border:1px solid #5ee6a8;text-align:center}
+    .toast{position:fixed;bottom:18px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#eafbf3;color:#07111d;padding:10px 14px;border-radius:12px;font-size:12px;font-weight:800;z-index:200;transition:.25s}
     .toast.show{opacity:1;transform:translate(-50%,0)}
-    
-    @media(max-width:1050px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.pitch{min-height:500px}.cards-grid{grid-template-columns:repeat(3,1fr)}}
+    .footer-note{color:#6f8196;font-size:10px;text-align:center;padding:14px}
+    @media(max-width:1050px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.cards-grid{grid-template-columns:repeat(3,1fr)}}
     @media(max-width:680px){
-      .app{padding:9px}.topbar{top:5px}.actions .label{display:none}.layout{display:block}.side{display:block}
-      .pitch-wrap{padding:9px}.pitch{min-height:460px;aspect-ratio:0.9/1}.slot{width:70px}.avatar{width:46px;height:46px}.avatar .num{font-size:14px}.player-name{font-size:10px}.player-meta{font-size:9px}
-      .bench{grid-template-columns:repeat(3,1fr)}.cards-grid{grid-template-columns:repeat(2,1fr)}.budget-value{font-size:28px}.box,.box2{left:22%;right:22%}
+      .app{padding:8px}.topbar{top:4px;padding:9px 10px}.brand-mark{width:36px;height:36px}.brand{font-size:14px}.actions{gap:5px}.actions .label{display:none}.btn{padding:9px 10px}
+      .layout{display:block}.side{display:block}.pitch-wrap{padding:9px}.pitch{width:100%;aspect-ratio:.74/1;min-height:0;border-radius:15px}
+      .pitch-info{padding:0 9px 2px;gap:6px}.pitch-chip{flex:1;min-width:0;padding:7px 8px}.pitch-chip b{font-size:9px}.pitch-chip span{font-size:10px;max-width:100%}
+      .slot{width:68px}.avatar{width:48px;height:48px;border-width:2px}.avatar .num{font-size:14px}.player-name{font-size:10px;margin-top:5px}.player-meta{font-size:9px}.slot .edit-dot{width:17px;height:17px;right:9px;top:-3px}.slot .edit-dot svg{width:9px}
+      .s1{top:91%}.s2{left:16%;top:73%}.s3{left:39%;top:73%}.s4{left:61%;top:73%}.s5{left:84%;top:73%}
+      .s6{left:28%;top:52%}.s7{left:50%;top:52%}.s8{left:72%;top:52%}.s9{left:16%;top:26%}.s10{left:50%;top:23%}.s11{left:84%;top:26%}
+      .bench{grid-template-columns:repeat(3,1fr);padding:12px 9px 15px}.bench-card{padding:8px 5px}.bench-avatar{width:38px;height:38px}
+      .field-row{grid-template-columns:1fr}.cards-grid{grid-template-columns:1fr}.cards-form{padding:0 10px 11px}.cards-list{padding:0 10px 14px}.deck-row{grid-template-columns:1fr}.deck-actions{justify-content:flex-start}
+      .budget,.fields{padding:14px}.panel-head{padding:14px}.panel{border-radius:16px}.cards-panel{margin-top:12px}.draw-result{margin:0 10px 12px}
     }
   </style>
 </head>
@@ -169,17 +160,13 @@
 
   <main class="layout">
     <section class="panel">
-      <div class="panel-head"><div><h2>Starting XI</h2><div class="small">Click a position to edit, add a player, or swap with the bench.</div></div><div class="small" id="formationText">4-3-3</div></div>
+      <div class="panel-head"><div><h2>Starting XI</h2><div class="small">Click a position to edit or use the swap action.</div></div><div class="small" id="formationText">4-3-3</div></div>
+      <div class="pitch-info">
+        <div class="pitch-chip"><b>CLUB</b><span id="pitchClub" class="pitch-empty">Not set</span></div>
+        <div class="pitch-chip"><b>SQUAD</b><span id="pitchSquad" class="pitch-empty">Not set</span></div>
+        <div class="pitch-chip"><b>MANAGER</b><span id="pitchManager" class="pitch-empty">Not set</span></div>
+      </div>
       <div class="pitch-wrap">
-        
-        <!-- Interactive Team Details Header above pitch -->
-        <div class="pitch-header-info">
-          <div class="pitch-info-block"><span class="pitch-info-label">Club</span><span class="pitch-info-val" id="dispClub">---</span></div>
-          <div class="pitch-info-block"><span class="pitch-info-label">Squad</span><span class="pitch-info-val" id="dispSquad">---</span></div>
-          <div class="pitch-info-block"><span class="pitch-info-label">Manager</span><span class="pitch-info-val" id="dispMgr">---</span></div>
-          <div class="pitch-info-block"><span class="pitch-info-label">Owner / User</span><span class="pitch-info-val" id="dispUser">---</span></div>
-        </div>
-
         <div class="pitch" id="pitch">
           <div class="half"></div><div class="circle"></div><div class="box"></div><div class="box2"></div><div class="spot"></div><div class="spot2"></div>
         </div>
@@ -205,7 +192,6 @@
           <div class="field"><label>CLUB</label><input class="input" id="clubInput" placeholder="Club name"></div>
           <div class="field"><label>SQUAD NAME</label><input class="input" id="nameInput" placeholder="Squad name"></div>
           <div class="field"><label>HEAD COACH</label><input class="input" id="mgrInput" placeholder="Manager"></div>
-          <div class="field"><label>YOUR NAME</label><input class="input" id="userInput" placeholder="Your Name"></div>
         </div>
       </section>
 
@@ -213,25 +199,28 @@
         <div class="panel-head"><h2>Squad Overview</h2><div class="small" id="playerCount">0 / 18</div></div>
         <div class="player-list" id="playerList"></div>
       </section>
-    </aside>
+
+</aside>
   </main>
 
-  <section class="panel cards-panel open" id="cardsPanel">
-    <button class="cards-toggle" id="cardsToggle"><div><h2 style="margin:0;font-size:16px;text-align:left">Game Cards</h2><div class="small">Add custom cards and draw randomly when needed</div></div>
+  <section class="panel cards-panel" id="cardsPanel">
+    <button class="cards-toggle" id="cardsToggle"><div><h2 style="margin:0;font-size:16px;text-align:left">Card Deck</h2><div class="small">Add your own cards, draw one, or draw a random set</div></div>
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
     </button>
     <div class="cards-content">
-      <div class="card-toolbar">
-        <button class="btn primary" id="randomCardsBtn">Draw Random Cards</button>
-        <input class="input" id="randomCount" type="number" min="1" value="3" style="width:90px" placeholder="Count">
-        <button class="btn" id="addCardBtn">Add Custom Card</button>
+      <div class="cards-form">
+        <textarea class="input" id="cardInput" placeholder="Write one card per line&#10;Example: Free Transfer&#10;Double Budget&#10;Swap Any Player"></textarea>
+        <div class="card-toolbar" style="padding:0">
+          <button class="btn primary" id="addCardsBtn">Add Cards</button>
+          <button class="btn" id="drawOneBtn">Draw 1 Random</button>
+          <input class="input" id="randomCount" type="number" min="1" max="999" value="1" style="width:88px" aria-label="Random card count">
+          <button class="btn" id="drawManyBtn">Draw Random Set</button>
+          <button class="btn danger" id="clearDeckBtn">Clear Deck</button>
+        </div>
+        <div class="cards-help">Cards are stored locally. Drawing removes the selected cards from the available deck.</div>
       </div>
-
-      <div style="padding: 0 16px 8px;"><h4 style="margin: 0; font-size:13px; color:var(--accent);">Available Pool Cards (<span id="availCardsCount">0</span>)</h4></div>
-      <div class="cards-grid" id="cardsGrid"></div>
-
-      <div style="padding: 10px 16px 8px; border-top:1px solid var(--line);"><h4 style="margin: 0; font-size:13px; color:var(--accent2);">Drawn / Selected Cards</h4></div>
-      <div class="cards-grid" id="drawnCardsGrid"></div>
+      <div id="drawResult" class="draw-result hidden"><h3>Draw Result</h3><div class="draw-result-list" id="drawResultList"></div></div>
+      <div class="cards-list" id="cardsList"></div>
     </div>
   </section>
 </div>
@@ -253,18 +242,22 @@
       </div>
       <div class="small">The image is stored locally in your browser when uploaded. URLs are saved with the squad.</div>
     </div>
-    <div class="modal-actions"><button class="btn danger" id="deletePlayerBtn">Remove</button><button class="btn" data-close="playerModal">Cancel</button><button class="btn primary" id="savePlayerBtn">Save Player</button></div>
+    <div class="modal-actions"><button class="btn danger" id="deletePlayerBtn">Remove</button><button class="btn swap" id="swapPlayerBtn">Swap with Bench</button><button class="btn" data-close="playerModal">Cancel</button><button class="btn primary" id="savePlayerBtn">Save Player</button></div>
   </div>
 </div>
 
-<div class="modal" id="customCardModal">
+<div class="modal" id="swapModal">
   <div class="modal-box">
-    <div class="modal-head"><h3 style="margin:0">Add Custom Card</h3><button class="icon-btn" data-close="customCardModal">×</button></div>
-    <div class="modal-body">
-      <div class="field"><label>CARD NAME</label><input class="input" id="customCardName" placeholder="e.g. Free Transfer"></div>
-      <div class="field"><label>EFFECT / DESCRIPTION</label><input class="input" id="customCardDesc" placeholder="Describe card action..."></div>
-    </div>
-    <div class="modal-actions"><button class="btn" data-close="customCardModal">Cancel</button><button class="btn primary" id="saveCardBtn">Add Card</button></div>
+    <div class="modal-head"><h3 style="margin:0">Swap with Bench</h3><button class="icon-btn" data-close="swapModal">×</button></div>
+    <div class="modal-body"><div class="small">Choose the bench slot to swap with this player.</div><div class="choice-list" id="swapChoices"></div></div>
+  </div>
+</div>
+
+<div class="modal" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-head"><h3 style="margin:0">Confirm Action</h3><button class="icon-btn" data-close="confirmModal">×</button></div>
+    <div class="modal-body"><div id="confirmMessage" style="font-size:14px;line-height:1.5"></div></div>
+    <div class="modal-actions"><button class="btn" data-close="confirmModal">Cancel</button><button class="btn danger" id="confirmYes">Confirm</button></div>
   </div>
 </div>
 
@@ -273,27 +266,31 @@
 <script>
 const POSITIONS = [
   {key:'GK', label:'GK'}, {key:'RB',label:'RB'}, {key:'CB1',label:'CB'}, {key:'CB2',label:'CB'}, {key:'LB',label:'LB'},
-  {key:'CM',label:'CM'}, {key:'CDM',label:'CDM'}, {key:'CAM',label:'CAM'}, {key:'RW',label:'RW'}, {key:'LW',label:'LW'}, {key:'ST',label:'ST'}
+  {key:'CM',label:'CM'}, {key:'CDM',label:'CDM'}, {key:'CAM',label:'CAM'}, {key:'LW',label:'LW'}, {key:'ST',label:'ST'}, {key:'RW',label:'RW'}
 ];
 const BENCH_POS = ['GK','DEF','DEF','MID','MID','ATK','ATK'];
-// Initial pool empty as requested
 const defaults = [];
-const slotClass = {GK:'s1',RB:'s2',CB1:'s3',CB2:'s4',LB:'s5',CM:'s6',CDM:'s7',CAM:'s8',RW:'s9',LW:'s10',ST:'s11'};
+const slotClass = {GK:'s1',RB:'s2',CB1:'s3',CB2:'s4',LB:'s5',CM:'s6',CDM:'s7',CAM:'s8',LW:'s9',ST:'s10',RW:'s11'};
 let state = loadState();
 
 function initialState(){
   const players={};
   POSITIONS.forEach(p=>players[p.key]={name:'',price:0,pos:p.label,image:''});
   return {
-    startingBudget:200000000, club:'', squadName:'', manager:'', userName:'',
+    version:2, startingBudget:200000000, club:'', squadName:'', manager:'',
     players, bench:Array.from({length:7},(_,i)=>({name:'',price:0,pos:BENCH_POS[i],image:''})),
-    cards:[], drawnCards:[]
+    cards:[]
   };
 }
 function loadState(){
   try{
     const raw=localStorage.getItem('squadforge_state');
-    if(raw){ const s=JSON.parse(raw); return {...initialState(),...s}; }
+    if(raw){
+      const parsed=JSON.parse(raw), base=initialState(), s={...base,...parsed};
+      if(!parsed.version || parsed.version<2){s.cards=[];s.version=2;}
+      s.cards=Array.isArray(s.cards)?s.cards.filter(c=>c&&c.name):[];
+      return s;
+    }
   }catch(e){}
   return initialState();
 }
@@ -328,17 +325,12 @@ function icon(name){
 function render(){
  document.getElementById('budgetValue').textContent=money(remainingBudget());
  document.getElementById('budgetInput').value=money(state.startingBudget);
- document.getElementById('clubInput').value=state.club||'';
- document.getElementById('nameInput').value=state.squadName||'';
- document.getElementById('mgrInput').value=state.manager||'';
- document.getElementById('userInput').value=state.userName||'';
-
- // Display Info above pitch
- document.getElementById('dispClub').textContent=state.club||'---';
- document.getElementById('dispSquad').textContent=state.squadName||'---';
- document.getElementById('dispMgr').textContent=state.manager||'---';
- document.getElementById('dispUser').textContent=state.userName||'---';
-
+ document.getElementById('clubInput').value=state.club;
+ document.getElementById('nameInput').value=state.squadName;
+ document.getElementById('mgrInput').value=state.manager;
+ [['pitchClub',state.club],['pitchSquad',state.squadName],['pitchManager',state.manager]].forEach(([id,val])=>{
+   const el=document.getElementById(id); el.textContent=val||'Not set'; el.classList.toggle('pitch-empty',!val);
+ });
  const pitch=document.getElementById('pitch');
  pitch.querySelectorAll('.slot').forEach(x=>x.remove());
  POSITIONS.forEach(p=>{
@@ -382,6 +374,7 @@ function openPlayer(slot,isBench){
  [...new Set(opts)].forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;select.appendChild(op)});
  select.value=pl.pos;
  document.getElementById('deletePlayerBtn').style.display=pl.name?'inline-flex':'none';
+ document.getElementById('swapPlayerBtn').style.display=(!isBench && pl.name)?'inline-flex':'none';
  document.getElementById('playerModal').classList.add('show');
 }
 function closeModal(id){document.getElementById(id).classList.remove('show')}
@@ -407,11 +400,8 @@ document.getElementById('playerFile').onchange=e=>{
  const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>document.getElementById('playerImage').value=r.result;r.readAsDataURL(f);
  document.getElementById('urlTab').click();
 };
-['clubInput','nameInput','mgrInput','userInput'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{
- const keys={clubInput:'club',nameInput:'squadName',mgrInput:'manager',userInput:'userName'};
- state[keys[id]]=e.target.value;
- save();
- document.getElementById({clubInput:'dispClub',nameInput:'dispSquad',mgrInput:'dispMgr',userInput:'dispUser'}[id]).textContent=e.target.value||'---';
+['clubInput','nameInput','mgrInput'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{
+ state[{clubInput:'club',nameInput:'squadName',mgrInput:'manager'}[id]]=e.target.value;save();
 }));
 document.getElementById('setBudgetBtn').onclick=()=>{
  const n=parseMoney(document.getElementById('budgetInput').value);
@@ -419,63 +409,67 @@ document.getElementById('setBudgetBtn').onclick=()=>{
  state.startingBudget=n;render();toast('Budget updated');
 };
 document.getElementById('cardsToggle').onclick=()=>document.getElementById('cardsPanel').classList.toggle('open');
-
 function renderCards(){
- const grid=document.getElementById('cardsGrid'); grid.innerHTML='';
- document.getElementById('availCardsCount').textContent=state.cards.length;
- state.cards.forEach((c, idx)=>{
-   const el=document.createElement('article');el.className='game-card';
-   el.innerHTML=`<div class="card-icon">${icon('bolt')}</div><h4>${esc(c.name)}</h4><p>${esc(c.desc)}</p>
-   <div class="card-actions"><button class="btn danger" style="padding:4px 8px;font-size:10px;">Remove</button></div>`;
-   el.querySelector('button').onclick=()=>{
-     state.cards.splice(idx,1); save(); renderCards(); toast('Card removed from pool');
-   };
-   grid.appendChild(el);
- });
-
- const drawnGrid=document.getElementById('drawnCardsGrid'); drawnGrid.innerHTML='';
- (state.drawnCards||[]).forEach(c=>{
-   const el=document.createElement('article');el.className='game-card';
-   el.style.borderColor='var(--accent2)';
-   el.innerHTML=`<div class="card-icon" style="color:var(--accent2);background:rgba(85,168,255,0.1);border-color:rgba(85,168,255,0.22);">${icon('card')}</div><h4>${esc(c.name)}</h4><p>${esc(c.desc)}</p>`;
-   drawnGrid.appendChild(el);
+ const list=document.getElementById('cardsList'); list.innerHTML='';
+ if(!state.cards.length){list.innerHTML='<div class="card-empty">Your deck is empty. Add cards above to start.</div>';return;}
+ state.cards.forEach((c,i)=>{
+   const row=document.createElement('div');row.className='deck-row';
+   row.innerHTML=`<div><div class="deck-name">${esc(c.name)}</div><div class="deck-state">Available card ${i+1}</div></div>
+     <div class="deck-actions"><button class="btn sm primary">Draw</button><button class="icon-btn" title="Remove">${icon('trash')}</button></div>`;
+   row.querySelector('.primary').onclick=()=>drawSpecific(i);
+   row.querySelector('.icon-btn').onclick=()=>{state.cards.splice(i,1);save();renderCards();toast('Card removed')};
+   list.appendChild(row);
  });
 }
-
-document.getElementById('addCardBtn').onclick=()=>document.getElementById('customCardModal').classList.add('show');
-document.getElementById('saveCardBtn').onclick=()=>{
- const n=document.getElementById('customCardName').value.trim(),d=document.getElementById('customCardDesc').value.trim();
- if(!n)return;
- state.cards.push({id:'custom_'+Date.now(),name:n,desc:d||'Custom card effect.'});
- document.getElementById('customCardName').value='';document.getElementById('customCardDesc').value='';
- closeModal('customCardModal');save();renderCards();toast('Custom card added');
+function showDrawResult(cards){
+ const box=document.getElementById('drawResult'), list=document.getElementById('drawResultList');
+ list.innerHTML=cards.map(c=>`<span class="draw-pill">${esc(c.name)}</span>`).join('');
+ box.classList.remove('hidden');
+}
+function drawSpecific(index){
+ if(index<0||index>=state.cards.length)return;
+ const picked=state.cards.splice(index,1);
+ save();renderCards();showDrawResult(picked);toast('Card drawn');
+}
+function drawRandom(count){
+ const available=state.cards.length;
+ if(!available){toast('Your card deck is empty. Add cards first.');return;}
+ count=Math.max(1,Math.floor(count||1));
+ if(count>available){toast(`You only have ${available} card${available===1?'':'s'} available.`);return;}
+ const pool=[...state.cards],picked=[];
+ while(picked.length<count){picked.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);}
+ const ids=new Set(picked.map(c=>c.id));
+ state.cards=state.cards.filter(c=>!ids.has(c.id));
+ save();renderCards();showDrawResult(picked);toast(`${picked.length} random card${picked.length===1?'':'s'} drawn`);
+}
+document.getElementById('addCardsBtn').onclick=()=>{
+ const names=document.getElementById('cardInput').value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+ if(!names.length){toast('Write at least one card first.');return;}
+ names.forEach(name=>state.cards.push({id:'card_'+Date.now()+'_'+Math.random().toString(36).slice(2),name}));
+ document.getElementById('cardInput').value='';save();renderCards();toast(`${names.length} card${names.length===1?'':'s'} added`);
 };
-
-document.getElementById('randomCardsBtn').onclick=()=>{
- const count = parseInt(document.getElementById('randomCount').value);
- if(isNaN(count) || count <= 0){
-   toast('Please enter a valid count');
-   return;
- }
- if(state.cards.length === 0){
-   toast('No cards available! Add custom cards first.');
-   return;
- }
- if(count > state.cards.length){
-   toast(`Warning: Only ${state.cards.length} card(s) available in pool! Cannot draw ${count}.`);
-   return;
- }
-
- const pool=[...state.cards], out=[];
- for(let i=0; i<count; i++){
-   const idx = Math.floor(Math.random()*pool.length);
-   out.push(pool.splice(idx,1)[0]);
- }
- state.drawnCards = out;
- save(); renderCards();
- toast(`${out.length} random card(s) drawn!`);
+document.getElementById('drawOneBtn').onclick=()=>drawRandom(1);
+document.getElementById('drawManyBtn').onclick=()=>drawRandom(+document.getElementById('randomCount').value||1);
+document.getElementById('clearDeckBtn').onclick=()=>{
+ if(!state.cards.length){toast('The deck is already empty.');return;}
+ askConfirm('Clear all available cards?',()=>{state.cards=[];save();renderCards();document.getElementById('drawResult').classList.add('hidden');toast('Deck cleared');});
 };
-
+document.getElementById('swapPlayerBtn').onclick=()=>{
+ const slot=document.getElementById('editSlot').value;
+ if(slot.startsWith('bench')){toast('Choose a starting XI player first.');return;}
+ const choices=document.getElementById('swapChoices');choices.innerHTML='';
+ state.bench.forEach((pl,i)=>{
+   const b=document.createElement('button');b.className='choice-btn';b.textContent=`${pl.name||'Empty slot'} • ${pl.pos}`;
+   b.onclick=()=>{
+     const temp=state.players[slot];
+     state.players[slot]=pl;
+     state.bench[i]={...temp,pos:pl.pos||BENCH_POS[i]};
+     closeModal('swapModal');render();toast('Players swapped');
+   };
+   choices.appendChild(b);
+ });
+ closeModal('playerModal');document.getElementById('swapModal').classList.add('show');
+};
 document.getElementById('exportBtn').onclick=()=>{
  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(state.squadName||'squadforge-squad')+'.json';a.click();URL.revokeObjectURL(a.href);toast('Squad exported');
 };
@@ -484,11 +478,20 @@ document.getElementById('fileInput').onchange=e=>{
  const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state={...initialState(),...JSON.parse(r.result)};save();render();toast('Squad imported')}catch(x){toast('Invalid squad file')}};r.readAsText(f);e.target.value='';
 };
 document.getElementById('resetBtn').onclick=()=>{
- state=initialState();save();render();toast('Everything reset');
+ askConfirm('Reset the entire squad, budget, club and cards? This cannot be undone.',()=>{state=initialState();save();render();toast('Everything reset')})
 };
-
-function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>x.classList.remove('show'),3000)}
+let confirmAction=null;
+function askConfirm(message,action){
+  document.getElementById('confirmMessage').textContent=message;
+  confirmAction=action;
+  document.getElementById('confirmModal').classList.add('show');
+}
+document.getElementById('confirmYes').onclick=()=>{
+  const action=confirmAction; confirmAction=null; closeModal('confirmModal'); if(action) action();
+};
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>x.classList.remove('show'),1800)}
 render();
 </script>
+
 </body>
 </html>
